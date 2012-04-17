@@ -3,6 +3,23 @@
 # jade4j - a jade implementation written in Java
 jade4j's intention is to be able to process jade templates in Java without the need of a JavaScript environment, while being **fully compatible** with the original jade syntax.
 
+## Contents
+
+- [Example](#example)
+- [Syntax](#syntax)
+- [Usage](#usage)
+- [Simple static API](#simple-api)
+- [Full API](#api)
+    - [Caching](#api-caching)
+    - [Output Formatting](#api-output)
+    - [Filters](#api-filters)
+    - [Model Defaults](#api-model-defaults)
+    - [Template Loader](#api-template-loader)
+- [Differences](#differences)
+- [Authors](#authors)
+- [License](#license)
+
+
 ## Example
 
 index.jade
@@ -80,6 +97,7 @@ add the dependency to your `pom.xml`
 
 or directly use the `jade4j-0.2.0.jar` located in your target directory.
 
+<a name="simple-api"></a>
 ## Simple static API
 
 Parsing template and and generating template in one step.
@@ -101,7 +119,8 @@ Streaming output using a `java.io.Writer`
 Jade4J.render(template, model, writer);
 ```
 
-## Flexible and convenient API
+<a name="api"></a>
+## Full API
 
 If you need more control you can instanciate a `JadeConfiguration` object.
 
@@ -116,7 +135,8 @@ model.put("company", "neuland");
 config.renderTemplate(template, model);
 ```
 
-### caching
+<a name="api-caching"></a>
+### Caching
 
 The `JadeConfiguration` handles template caching for you. If you request the same unmodified template twice you'll get the same instance and avoid unnecesarry parsing.
 
@@ -126,7 +146,8 @@ JadeTemplate t2 = config.getTemplate("index.jade");
 t1.equals(t2) // true
 ```
 
-### output formatting
+<a name="api-output"></a>
+### Output Formatting
 
 By default Jade4J produces compressed HTML without unneeded whitespace. You can change this behaviour by enabling PrettyPrint.
 
@@ -134,33 +155,32 @@ By default Jade4J produces compressed HTML without unneeded whitespace. You can 
 config.setPrettyPrint(true);
 ```
 
-### HTML vs. XHTML vs. XML
-
 Jade detects if it has to generate HTML or XML code by your specified [doctype](https://github.com/visionmedia/jade#a6-11).
 
 If you are rendering partial templates that don't include a doctype you can set the generation mode manually.
 
     input(checked=true)
 
-**HTML5** (default)
+HTML5 (default)
 
     config.setTerse(true);
     config.setXML(false);
     // <input checked>
 
-**XHTML**
+XHTML
 
     config.setTerse(false);
     config.setXML(false);
     // <input checked="true" />
 
-**XML**
+XML
 
     config.setTerse(false);
     config.setXML(true);
     // <input checked="true"></input>
 
-### adding filters
+<a name="api-filters"></a>
+### Filters
 
 Filters allow embedding content like `markdown` or `coffeescript` into your jade template.
 
@@ -182,7 +202,8 @@ jade4j comes with a `plain` and `cdata` filter. `plain` takes your input to pass
 
 To implement your own filter you have to implement the `Filter` Interface. If your filter doesn't use any data from the model you can inherit from the abstract `CachingFilter` and also get caching for free. See the [neuland/jade4j-coffeescript-filter](https://github.com/neuland/jade4j-coffeescript-filter) project as an example.
 
-### define model defaults
+<a name="api-model-defaults"></a>
+### Model Defaults
 
 If you are using multiple templates, you might have the need for a set of default objects that are available in all templates.
 
@@ -194,7 +215,8 @@ defaults.put("url", new MyUrlHelper());
 config.setSharedVariables(defaults);
 ```
 
-### bring your own template loader
+<a name="api-template-loader"></a>
+### Template Loader
 
 By default jade4j searches for template files in your work directory. By specifying your own `FileTemplateLoader` you can alter that behaviour. You can also implement the `TemplateLoader` interface to create your own.
 
@@ -203,6 +225,7 @@ TemplateLoader loader = new FileTemplateLoader("/templates/", "UTF-8");
 config.setTemplateLoader(loader);
 ```
 
+<a name="differences"></a>
 ## Differences
 
 The original jade implementation uses JavaScript for expression handling in `if`, `unless`, `for`, `case` commands, like this
@@ -224,19 +247,24 @@ in jade4j:
 
 However, in most cases you would not create new objects in templates anyway.
 
+<a name="framework-integrations"></a>
 ## Framework Integrations
 
 If you want to use jade4j with Spring check out our [neuland/spring-jade4j](https://github.com/neuland/spring-jade4j) project.
 
+<a name="authors"></a>
 ## Authors
 
 - Artur Tomas / [atomiccoder](https://github.com/atomiccoder)
 - Stefan Kuper / [planetk](https://github.com/planetk)
 - Michael Geers / [naltatis](https://github.com/naltatis)
 
+Special thanks to [TJ Holowaychuk](https://github.com/visionmedia) the creator of jade!
+
+<a name="license"></a>
 ## License
 
-(The MIT License)
+The MIT License
 
 Copyright (C) 2011-2012 [neuland Büro für Informatik](http://www.neuland-bfi.de/), Bremen, Germany
 
