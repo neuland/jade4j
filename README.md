@@ -233,9 +233,9 @@ The original jade implementation uses JavaScript for expression handling in `if`
     if book.price < 5.50 && book.available
       p.sale special offer
 
-We decided to use OGNL instead of a JavaScript interpreter like Rhino. OGNL's syntax and handling of `falsy` values is very similar to JavaScript. There are although some differences when it comes to `array` and `object/map` creation in the template:
+We decided to use [OGNL](http://en.wikipedia.org/wiki/OGNL) instead of a JavaScript interpreter like Rhino. OGNL's syntax and handling of `falsy` values is very similar to JavaScript. There are although some differences when it comes to `array` and `object/map` creation in the template:
 
-in original jade:
+in jade.js:
 
     names = ["artur", "stefan"]
     book = {name: "My Diary", pages: 10}
