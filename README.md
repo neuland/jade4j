@@ -1,0 +1,245 @@
+# jade4j - a jade implementation written in Java
+jade4j's intention is to be able to process jade templates in Java without the need of a JavaScript environment, while being **fully compatible** with the original jade syntax.
+
+## Example
+
+index.jade
+
+```
+!!! 5
+html
+  head
+    title= pageName
+  body
+    ol#books
+      for book in books
+        if book.available
+          li #{book.name} for #{book.price} €
+```
+
+Java model
+
+```java
+List<Book> books = new ArrayList<Book>();
+books.add(new Book("The Hitchhiker's Guide to the Galaxy", 5.70, true));
+books.add(new Book("Life, the Universe and Everything", 5,60, false));
+books.add(new Book("The Restaurant at the End of the Universe", 5.40, true));
+
+Map<String, Object> model = new HashMap<String, Object>();
+model.put("books", books);
+model.put("pageName", "My Bookshelf")
+```
+
+running the above code through `String html = Jade4J.render("./index.jade", model)` will result in the following output:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Bookshelf</title>
+  </head>
+  <body>
+    <ol id="books">
+      <li>The Hitchhiker's Guide to the Galaxy for 5,70 €</li>
+      <li>The Restaurant at the End of the Universe for 5,40 €</li>
+    </ol>
+  </body>
+</html>
+```
+
+## Syntax
+
+see the original [visionmedia/jade documentation](https://github.com/visionmedia/jade#a6).
+
+## Usage
+
+clone this repository
+
+```bash
+git clone https://github.com/neuland/jade4j.git
+```
+
+build it using `maven`
+
+```bash
+cd jade4j
+mvn install
+```
+
+add the dependency to your `pom.xml`
+
+```xml
+<dependency>
+    <groupId>de.neuland</groupId>
+    <artifactId>jade4j</artifactId>
+    <version>0.2.0</version>
+</dependency>
+```
+
+or directly use the `jade4j-0.2.0.jar` located in your target directory.
+
+## Simple static API
+
+Parsing template and and generating template in one step.
+
+```java
+String html = Jade4J.render("./index.jade", model);
+```
+
+If you use this in production you would probalby do the template parsing only once per template and call the render method with different models.
+
+```java
+JadeTemplate template = Jade4J.getTemplate("./index.jade");
+String html = Jade4J.render(template, model);
+```
+
+Streaming output using a `java.io.Writer`
+
+```java
+Jade4J.render(template, model, writer);
+```
+
+## Flexible and convenient API
+
+If you need more control you can instanciate a `JadeConfiguration` object.
+
+```java
+JadeConfiguration config = new JadeConfiguration();
+
+JadeTemplate template = config.getTemplate("index");
+
+Map<String, Object> model = new HashMap<String, Object>();
+model.put("company", "neuland");
+
+config.renderTemplate(template, model);
+```
+
+### caching
+
+The `JadeConfiguration` handles template caching for you. If you request the same unmodified template twice you'll get the same instance and avoid unnecesarry parsing.
+
+```java
+JadeTemplate t1 = config.getTemplate("index.jade");
+JadeTemplate t2 = config.getTemplate("index.jade");
+t1.equals(t2) // true
+```
+
+### output formatting
+
+By default Jade4J produces compressed HTML without unneeded whitespace. You can change this behaviour by enabling PrettyPrint.
+
+```java
+config.setPrettyPrint(true);
+```
+
+### HTML vs. XHTML vs. XML
+
+Jade detects if it has to generate HTML or XML code by your specified [doctype](https://github.com/visionmedia/jade#a6-11).
+
+If you are rendering partial templates that don't include a doctype you can set the generation mode manually.
+
+    input(checked=true)
+
+**HTML5** (default)
+
+    config.setTerse(true);
+    config.setXML(false);
+    // <input checked>
+
+**XHTML**
+
+    config.setTerse(false);
+    config.setXML(false);
+    // <input checked="true" />
+
+**XML**
+
+    config.setTerse(false);
+    config.setXML(true);
+    // <input checked="true"></input>
+
+### adding filters
+
+Filters allow embedding content like `markdown` or `coffeescript` into your jade template.
+
+    script
+      :coffeescript
+        sayHello -> alert "hello world"
+
+will generate
+
+    <script>
+      sayHello(function() {
+        return alert("hello world");
+      });
+    </script>
+
+jade4j comes with a `plain` and `cdata` filter. `plain` takes your input to pass it directly through, `cdata` wraps your content in `<![CDATA[...]]>`. You can add your custom filters to your configuration.
+
+    config.setFilter("coffeescript", new CoffeeScriptFilter());
+
+To implement your own filter you have to implement the `Filter` Interface. If your filter doesn't use any data from the model you can inherit from the abstract `CachingFilter` and also get caching for free. See the [neuland/jade4j-coffeescript-filter](https://github.com/neuland/jade4j-coffeescript-filter) project as an example.
+
+### define model defaults
+
+If you are using multiple templates, you might have the need for a set of default objects that are available in all templates.
+
+```java
+Map<String, Object> defaults = new HashMap<String, Object>();
+defaults.put("city", "Bremen");
+defaults.put("country", "Germany");
+defaults.put("url", new MyUrlHelper());
+config.setSharedVariables(defaults);
+```
+
+### bring your own template loader
+
+By default jade4j searches for template files in your work directory. By specifying your own `FileTemplateLoader` you can alter that behaviour. You can also implement the `TemplateLoader` interface to create your own.
+
+```java
+TemplateLoader loader = new FileTemplateLoader("/templates/", "UTF-8");
+config.setTemplateLoader(loader);
+```
+
+## Differences
+
+The original jade implementation uses JavaScript for expression handling in `if`, `unless`, `for`, `case` commands, like this
+
+    if book.price < 5.50 && book.available
+      p.sale special offer
+
+We decided to use OGNL instead of a JavaScript interpreter like Rhino. OGNL's syntax and handling of `falsy` values is very similar to JavaScript. There are although some differences when it comes to `array` and `object/map` creation in the template:
+
+in original jade:
+
+    names = ["artur", "stefan"]
+    book = {name: "My Diary", pages: 10}
+
+in jade4j:
+
+    names = {"artur", "stefan"}
+    book = #{"name": "My Diary", "pages": "10"}
+
+However, in most cases you would not create new objects in templates anyway.
+
+## Framework Integrations
+
+If you want to use jade4j with Spring check out our [neuland/spring-jade4j](https://github.com/neuland/spring-jade4j) project.
+
+## Authors
+
+- Artur Tomas / [atomiccoder](https://github.com/atomiccoder)
+- Stefan Kuper / [planetk](https://github.com/planetk)
+- Michael Geers / [naltatis](https://github.com/naltatis)
+
+## License
+
+(The MIT License)
+
+Copyright (C) 2011-2012 [neuland Büro für Informatik](http://www.neuland-bfi.de/), Bremen, Germany
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

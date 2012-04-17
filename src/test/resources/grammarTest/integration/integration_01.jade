@@ -1,0 +1,66 @@
+!!! 5
+h1 Bestellung eingegangen
+.cols.pc50
+  .col
+    .framed.box
+      h3 Vielen Dank
+    .padding
+        p Ihre Bestellung ist bei uns eingegangen.
+        p Sie erhalten eine Best?tigung mit allen Positionen an vin Ihnen angegebene E-Mail Adresse
+          strong max.mustermann@vielkauf.de
+        ="."
+
+h3 Ihre Bestellung
+table.cart
+  thead
+    tr
+      th#thCartArticle Artikel 6
+      th.c2#thCartQty Menge
+      th.c3#thCartUnitPriceAfterTax Brutto [&euro;]
+      th.c4#thCartUnitRebate Rabatt [&euro;]          
+      th.c5#thCartUnitPricePreTax Netto [&euro;]
+      th.c6#thCartSum Summe [&euro;]
+    tbody.articles
+      - each cartEntry in model.order.cart.cartEntries
+        != partial('carts/cartentry', {cartEntry: cartEntry})
+  //
+    tbody.coupon
+      tr
+        td(colspan="6")
+          h2 Coupon einl?sen
+          .td
+            p Sie haben einen Coupon von Gartenland erhalten? Dann l?sen Sie ihn jetzt bitte ein!
+            div
+              label Coupon-Nummer:&nbsp;
+              input#coupon-no(maxlength="12", name="coupon-no", size="12", type="text")
+              &nbsp;
+              button#refresh(name="refresh", type="button") Gesamtsumme aktualisieren
+  //
+    tbody.note
+      tr
+        td(colspan="6")
+          .td
+            p Finanzierung ab 100,&ndash;&nbsp;&euro; Gesamtwarenwert
+            p
+              a.button(href="#") Finanzierung berechnen
+   tfoot.totals
+    tr
+      th#thTotal(colspan="5") Gesamtwarenwert
+      td.c6(headers="thCartSum")
+        .td 1.234,56
+    tr
+      th#thShippingCost(colspan="5") Versandkosten
+      td.c6(headers="thShippingCost")
+        .td 34,56
+    tr
+      th#thGrandTotal(colspan="5")
+        = "Gesamtsumme"
+        br
+        small inkl. gesetzl. MwSt.
+      td.c6(headers="thGrandTotal")
+        .td 1.269,12
+#ccartmessage
+  h3 Nachricht:
+  p
+    != model.order.cart.message
+

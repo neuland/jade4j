@@ -1,0 +1,11 @@
+{
+"hallo": "welt",
+"one": 1,
+"zero": 0,
+"double": 1.23,
+"emptyList": [],
+"list": ["entry"],
+"emptyArray": [],
+"array": [1],
+"emptyString": ""
+}

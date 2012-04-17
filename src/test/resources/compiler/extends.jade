@@ -1,0 +1,18 @@
+extends layout
+
+block bar
+  p special bar
+  
+append listA
+  li 3
+  li 4
+  
+prepend listB
+  li a
+  li b
+  
+block prepend world
+  | hello
+  
+block append hello
+  |  world
