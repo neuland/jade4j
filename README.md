@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/neuland/jade4j.png?branch=master)](http://travis-ci.org/neuland/jade4j)
+
 # jade4j - a jade implementation written in Java
 jade4j's intention is to be able to process jade templates in Java without the need of a JavaScript environment, while being **fully compatible** with the original jade syntax.
 
