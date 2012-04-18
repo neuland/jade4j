@@ -72,30 +72,45 @@ see the original [visionmedia/jade documentation](https://github.com/visionmedia
 
 ## Usage
 
-clone this repository
+### via Maven
+
+We are using Github to for Maven hosting. Just add this repository ...
+
+```xml
+<repositories>
+  <repository>
+    <id>jade4j-releases</id>
+    <url>https://github.com/neuland/jade4j/raw/master/releases</url>
+  </repository>
+</repositories>
+```
+
+... and dependency definitions to your `pom.xml`.
+
+```xml
+<dependency>
+  <groupId>de.neuland</groupId>
+  <artifactId>jade4j</artifactId>
+  <version>0.2.0</version>
+</dependency>
+```
+
+### build it yourself
+
+Clone this repository ...
 
 ```bash
 git clone https://github.com/neuland/jade4j.git
 ```
 
-build it using `maven`
+... build it using `maven` ...
 
 ```bash
 cd jade4j
 mvn install
 ```
 
-add the dependency to your `pom.xml`
-
-```xml
-<dependency>
-    <groupId>de.neuland</groupId>
-    <artifactId>jade4j</artifactId>
-    <version>0.2.0</version>
-</dependency>
-```
-
-or directly use the `jade4j-0.2.0.jar` located in your target directory.
+... and use the `jade4j-0.x.x.jar` located in your target directory.
 
 <a name="simple-api"></a>
 ## Simple static API
