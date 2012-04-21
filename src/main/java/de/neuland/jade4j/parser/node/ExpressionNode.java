@@ -24,19 +24,19 @@ public class ExpressionNode extends Node {
 
 	@Override
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
-        try {
-            Object result = ExpressionHandler.evaluateExpression(getValue(), model);
-            if (result == null || !buffer) {
-                return;
-            }
-            String string = result.toString();
-            if (escape) {
-                string = StringEscapeUtils.escapeHtml4(string);
-            }
-            writer.append(string);
-        } catch (ExpressionException e) {
-            throw new JadeCompilerException(this, e);
-        }
+		try {
+			Object result = ExpressionHandler.evaluateExpression(getValue(), model);
+			if (result == null || !buffer) {
+				return;
+			}
+			String string = result.toString();
+			if (escape) {
+				string = StringEscapeUtils.escapeHtml4(string);
+			}
+			writer.append(string);
+		} catch (ExpressionException e) {
+			throw new JadeCompilerException(this, template.getTemplateLoader(), e);
+		}
 	}
 
 	@Override

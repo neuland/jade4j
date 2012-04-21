@@ -15,21 +15,21 @@ public class ConditionalNode extends Node {
 
 	@Override
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
-	    try {
-    		if (!conditionActive) {
-    			this.block.execute(writer, model, template);
-    		} else {
-    			Boolean conditionCheck;
-                    conditionCheck = checkCondition(model) ^ inverseCondition;
-    			if (conditionCheck) {
-    				this.block.execute(writer, model, template);
-    			} else if (elseNode != null) {
-    				this.elseNode.execute(writer, model, template);
-    			}
-    		}
-	    } catch (ExpressionException e) {
-	        throw new JadeCompilerException(this, e);
-	    }
+		try {
+			if (!conditionActive) {
+				this.block.execute(writer, model, template);
+			} else {
+				Boolean conditionCheck;
+				conditionCheck = checkCondition(model) ^ inverseCondition;
+				if (conditionCheck) {
+					this.block.execute(writer, model, template);
+				} else if (elseNode != null) {
+					this.elseNode.execute(writer, model, template);
+				}
+			}
+		} catch (ExpressionException e) {
+			throw new JadeCompilerException(this, template.getTemplateLoader(), e);
+		}
 	}
 
 	private boolean checkCondition(JadeModel model) throws ExpressionException {

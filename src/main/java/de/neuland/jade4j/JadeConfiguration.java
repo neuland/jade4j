@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.neuland.jade4j.exceptions.JadeCompilerException;
+import de.neuland.jade4j.exceptions.JadeException;
 import de.neuland.jade4j.filter.CDATAFilter;
 import de.neuland.jade4j.filter.Filter;
 import de.neuland.jade4j.filter.PlainFilter;
@@ -22,6 +23,10 @@ import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.template.TemplateLoader;
 
 public class JadeConfiguration {
+
+	private static final String FILTER_CDATA = "cdata";
+
+	private static final String FILTER_PLAIN = "plain";
 
 	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.getLogger(JadeConfiguration.class);
@@ -36,8 +41,8 @@ public class JadeConfiguration {
 	protected static final int MAX_ENTRIES = 1000;
 
 	public JadeConfiguration() {
-		setFilter("plain", new PlainFilter());
-		setFilter("cdata", new CDATAFilter());
+		setFilter(FILTER_PLAIN, new PlainFilter());
+		setFilter(FILTER_CDATA, new CDATAFilter());
 	}
 
 	private Map<String, JadeTemplate> cache = new LinkedHashMap<String, JadeTemplate>(MAX_ENTRIES + 1, .75F, true) {
@@ -48,7 +53,7 @@ public class JadeConfiguration {
 		}
 	};
 
-	public JadeTemplate getTemplate(String name) throws IOException {
+	public JadeTemplate getTemplate(String name) throws IOException, JadeException {
 
 		long lastModified = templateLoader.getLastModified(name);
 
@@ -68,18 +73,19 @@ public class JadeConfiguration {
 		template.process(jadeModel, writer);
 	}
 
-	public String renderTemplate(JadeTemplate template, Map<String, Object> model) {
+	public String renderTemplate(JadeTemplate template, Map<String, Object> model) throws JadeCompilerException {
 		StringWriter writer = new StringWriter();
 		renderTemplate(template, model, writer);
 		return writer.toString();
 	}
 
-	private JadeTemplate createTemplate(String name, long lastModified) throws IOException {
+	private JadeTemplate createTemplate(String name, long lastModified) throws JadeException, IOException {
 		JadeTemplate template = new JadeTemplate();
 		template.setLastmodified(lastModified);
 
 		Parser parser = new Parser(name, templateLoader);
 		Node root = parser.parse();
+		template.setTemplateLoader(templateLoader);
 		template.setRootNode(root);
 		template.setPrettyPrint(prettyPrint);
 		template.setTerse(terse);

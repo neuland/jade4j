@@ -15,7 +15,7 @@ public class AssigmentNode extends Node {
 		try {
 			result = ExpressionHandler.evaluateExpression(value, model);
 		} catch (ExpressionException e) {
-			throw new JadeCompilerException(this, e);
+			throw new JadeCompilerException(this, template.getTemplateLoader(), e);
 		}
 		model.put(name, result);
 	}

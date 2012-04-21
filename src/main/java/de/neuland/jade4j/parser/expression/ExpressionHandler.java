@@ -5,16 +5,10 @@ import java.util.Map;
 
 import ognl.Ognl;
 import ognl.OgnlException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.model.JadeModel;
 
 public class ExpressionHandler {
-
-	private static final Logger logger = LoggerFactory.getLogger(ExpressionHandler.class);
 
 	private static final int MAX_ENTRIES = 5000;
 

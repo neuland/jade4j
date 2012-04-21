@@ -14,6 +14,7 @@ public class JadeTemplate {
 	private Long lastmodified;
 	private boolean terse = true;
 	private boolean xml = false;
+	private TemplateLoader templateLoader;
 
 	public void process(JadeModel model, Writer writer) throws JadeCompilerException {
 		Compiler compiler = new Compiler(rootNode);
@@ -60,5 +61,13 @@ public class JadeTemplate {
 
 	public boolean isXml() {
 		return xml;
+	}
+
+	public void setTemplateLoader(TemplateLoader templateLoader) {
+		this.templateLoader = templateLoader;
+	}
+
+	public TemplateLoader getTemplateLoader() {
+		return templateLoader;
 	}
 }

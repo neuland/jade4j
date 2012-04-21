@@ -47,7 +47,6 @@ import de.neuland.jade4j.parser.node.CaseNode;
 import de.neuland.jade4j.parser.node.ConditionalNode;
 import de.neuland.jade4j.parser.node.DoctypeNode;
 import de.neuland.jade4j.parser.node.EachNode;
-import de.neuland.jade4j.parser.node.ErrorNode;
 import de.neuland.jade4j.parser.node.ExpressionNode;
 import de.neuland.jade4j.parser.node.FilterNode;
 import de.neuland.jade4j.parser.node.LiteralNode;
@@ -153,7 +152,7 @@ public class Parser {
 		if (token instanceof Yield) {
 			return parseYield();
 		}
-		throw new JadeParserException(filename, lexer.getLineno(), token);
+		throw new JadeParserException(filename, lexer.getLineno(), templateLoader, token);
 	}
 
 	private Node parseComment() {
@@ -206,9 +205,6 @@ public class Parser {
 		Node blockNode;
 		if (peek() instanceof Indent) {
 			blockNode = block();
-			if (blockNode instanceof ErrorNode) {
-				return blockNode;
-			}
 		} else {
 			blockNode = new BlockNode();
 			blockNode.setLineNumber(block.getLineNumber());
@@ -271,8 +267,8 @@ public class Parser {
 		try {
 			return new Parser(templateUri.toString(), templateLoader);
 		} catch (IOException e) {
-			throw new JadeParserException(filename, lexer.getLineno(), "the template [" + templateName + "] could not be open\n"
-					+ e.getMessage());
+			throw new JadeParserException(filename, lexer.getLineno(), templateLoader, "the template [" + templateName
+					+ "] could not be opened\n" + e.getMessage());
 		}
 	}
 
@@ -671,7 +667,7 @@ public class Parser {
 		if (t.getClass().equals(expectedTokenClass)) {
 			return nextToken();
 		} else {
-			throw new JadeParserException(filename, lexer.getLineno(), expectedTokenClass, t.getClass());
+			throw new JadeParserException(filename, lexer.getLineno(), templateLoader, expectedTokenClass, t.getClass());
 		}
 	}
 

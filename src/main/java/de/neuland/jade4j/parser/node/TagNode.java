@@ -2,7 +2,6 @@ package de.neuland.jade4j.parser.node;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,22 +17,12 @@ import de.neuland.jade4j.parser.expression.ExpressionHandler;
 import de.neuland.jade4j.template.JadeTemplate;
 
 public class TagNode extends Node {
-
-	private LinkedList<CssClassNode> cssNodes = new LinkedList<CssClassNode>();
 	private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
 	private Map<String, List<Object>> preparedAttributeValues = new HashMap<String, List<Object>>();
 	private boolean textOnly;
 	private Node textNode;
 	private Node codeNode;
 	private String[] selfClosing = { "meta", "img", "link", "input", "area", "base", "col", "br", "hr", "source" };
-
-	public void addCssClass(CssClassNode cssClassNode) {
-		cssNodes.add(cssClassNode);
-	}
-
-	public LinkedList<CssClassNode> getCssNodes() {
-		return cssNodes;
-	}
 
 	public Map<String, Object> getAttributes() {
 		return attributes;
@@ -135,7 +124,7 @@ public class TagNode extends Node {
 				try {
 					attributeString = getAttributeString(name, value, model, template);
 				} catch (ExpressionException e) {
-					throw new JadeCompilerException(this, e);
+					throw new JadeCompilerException(this, template.getTemplateLoader(), e);
 				}
 				sb.append(attributeString);
 			}
@@ -146,7 +135,7 @@ public class TagNode extends Node {
 	private String getAttributeString(String name, Object attribute, JadeModel model, JadeTemplate template) throws ExpressionException {
 		String value = null;
 		if (attribute instanceof String) {
-			value = getInterpolatedAttributeValue(name, attribute, model);
+			value = getInterpolatedAttributeValue(name, attribute, model, template);
 		} else if (attribute instanceof Boolean) {
 			if ((Boolean) attribute) {
 				value = name;
@@ -193,7 +182,8 @@ public class TagNode extends Node {
 		return sb.toString();
 	}
 
-	private String getInterpolatedAttributeValue(String name, Object attribute, JadeModel model) throws JadeCompilerException {
+	private String getInterpolatedAttributeValue(String name, Object attribute, JadeModel model, JadeTemplate template)
+			throws JadeCompilerException {
 		if (!preparedAttributeValues.containsKey(name)) {
 			preparedAttributeValues.put(name, Utils.prepareInterpolate((String) attribute, true));
 		}
@@ -201,7 +191,7 @@ public class TagNode extends Node {
 		try {
 			return Utils.interpolate(prepared, model);
 		} catch (ExpressionException e) {
-			throw new JadeCompilerException(this, e);
+			throw new JadeCompilerException(this, template.getTemplateLoader(), e);
 		}
 	}
 }

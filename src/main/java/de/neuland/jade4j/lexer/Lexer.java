@@ -50,9 +50,11 @@ public class Lexer {
 	private boolean attributeMode;
 	private Reader reader;
 	private final String filename;
+	private final TemplateLoader templateLoader;
 
 	public Lexer(String filename, TemplateLoader templateLoader) throws IOException {
 		this.filename = filename;
+		this.templateLoader = templateLoader;
 		reader = templateLoader.getReader(filename);
 		options = new LinkedList<String>();
 		scanner = new Scanner(reader);
@@ -153,7 +155,7 @@ public class Lexer {
 			token = dot();
 		}
 		if (token == null) {
-			throw new JadeLexerException("token not recognized", filename, getLineno(), scanner.getInput());
+			throw new JadeLexerException("token not recognized", filename, getLineno(), templateLoader);
 		}
 
 		return token;
@@ -602,7 +604,7 @@ public class Lexer {
 			consume(indents + 1);
 
 			if ((indents > 0 && lastIndents > 0 && indents % lastIndents != 0) || scanner.isIntendantionViolated()) {
-				throw new JadeLexerException("invalid indentation", filename, getLineno(), scanner.getInput());
+				throw new JadeLexerException("invalid indentation", filename, getLineno(), templateLoader);
 			}
 
 			// blank line

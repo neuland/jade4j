@@ -13,9 +13,6 @@ public class BlockNode extends Node {
 
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
 		for (Node node : getNodes()) {
-			if (node == null) {
-				throw new JadeCompilerException(this, "this should never happen :)");
-			}
 			node.execute(writer, model, template);
 		}
 	}

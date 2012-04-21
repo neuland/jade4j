@@ -21,16 +21,16 @@ public class MixinNode extends Node {
 		} else {
 			MixinNode mixin = model.getMixin(getName());
 			if (mixin == null) {
-				throw new JadeCompilerException(this, "mixin " + getName() + " is not defined");
+				throw new JadeCompilerException(this, template.getTemplateLoader(), "mixin " + getName() + " is not defined");
 			}
 			model.pushScope();
-			writeVariables(model, mixin);
+			writeVariables(model, mixin, template);
 			mixin.getBlock().execute(writer, model, template);
 			model.popScope();
 		}
 	}
 
-	private void writeVariables(JadeModel model, MixinNode mixin) {
+	private void writeVariables(JadeModel model, MixinNode mixin, JadeTemplate template) {
 		List<String> names = mixin.getArguments();
 		List<String> values = arguments;
 		if (names == null) {
@@ -42,7 +42,7 @@ public class MixinNode extends Node {
 			try {
 				value = Ognl.getValue(values.get(i), model);
 			} catch (OgnlException e) {
-				throw new JadeCompilerException(this, e);
+				throw new JadeCompilerException(this, template.getTemplateLoader(), e);
 			}
 			if (key != null) {
 				model.put(key, value);

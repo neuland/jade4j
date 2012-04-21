@@ -22,7 +22,7 @@ public class EachNode extends Node {
 		try {
 			result = ExpressionHandler.evaluateExpression(getCode(), model);
 		} catch (ExpressionException e) {
-			throw new JadeCompilerException(this, e);
+			throw new JadeCompilerException(this, template.getTemplateLoader(), e);
 		}
 		model.pushScope();
 		run(writer, model, result, template);

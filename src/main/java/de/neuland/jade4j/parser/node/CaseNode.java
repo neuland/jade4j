@@ -15,16 +15,16 @@ public class CaseNode extends Node {
 
 	@Override
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
-	    try {
-    		for (Node caseConditionNode : caseConditionNodes) {
-                if (((CaseConditionNode)caseConditionNode).isDefault() || checkCondition(model, caseConditionNode)) {
-                	caseConditionNode.execute(writer, model, template);
-                	break;
-                }
-    		}
-	    } catch (ExpressionException e) {
-	        throw new JadeCompilerException(this, e);
-	    }
+		try {
+			for (Node caseConditionNode : caseConditionNodes) {
+				if (((CaseConditionNode) caseConditionNode).isDefault() || checkCondition(model, caseConditionNode)) {
+					caseConditionNode.execute(writer, model, template);
+					break;
+				}
+			}
+		} catch (ExpressionException e) {
+			throw new JadeCompilerException(this, template.getTemplateLoader(), e);
+		}
 	}
 
 	private Boolean checkCondition(JadeModel model, Node caseConditionNode) throws ExpressionException {
@@ -32,7 +32,7 @@ public class CaseNode extends Node {
 	}
 
 	public void setConditions(List<Node> caseConditionNodes) {
-		this.caseConditionNodes = caseConditionNodes;		
+		this.caseConditionNodes = caseConditionNodes;
 	}
 
 }
