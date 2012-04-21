@@ -1,0 +1,92 @@
+<!DOCTYPE html><!--thanks to the play! framework (http://www.playframework.org/)--><html><head><title>Jade Compiler Exception</title><style>html, body, pre {
+  margin: 0;
+  padding: 0;
+  font-family: Monaco, 'Lucida Console';
+  background: #ECECEC;
+}
+h1 {
+  margin: 0;
+  background: #A31012;
+  padding: 20px 45px;
+  color: #fff;
+  text-shadow: 1px 1px 1px rgba(0,0,0,.3);
+  border-bottom: 1px solid #690000;
+  font-size: 28px;
+}
+p#detail {
+  margin: 0;
+  padding: 15px 45px;
+  background: #F5A0A0;
+  border-top: 4px solid #D36D6D;
+  color: #730000;
+  text-shadow: 1px 1px 1px rgba(255,255,255,.3);
+  font-size: 14px;
+  border-bottom: 1px solid #BA7A7A;
+}
+p#detail input {
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#AE1113), to(#A31012));
+  border: 1px solid #790000;
+  padding: 3px 10px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, .5);
+  color: white;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: Monaco, 'Lucida Console';
+  font-size: 12px;
+  margin: 0 10px;
+  display: inline-block;
+  position: relative;
+  top: -1px;
+}
+h2 {
+  margin: 0;
+  padding: 5px 45px;
+  font-size: 12px;
+  background: #333;
+  color: #fff;
+  text-shadow: 1px 1px 1px rgba(0,0,0,.3);
+  border-top: 4px solid #2a2a2a;
+}
+pre {
+  margin: 0;
+  border-bottom: 1px solid #DDD;
+  text-shadow: 1px 1px 1px rgba(255,255,255,.5);
+  position: relative;
+  font-size: 12px;
+  overflow: hidden;
+}
+pre span.line {
+  text-align: right;
+  display: inline-block;
+  padding: 5px 5px;
+  width: 30px;
+  background: #D6D6D6;
+  color: #8B8B8B;
+  text-shadow: 1px 1px 1px rgba(255,255,255,.5);
+  font-weight: bold;
+}
+pre span.code {
+  padding: 5px 5px;
+  position: absolute;
+  right: 0;
+  left: 40px;
+}
+pre:first-child span.code {
+  border-top: 4px solid #CDCDCD;
+}
+pre:first-child span.line {
+  border-top: 4px solid #B6B6B6;
+}
+pre.error span.line {
+  background: #A31012;
+  color: #fff;
+  text-shadow: 1px 1px 1px rgba(0,0,0,.3);
+}
+pre.error {
+  color: #A31012;
+}
+pre.error span.marker {
+  background: #A31012;
+  color: #fff;
+  text-shadow: 1px 1px 1px rgba(0,0,0,.3);
+}</style></head><body><h1>Jade Compiler Exception</h1><p id="detail">unable to evaluate [non.existing.query] - OgnlException source is null for getProperty(null, &quot;existing&quot;)</p><h2>In /Users/michael/Lab/neuland-jade4j/jade4j/target/test-classes/compiler/exceptions/error.jade at line 9.</h2><div><pre><span class="line">5</span><span class="code">    body {</span></pre><pre><span class="line">6</span><span class="code">      color: orange;</span></pre><pre><span class="line">7</span><span class="code">    }</span></pre><pre><span class="line">8</span><span class="code">  body</span></pre><pre class="error"><span class="line">9</span><span class="code">    h1= non.existing.query</span></pre><pre><span class="line">10</span><span class="code">    ul</span></pre><pre><span class="line">11</span><span class="code">      li At vero eos</span></pre><pre><span class="line">12</span><span class="code">      li Lorem ipsum dolor</span></pre></div></body></html>

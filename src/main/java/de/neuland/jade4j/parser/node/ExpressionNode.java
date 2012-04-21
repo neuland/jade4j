@@ -41,6 +41,6 @@ public class ExpressionNode extends Node {
 
 	@Override
 	public void setValue(String value) {
-		super.setValue(value);
+		super.setValue(value.trim());
 	}
 }

@@ -1,7 +1,8 @@
 !!! 5
+// thanks to the play! framework (http://www.playframework.org/)
 html
   head
-    title Compilation error
+    title= exception
     style
       html, body, pre {
         margin: 0;
@@ -96,13 +97,12 @@ html
         text-shadow: 1px 1px 1px rgba(0,0,0,.3);
       }
   body
-    h1 Compilation error
-    p#detail
-      | cannot find symbol [symbol: variable ren] [location: class views.html.index]
-    h2
-      | In /Users/michael/Lab/play-sample/app/controllers/Application.java
-      | at line 11.
+    h1= exception
+    p#detail= message
+    h2 In #{filename} at line #{linenumber}.
     div
-      pre.error
-        span.line 7
-        span.code
+      for line, i in lines
+        if i > linenumber - 6 && i < linenumber + 3
+          pre(class=(i+1 == linenumber ? "error" : false))
+            span.line= i+1
+            span.code= line

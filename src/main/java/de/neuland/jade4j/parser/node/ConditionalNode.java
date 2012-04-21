@@ -16,12 +16,12 @@ public class ConditionalNode extends Node {
 	@Override
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
 		try {
-			if (!conditionActive) {
+			if (!conditionActive && this.block != null) {
 				this.block.execute(writer, model, template);
 			} else {
 				Boolean conditionCheck;
 				conditionCheck = checkCondition(model) ^ inverseCondition;
-				if (conditionCheck) {
+				if (conditionCheck && this.block != null) {
 					this.block.execute(writer, model, template);
 				} else if (elseNode != null) {
 					this.elseNode.execute(writer, model, template);

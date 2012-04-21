@@ -2,12 +2,15 @@ package de.neuland.jade4j.exceptions;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
+import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.template.TemplateLoader;
 
 public abstract class JadeException extends RuntimeException {
@@ -57,12 +60,22 @@ public abstract class JadeException extends RuntimeException {
 	}
 
 	public String toHtmlString() {
-		// will be made pretty soon :)
-		StringWriter stringWriter = new StringWriter();
-		stringWriter.write(toString());
-		PrintWriter writer = new PrintWriter(stringWriter);
-		printStackTrace(writer);
-		writer.flush();
-		return "<pre>" + stringWriter.toString() + "</pre>";
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("filename", filename);
+		model.put("linenumber", lineNumber);
+		model.put("message", getMessage());
+		model.put("lines", getTemplateLines());
+		model.put("exception", getName());
+
+		try {
+			return Jade4J.render("src/main/resources/error.jade", model);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	private String getName() {
+		return this.getClass().getSimpleName().replaceAll("([A-Z])", " $1").trim();
 	}
 }

@@ -16,18 +16,41 @@ import de.neuland.jade4j.template.TemplateLoader;
 public class Jade4J {
 
 	public static String render(String filename, Map<String, Object> model) throws IOException, JadeCompilerException {
-		return templateToString(getTemplate(filename), model);
+		return render(filename, model, false);
+	}
+
+	public static String render(String filename, Map<String, Object> model, boolean pretty) throws IOException, JadeCompilerException {
+		JadeTemplate template = getTemplate(filename);
+		template.setPrettyPrint(pretty);
+		return templateToString(template, model);
 	}
 
 	public static void render(String filename, Map<String, Object> model, Writer writer) throws IOException, JadeCompilerException {
-		getTemplate(filename).process(new JadeModel(model), writer);
+		render(filename, model, writer, false);
+	}
+
+	public static void render(String filename, Map<String, Object> model, Writer writer, boolean pretty) throws IOException,
+			JadeCompilerException {
+		JadeTemplate template = getTemplate(filename);
+		template.setPrettyPrint(pretty);
+		template.process(new JadeModel(model), writer);
 	}
 
 	public static String render(JadeTemplate template, Map<String, Object> model) throws JadeCompilerException {
+		return render(template, model, true);
+	}
+
+	public static String render(JadeTemplate template, Map<String, Object> model, boolean pretty) throws JadeCompilerException {
+		template.setPrettyPrint(pretty);
 		return templateToString(template, model);
 	}
 
 	public static void render(JadeTemplate template, Map<String, Object> model, Writer writer) throws JadeCompilerException {
+		render(template, model, writer, true);
+	}
+
+	public static void render(JadeTemplate template, Map<String, Object> model, Writer writer, boolean pretty) throws JadeCompilerException {
+		template.setPrettyPrint(pretty);
 		template.process(new JadeModel(model), writer);
 	}
 
@@ -37,6 +60,7 @@ public class Jade4J {
 		Parser parser = new Parser(filename, loader);
 		Node root = parser.parse();
 		JadeTemplate template = new JadeTemplate();
+		template.setTemplateLoader(loader);
 		template.setRootNode(root);
 		return template;
 	}

@@ -155,7 +155,8 @@ public class Lexer {
 			token = dot();
 		}
 		if (token == null) {
-			throw new JadeLexerException("token not recognized", filename, getLineno(), templateLoader);
+			throw new JadeLexerException("token not recognized " + scanner.getInput().substring(0, 5), filename, getLineno(),
+					templateLoader);
 		}
 
 		return token;

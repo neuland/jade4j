@@ -167,6 +167,7 @@ public class Parser {
 		}
 		node.setBuffered(token.isBuffer());
 		node.setLineNumber(token.getLineNumber());
+		node.setFileName(filename);
 		node.setValue(token.getValue());
 
 		return node;
@@ -276,6 +277,7 @@ public class Parser {
 		nextToken();
 		BlockNode block = (BlockNode) new BlockNode();
 		block.setLineNumber(lexer.getLineno());
+		block.setFileName(filename);
 		block.setYield(true);
 		return block;
 	}
@@ -335,6 +337,7 @@ public class Parser {
 		Node node = new TextNode();
 		node.setValue(token.getValue());
 		node.setLineNumber(token.getLineNumber());
+		node.setFileName(filename);
 		return node;
 	}
 
@@ -346,6 +349,7 @@ public class Parser {
 		node.setKey(eachToken.getKey());
 		node.setCode(eachToken.getCode());
 		node.setLineNumber(eachToken.getLineNumber());
+		node.setFileName(filename);
 		node.setBlock(block());
 		return node;
 	}
@@ -356,6 +360,7 @@ public class Parser {
 		WhileNode node = new WhileNode();
 		node.setValue(whileToken.getValue());
 		node.setLineNumber(whileToken.getLineNumber());
+		node.setFileName(filename);
 		node.setBlock(block());
 		return node;
 	}
@@ -386,8 +391,8 @@ public class Parser {
 		Token token = nextToken();
 		String name = token.getValue();
 		TagNode tagNode = new TagNode();
-		tagNode.setFileName(filename);
 		tagNode.setLineNumber(lexer.getLineno());
+		tagNode.setFileName(filename);
 		tagNode.setName(name);
 		tagNode.setValue(name);
 
@@ -475,6 +480,7 @@ public class Parser {
 	private Node parseTextBlock() {
 		TextNode textNode = new TextNode();
 		textNode.setLineNumber(line());
+		textNode.setFileName(filename);
 		Token token = expect(Indent.class);
 		Indent indentToken = (Indent) token;
 		int spaces = indentToken.getIndents();
@@ -509,7 +515,8 @@ public class Parser {
 		conditionalNode.setConditionActive(conditionalToken.isConditionActive());
 		conditionalNode.setInverseCondition(conditionalToken.isInverseCondition());
 		conditionalNode.setLineNumber(conditionalToken.getLineNumber());
-
+		conditionalNode.setFileName(filename);
+		
 		while (peek() instanceof Newline) {
 			nextToken();
 		}
@@ -535,6 +542,7 @@ public class Parser {
 		CaseToken caseToken = (CaseToken) token;
 		CaseNode node = new CaseNode();
 		node.setLineNumber(caseToken.getLineNumber());
+		node.setFileName(filename);
 		node.setValue(caseToken.getValue());
 		node.setConditions(whenBlock());
 		return node;
@@ -550,6 +558,7 @@ public class Parser {
 			node.setDefault(true);
 		}
 		node.setLineNumber(token.getLineNumber());
+		node.setFileName(filename);
 		node.setValue(token.getValue());
 		node.setBlock(blockExpansion());
 		return node;
@@ -563,6 +572,7 @@ public class Parser {
 		codeNode.setBuffer(expressionToken.isBuffer());
 		codeNode.setEscape(expressionToken.isEscape());
 		codeNode.setLineNumber(expressionToken.getLineNumber());
+		codeNode.setFileName(filename);
 		boolean block = false;
 		int i = 1;
 		while (lookahead(i) != null && lookahead(i) instanceof Newline)
@@ -626,6 +636,7 @@ public class Parser {
 		node.setValue(filterToken.getValue());
 		node.setBlock(block());
 		node.setLineNumber(line());
+		node.setFileName(filename);
 		node.setAttributes(attr.getAttributes());
 		return node;
 	}
