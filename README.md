@@ -75,7 +75,7 @@ see the original [visionmedia/jade documentation](https://github.com/visionmedia
 
 ### via Maven
 
-We are using Github to for Maven hosting. Just add this repository ...
+We are using Github for Maven hosting. Just add this repository ...
 
 ```xml
 <repositories>
@@ -116,13 +116,13 @@ mvn install
 <a name="simple-api"></a>
 ## Simple static API
 
-Parsing template and and generating template in one step.
+Parsing template and generating template in one step.
 
 ```java
 String html = Jade4J.render("./index.jade", model);
 ```
 
-If you use this in production you would probalby do the template parsing only once per template and call the render method with different models.
+If you use this in production you would probably do the template parsing only once per template and call the render method with different models.
 
 ```java
 JadeTemplate template = Jade4J.getTemplate("./index.jade");
