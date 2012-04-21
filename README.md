@@ -15,6 +15,7 @@ jade4j's intention is to be able to process jade templates in Java without the n
     - [Filters](#api-filters)
     - [Model Defaults](#api-model-defaults)
     - [Template Loader](#api-template-loader)
+- [Error Handling](#errorhandling)
 - [Differences](#differences)
 - [Authors](#authors)
 - [License](#license)
@@ -91,7 +92,7 @@ We are using Github to for Maven hosting. Just add this repository ...
 <dependency>
   <groupId>de.neuland</groupId>
   <artifactId>jade4j</artifactId>
-  <version>0.2.0</version>
+  <version>0.2.1</version>
 </dependency>
 ```
 
