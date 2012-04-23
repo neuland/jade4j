@@ -23,7 +23,6 @@ public class JadeExceptionTest {
 			Jade4J.render(errorJade, new HashMap<String, Object>());
 			fail();
 		} catch (JadeException e) {
-			System.out.println(e.toHtmlString());
 			assertTrue(e.getMessage().startsWith("unable to evaluate [non.existing.query]"));
 			assertEquals(9, e.getLineNumber());
 			assertEquals(errorJade, e.getFilename());
