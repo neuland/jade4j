@@ -26,8 +26,15 @@ public class JadeExceptionTest {
 			assertTrue(e.getMessage().startsWith("unable to evaluate [non.existing.query]"));
 			assertEquals(9, e.getLineNumber());
 			assertEquals(errorJade, e.getFilename());
-			assertEquals(readFile(exceptionHtml), e.toHtmlString());
+			String expectedHtml = readFile(exceptionHtml);
+			String html = e.toHtmlString();
+			assertEquals(removeAbsolutePath(expectedHtml), removeAbsolutePath(html));
 		}
+	}
+
+	private String removeAbsolutePath(String html) {
+		html = html.replaceAll("(<h2>In ).*(compiler/exceptions/error\\.jade at line 9\\.</h2>)", "$1\\.\\./$2");
+		return html;
 	}
 
 	private String readFile(String fileName) {
