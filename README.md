@@ -177,22 +177,19 @@ If you are rendering partial templates that don't include a doctype you can set 
 
     input(checked=true)
 
-HTML5 (default)
+HTML/HTML5 (default)
 
-    config.setTerse(true);
-    config.setXML(false);
+    config.setMode(Jade4J.Mode.HTML);
     // <input checked>
 
 XHTML
 
-    config.setTerse(false);
-    config.setXML(false);
+    config.setMode(Jade4J.Mode.XHTML);
     // <input checked="true" />
 
 XML
 
-    config.setTerse(false);
-    config.setXML(true);
+    config.setMode(Jade4J.Mode.XML);
     // <input checked="true"></input>
 
 <a name="api-filters"></a>

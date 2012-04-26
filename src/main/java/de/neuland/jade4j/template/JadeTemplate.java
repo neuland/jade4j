@@ -2,6 +2,7 @@ package de.neuland.jade4j.template;
 
 import java.io.Writer;
 
+import de.neuland.jade4j.Jade4J.Mode;
 import de.neuland.jade4j.compiler.Compiler;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.model.JadeModel;
@@ -47,16 +48,8 @@ public class JadeTemplate {
 		this.lastmodified = lastmodified;
 	}
 
-	public void setTerse(boolean terse) {
-		this.terse = terse;
-	}
-
 	public boolean isTerse() {
 		return terse;
-	}
-
-	public void setXml(boolean xml) {
-		this.xml = xml;
 	}
 
 	public boolean isXml() {
@@ -69,5 +62,18 @@ public class JadeTemplate {
 
 	public TemplateLoader getTemplateLoader() {
 		return templateLoader;
+	}
+
+	public void setMode(Mode mode) {
+		xml = false;
+		terse = false;
+		switch (mode) {
+		case HTML:
+			terse = true;
+			break;
+		case XML:
+			xml = true;
+			break;
+		}
 	}
 }

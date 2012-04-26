@@ -15,6 +15,10 @@ import de.neuland.jade4j.template.TemplateLoader;
 
 public class Jade4J {
 
+	public enum Mode {
+		HTML, XML, XHTML
+	}
+
 	public static String render(String filename, Map<String, Object> model) throws IOException, JadeCompilerException {
 		return render(filename, model, false);
 	}

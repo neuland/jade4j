@@ -10,6 +10,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.neuland.jade4j.Jade4J.Mode;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.exceptions.JadeException;
 import de.neuland.jade4j.filter.CDATAFilter;
@@ -32,8 +33,7 @@ public class JadeConfiguration {
 	private static Logger logger = LoggerFactory.getLogger(JadeConfiguration.class);
 
 	private boolean prettyPrint = false;
-	private boolean terse = true;
-	private boolean xml = false;
+	private Mode mode = Jade4J.Mode.HTML;
 
 	private Map<String, Filter> filters = new HashMap<String, Filter>();
 	private Map<String, Object> sharedVariables = new HashMap<String, Object>();
@@ -88,8 +88,7 @@ public class JadeConfiguration {
 		template.setTemplateLoader(templateLoader);
 		template.setRootNode(root);
 		template.setPrettyPrint(prettyPrint);
-		template.setTerse(terse);
-		template.setXml(xml);
+		template.setMode(getMode());
 		return template;
 	}
 
@@ -125,20 +124,12 @@ public class JadeConfiguration {
 		this.templateLoader = templateLoader;
 	}
 
-	public boolean isTerse() {
-		return terse;
+	public Mode getMode() {
+		return mode;
 	}
 
-	public void setTerse(boolean terse) {
-		this.terse = terse;
-	}
-
-	public boolean isXml() {
-		return xml;
-	}
-
-	public void setXml(boolean xml) {
-		this.xml = xml;
+	public void setMode(Mode mode) {
+		this.mode = mode;
 	}
 
 }

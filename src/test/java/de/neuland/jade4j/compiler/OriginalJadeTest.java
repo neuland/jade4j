@@ -13,6 +13,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Test;
 
+import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.TestFileHelper;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
@@ -33,8 +34,7 @@ public class OriginalJadeTest {
 		Collection<File> files = FileUtils.listFiles(folder, new String[] { "jade" }, false);
 
 		JadeConfiguration jade = new JadeConfiguration();
-		jade.setTerse(false); // original jade uses xhtml by default
-		jade.setPrettyPrint(false);
+		jade.setMode(Jade4J.Mode.XHTML); // original jade uses xhtml by default
 		jade.setFilter("plain", new PlainFilter());
 		jade.setFilter("cdata", new CDATAFilter());
 

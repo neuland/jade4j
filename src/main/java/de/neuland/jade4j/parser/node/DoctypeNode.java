@@ -1,5 +1,6 @@
 package de.neuland.jade4j.parser.node;
 
+import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.lexer.token.Doctypes;
@@ -18,16 +19,16 @@ public class DoctypeNode extends Node {
 		if (doctypeLine == null) {
 			doctypeLine = "<!DOCTYPE " + name + ">";
 		}
-		template.setTerse(isTerseDoctype(name));
-		template.setXml(isXmlDoctype(doctypeLine));
+
+		if (doctypeLine.startsWith("<?xml")) {
+			template.setMode(Jade4J.Mode.XML);
+		} else if (doctypeLine.equals("<!DOCTYPE html>")) {
+			template.setMode(Jade4J.Mode.HTML);
+		} else {
+			template.setMode(Jade4J.Mode.XHTML);
+		}
+
 		writer.append(doctypeLine);
 	}
 
-	private boolean isXmlDoctype(String doctype) {
-		return doctype.startsWith("<?xml");
-	}
-
-	private boolean isTerseDoctype(String name) {
-		return "5".equals(name) || "html".equals(name);
-	}
 }
