@@ -171,26 +171,15 @@ By default Jade4J produces compressed HTML without unneeded whitespace. You can 
 config.setPrettyPrint(true);
 ```
 
-Jade detects if it has to generate HTML or XML code by your specified [doctype](https://github.com/visionmedia/jade#a6-11).
+Jade detects if it has to generate (X)HTML or XML code by your specified [doctype](https://github.com/visionmedia/jade#a6-11).
 
-If you are rendering partial templates that don't include a doctype you can set the generation mode manually.
+If you are rendering partial templates that don't include a doctype jade4j generates HTML code. You can also set the `mode` manually:
 
-    input(checked=true)
-
-HTML/HTML5 (default)
-
-    config.setMode(Jade4J.Mode.HTML);
-    // <input checked>
-
-XHTML
-
-    config.setMode(Jade4J.Mode.XHTML);
-    // <input checked="true" />
-
-XML
-
-    config.setMode(Jade4J.Mode.XML);
-    // <input checked="true"></input>
+```
+config.setMode(Jade4J.Mode.HTML);   // <input checked>
+config.setMode(Jade4J.Mode.XHTML);  // <input checked="true" />
+config.setMode(Jade4J.Mode.XML);    // <input checked="true"></input>
+```
 
 <a name="api-filters"></a>
 ### Filters
