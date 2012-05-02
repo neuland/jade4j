@@ -132,4 +132,12 @@ public class JadeConfiguration {
 		this.mode = mode;
 	}
 
+	public boolean templateExists(String url) {
+		try {
+			return templateLoader.getReader(url) != null;
+		} catch (IOException e) {
+			return false;
+		}
+	}
+
 }

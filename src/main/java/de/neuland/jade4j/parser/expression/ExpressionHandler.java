@@ -24,7 +24,7 @@ public class ExpressionHandler {
 		try {
 			Object tree = getCompiledExpression(expression);
 			return (Boolean) Ognl.getValue(tree, (Object) model, Boolean.class);
-		} catch (OgnlException e) {
+		} catch (Throwable e) {
 			throw new ExpressionException(expression, e);
 		}
 	}

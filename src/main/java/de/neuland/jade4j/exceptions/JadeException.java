@@ -66,7 +66,7 @@ public abstract class JadeException extends RuntimeException {
 		model.put("exception", getName());
 
 		try {
-			return Jade4J.render("src/main/resources/error.jade", model);
+			return Jade4J.render(JadeException.class.getResource("/error.jade").getPath(), model);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
