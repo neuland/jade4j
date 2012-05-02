@@ -656,4 +656,8 @@ public class Lexer {
 		}
 		return null;
 	}
+
+	public boolean getPipeless() {
+		return pipeless;
+	}
 }

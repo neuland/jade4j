@@ -88,8 +88,12 @@ public class CompilerTest {
 
 	@Test
 	public void scriptTag() {
-		// TODO newlines currently get removed
 		run("script_tag");
+	}
+
+	@Test
+	public void scriptTemplate() {
+		run("script-template");
 	}
 
 	@Test

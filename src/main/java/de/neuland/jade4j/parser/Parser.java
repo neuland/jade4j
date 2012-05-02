@@ -481,6 +481,7 @@ public class Parser {
 		TextNode textNode = new TextNode();
 		textNode.setLineNumber(line());
 		textNode.setFileName(filename);
+		textNode.setEscape(!lexer.getPipeless());
 		Token token = expect(Indent.class);
 		Indent indentToken = (Indent) token;
 		int spaces = indentToken.getIndents();
@@ -516,7 +517,7 @@ public class Parser {
 		conditionalNode.setInverseCondition(conditionalToken.isInverseCondition());
 		conditionalNode.setLineNumber(conditionalToken.getLineNumber());
 		conditionalNode.setFileName(filename);
-		
+
 		while (peek() instanceof Newline) {
 			nextToken();
 		}
