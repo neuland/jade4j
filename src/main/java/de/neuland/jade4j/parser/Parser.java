@@ -481,7 +481,6 @@ public class Parser {
 		TextNode textNode = new TextNode();
 		textNode.setLineNumber(line());
 		textNode.setFileName(filename);
-		textNode.setEscape(!lexer.getPipeless());
 		Token token = expect(Indent.class);
 		Indent indentToken = (Indent) token;
 		int spaces = indentToken.getIndents();

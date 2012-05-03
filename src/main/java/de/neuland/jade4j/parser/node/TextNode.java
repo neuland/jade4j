@@ -14,7 +14,6 @@ public class TextNode extends Node {
 
 	private String value = "";
 	private List<Object> preparedValue = new LinkedList<Object>();
-	private boolean escape = true;
 
 	public void appendText(String txt) {
 		value += txt;
@@ -31,7 +30,7 @@ public class TextNode extends Node {
 	}
 
 	private void prepare() {
-		preparedValue = Utils.prepareInterpolate(value, escape);
+		preparedValue = Utils.prepareInterpolate(value, false);
 	}
 
 	@Override
@@ -50,13 +49,5 @@ public class TextNode extends Node {
 
 	public LinkedList<Node> getNodes() {
 		return nodes;
-	}
-
-	public boolean isEscape() {
-		return escape;
-	}
-
-	public void setEscape(boolean escape) {
-		this.escape = escape;
 	}
 }

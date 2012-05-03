@@ -107,6 +107,11 @@ public class CompilerTest {
 	}
 
 	@Test
+	public void escape() {
+		run("escape");
+	}
+
+	@Test
 	public void complexCondition() {
 		run("complex_condition");
 	}
