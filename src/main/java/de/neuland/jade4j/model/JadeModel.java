@@ -19,6 +19,8 @@ import de.neuland.jade4j.parser.node.MixinNode;
 
 public class JadeModel implements Map<String, Object> {
 
+	private static final String LOCALS = "locals";
+
 	@SuppressWarnings("unused")
     private static final Logger logger = LoggerFactory.getLogger(JadeModel.class);
 
@@ -30,6 +32,7 @@ public class JadeModel implements Map<String, Object> {
 		if (model == null) {
 			model = new HashMap<String, Object>();
 		}
+		model.put(LOCALS, this);
 		scopes.add(model);
 	}
 

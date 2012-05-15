@@ -112,6 +112,11 @@ public class CompilerTest {
 	}
 
 	@Test
+	public void locals() {
+		run("locals");
+	}
+
+	@Test
 	public void complexCondition() {
 		run("complex_condition");
 	}
