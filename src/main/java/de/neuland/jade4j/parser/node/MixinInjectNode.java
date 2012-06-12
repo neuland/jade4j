@@ -12,7 +12,7 @@ import de.neuland.jade4j.template.JadeTemplate;
 
 public class MixinInjectNode extends Node {
     
-    private List<String> arguments = new ArrayList<String>();
+    protected List<String> arguments = new ArrayList<String>();
     
     @Override
     public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
@@ -20,14 +20,48 @@ public class MixinInjectNode extends Node {
         if (mixin == null) {
             throw new JadeCompilerException(this, template.getTemplateLoader(), "mixin " + getName() + " is not defined");
         }
+        
+        //clone it
+        mixin = new MixinNode(mixin);
+        
+        if(hasBlock()) {
+            Node injectionPoint = getInjectionPoint(mixin.getBlock());
+            if(injectionPoint != null) {
+                injectionPoint.getNodes().add(block);
+            }
+        }
+        
         model.pushScope();
         writeVariables(model, mixin, template);
         mixin.getBlock().execute(writer, model, template);
+        
         model.popScope();
         
-        if(hasBlock()) {
-            getBlock().execute(writer, model, template);
+    }
+    
+    private Node getInjectionPoint(Node block) {
+        for(Node node : block.getNodes()) {
+            if(node instanceof BlockNode && !node.hasNodes()) {
+                return node;
+            }
+            
+            if(node.hasBlock()) {
+                if(!node.getBlock().hasNodes()) {
+                    return node.getBlock();
+                }
+                
+                Node nodeFromTree = getInjectionPoint(node.getBlock());
+                if(nodeFromTree != null) {
+                    return nodeFromTree;
+                }
+            }
+            
+            Node nodeFromTree = getInjectionPoint(node);
+            if(nodeFromTree != null) {
+                return nodeFromTree;
+            }
         }
+        return null;
     }
     
     private void writeVariables(JadeModel model, MixinNode mixin, JadeTemplate template) {
