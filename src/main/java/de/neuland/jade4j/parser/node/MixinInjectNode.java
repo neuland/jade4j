@@ -24,6 +24,10 @@ public class MixinInjectNode extends Node {
         writeVariables(model, mixin, template);
         mixin.getBlock().execute(writer, model, template);
         model.popScope();
+        
+        if(hasBlock()) {
+            getBlock().execute(writer, model, template);
+        }
     }
     
     private void writeVariables(JadeModel model, MixinNode mixin, JadeTemplate template) {
