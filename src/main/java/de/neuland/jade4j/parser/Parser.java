@@ -14,47 +14,8 @@ import de.neuland.jade4j.exceptions.JadeParserException;
 import de.neuland.jade4j.lexer.Assignment;
 import de.neuland.jade4j.lexer.Each;
 import de.neuland.jade4j.lexer.Lexer;
-import de.neuland.jade4j.lexer.token.Attribute;
-import de.neuland.jade4j.lexer.token.Block;
-import de.neuland.jade4j.lexer.token.CaseToken;
-import de.neuland.jade4j.lexer.token.Colon;
-import de.neuland.jade4j.lexer.token.Comment;
-import de.neuland.jade4j.lexer.token.Conditional;
-import de.neuland.jade4j.lexer.token.CssClass;
-import de.neuland.jade4j.lexer.token.CssId;
-import de.neuland.jade4j.lexer.token.Default;
-import de.neuland.jade4j.lexer.token.Doctype;
-import de.neuland.jade4j.lexer.token.Dot;
-import de.neuland.jade4j.lexer.token.Eos;
-import de.neuland.jade4j.lexer.token.Expression;
-import de.neuland.jade4j.lexer.token.ExtendsToken;
-import de.neuland.jade4j.lexer.token.Filter;
-import de.neuland.jade4j.lexer.token.Include;
-import de.neuland.jade4j.lexer.token.Indent;
-import de.neuland.jade4j.lexer.token.Mixin;
-import de.neuland.jade4j.lexer.token.Newline;
-import de.neuland.jade4j.lexer.token.Outdent;
-import de.neuland.jade4j.lexer.token.Tag;
-import de.neuland.jade4j.lexer.token.Text;
-import de.neuland.jade4j.lexer.token.Token;
-import de.neuland.jade4j.lexer.token.When;
-import de.neuland.jade4j.lexer.token.While;
-import de.neuland.jade4j.lexer.token.Yield;
-import de.neuland.jade4j.parser.node.AssigmentNode;
-import de.neuland.jade4j.parser.node.BlockNode;
-import de.neuland.jade4j.parser.node.CaseConditionNode;
-import de.neuland.jade4j.parser.node.CaseNode;
-import de.neuland.jade4j.parser.node.ConditionalNode;
-import de.neuland.jade4j.parser.node.DoctypeNode;
-import de.neuland.jade4j.parser.node.EachNode;
-import de.neuland.jade4j.parser.node.ExpressionNode;
-import de.neuland.jade4j.parser.node.FilterNode;
-import de.neuland.jade4j.parser.node.LiteralNode;
-import de.neuland.jade4j.parser.node.MixinNode;
-import de.neuland.jade4j.parser.node.Node;
-import de.neuland.jade4j.parser.node.TagNode;
-import de.neuland.jade4j.parser.node.TextNode;
-import de.neuland.jade4j.parser.node.WhileNode;
+import de.neuland.jade4j.lexer.token.*;
+import de.neuland.jade4j.parser.node.*;
 import de.neuland.jade4j.template.TemplateLoader;
 
 public class Parser {
@@ -106,6 +67,9 @@ public class Parser {
 		}
 		if (token instanceof Mixin) {
 			return parseMixin();
+		}
+                if (token instanceof MixinInject) {
+			return parseMixinInject();
 		}
 		if (token instanceof Block) {
 			return parseBlock();
@@ -188,6 +152,22 @@ public class Parser {
 		}
 		return node;
 	}
+        
+        private Node parseMixinInject() {
+                Token token = expect(MixinInject.class);
+		MixinInject mixinInjectToken = (MixinInject) token;
+		MixinInjectNode node = new MixinInjectNode();
+		node.setName(mixinInjectToken.getValue());
+		node.setLineNumber(mixinInjectToken.getLineNumber());
+		node.setFileName(filename);
+		if (StringUtils.isNotBlank(mixinInjectToken.getArguments())) {
+			node.setArguments(mixinInjectToken.getArguments());
+		}
+		if (peek() instanceof Indent) {
+			node.setBlock(block());
+		}
+		return node;
+        }
 
 	private Node parseCssClassOrId() {
 		Token tok = nextToken();
