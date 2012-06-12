@@ -8,31 +8,7 @@ import java.util.regex.Matcher;
 import org.apache.commons.lang3.StringUtils;
 
 import de.neuland.jade4j.exceptions.JadeLexerException;
-import de.neuland.jade4j.lexer.token.Block;
-import de.neuland.jade4j.lexer.token.CaseToken;
-import de.neuland.jade4j.lexer.token.Colon;
-import de.neuland.jade4j.lexer.token.Comment;
-import de.neuland.jade4j.lexer.token.Conditional;
-import de.neuland.jade4j.lexer.token.CssClass;
-import de.neuland.jade4j.lexer.token.CssId;
-import de.neuland.jade4j.lexer.token.Default;
-import de.neuland.jade4j.lexer.token.Doctype;
-import de.neuland.jade4j.lexer.token.Dot;
-import de.neuland.jade4j.lexer.token.Eos;
-import de.neuland.jade4j.lexer.token.Expression;
-import de.neuland.jade4j.lexer.token.ExtendsToken;
-import de.neuland.jade4j.lexer.token.Filter;
-import de.neuland.jade4j.lexer.token.Include;
-import de.neuland.jade4j.lexer.token.Indent;
-import de.neuland.jade4j.lexer.token.Mixin;
-import de.neuland.jade4j.lexer.token.Newline;
-import de.neuland.jade4j.lexer.token.Outdent;
-import de.neuland.jade4j.lexer.token.Tag;
-import de.neuland.jade4j.lexer.token.Text;
-import de.neuland.jade4j.lexer.token.Token;
-import de.neuland.jade4j.lexer.token.When;
-import de.neuland.jade4j.lexer.token.While;
-import de.neuland.jade4j.lexer.token.Yield;
+import de.neuland.jade4j.lexer.token.*;
 import de.neuland.jade4j.template.TemplateLoader;
 
 public class Lexer {
@@ -108,6 +84,9 @@ public class Lexer {
 		}
 		if (token == null) {
 			token = mixin();
+		}
+		if (token == null) {
+			token = mixinInject();
 		}
 		if (token == null) {
 			token = conditional();
@@ -514,6 +493,17 @@ public class Lexer {
 		Matcher matcher = scanner.getMatcherForPattern("^mixin +([-\\w]+)(?: *\\((.*)\\))?");
 		if (matcher.find(0) && matcher.groupCount() > 1) {
 			Mixin tok = new Mixin(matcher.group(1), lineno);
+			tok.setArguments(matcher.group(2));
+			consume(matcher.end());
+			return tok;
+		}
+		return null;
+	}
+        
+        private Token mixinInject() {
+		Matcher matcher = scanner.getMatcherForPattern("^\\++([-\\w]+)(?: *\\((.*)\\))?");
+		if (matcher.find(0) && matcher.groupCount() > 1) {
+			MixinInject tok = new MixinInject(matcher.group(1), lineno);
 			tok.setArguments(matcher.group(2));
 			consume(matcher.end());
 			return tok;
