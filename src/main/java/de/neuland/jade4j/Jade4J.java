@@ -1,8 +1,12 @@
 package de.neuland.jade4j;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.URL;
 import java.util.Map;
 
 import de.neuland.jade4j.exceptions.JadeCompilerException;
@@ -11,6 +15,7 @@ import de.neuland.jade4j.parser.Parser;
 import de.neuland.jade4j.parser.node.Node;
 import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
+import de.neuland.jade4j.template.ReaderTemplateLoader;
 import de.neuland.jade4j.template.TemplateLoader;
 
 public class Jade4J {
@@ -41,7 +46,7 @@ public class Jade4J {
 	}
 
 	public static String render(JadeTemplate template, Map<String, Object> model) throws JadeCompilerException {
-		return render(template, model, true);
+		return render(template, model, false);
 	}
 
 	public static String render(JadeTemplate template, Map<String, Object> model, boolean pretty) throws JadeCompilerException {
@@ -50,7 +55,7 @@ public class Jade4J {
 	}
 
 	public static void render(JadeTemplate template, Map<String, Object> model, Writer writer) throws JadeCompilerException {
-		render(template, model, writer, true);
+		render(template, model, writer, false);
 	}
 
 	public static void render(JadeTemplate template, Map<String, Object> model, Writer writer, boolean pretty) throws JadeCompilerException {
@@ -59,8 +64,14 @@ public class Jade4J {
 	}
 
 	public static JadeTemplate getTemplate(String filename) throws IOException {
-		TemplateLoader loader = new FileTemplateLoader("", "UTF-8");
+		return createTemplate(filename, new FileTemplateLoader("", "UTF-8"));
+	}
 
+	private static JadeTemplate getTemplate(Reader reader, String name) throws IOException {
+		return createTemplate(name, new ReaderTemplateLoader(reader, name));
+	}
+
+	private static JadeTemplate createTemplate(String filename, TemplateLoader loader) throws IOException {
 		Parser parser = new Parser(filename, loader);
 		Node root = parser.parse();
 		JadeTemplate template = new JadeTemplate();
@@ -75,6 +86,13 @@ public class Jade4J {
 
 		template.process(jadeModel, writer);
 		return writer.toString();
+	}
+
+	public static String render(URL url, Map<String, Object> model) throws IOException, JadeCompilerException {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+		JadeTemplate template = new JadeTemplate();
+		template = getTemplate(reader, url.getPath());
+		return render(template, model);
 	}
 
 }
