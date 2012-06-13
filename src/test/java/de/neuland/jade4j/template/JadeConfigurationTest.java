@@ -1,12 +1,10 @@
 package de.neuland.jade4j.template;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -55,18 +53,6 @@ public class JadeConfigurationTest {
     	JadeConfiguration config = new JadeConfiguration();
     	JadeTemplate template = config.getTemplate(getParserResourcePath("assignment"));
     	assertNotNull(template.getRootNode());
-    }
-    
-    @Test
-    public void testLastModified() throws IOException {
-    	String fileBaseName = getParserResourcePath("assignment");
-    	File f = new File(fileBaseName + ".jade");
-    	
-    	JadeConfiguration config = new JadeConfiguration();
-    	JadeTemplate template = config.getTemplate(fileBaseName);
-    	
-    	assertEquals(f.lastModified(), template.getLastmodified().longValue());
-    	
     }
     
     public String getParserResourcePath(String fileName) {

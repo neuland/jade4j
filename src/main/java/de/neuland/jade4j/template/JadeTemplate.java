@@ -12,7 +12,6 @@ public class JadeTemplate {
 
 	private boolean prettyPrint = false;
 	private Node rootNode;
-	private Long lastmodified;
 	private boolean terse = true;
 	private boolean xml = false;
 	private TemplateLoader templateLoader;
@@ -38,14 +37,6 @@ public class JadeTemplate {
 
 	public void setRootNode(Node rootNode) {
 		this.rootNode = rootNode;
-	}
-
-	public Long getLastmodified() {
-		return lastmodified;
-	}
-
-	public void setLastmodified(Long lastmodified) {
-		this.lastmodified = lastmodified;
 	}
 
 	public boolean isTerse() {

@@ -33,6 +33,7 @@ public class JadeConfiguration {
 	private static Logger logger = LoggerFactory.getLogger(JadeConfiguration.class);
 
 	private boolean prettyPrint = false;
+	private boolean caching = false;
 	private Mode mode = Jade4J.Mode.HTML;
 
 	private Map<String, Filter> filters = new HashMap<String, Filter>();
@@ -54,14 +55,15 @@ public class JadeConfiguration {
 	};
 
 	public JadeTemplate getTemplate(String name) throws IOException, JadeException {
-
-		long lastModified = templateLoader.getLastModified(name);
-
-		String key = name + "-" + lastModified;
-		if (!cache.containsKey(key)) {
-			cache.put(key, createTemplate(name, lastModified));
+		if (caching) {
+			long lastModified = templateLoader.getLastModified(name);
+			String key = name + "-" + lastModified;
+			if (!cache.containsKey(key)) {
+				cache.put(key, createTemplate(name));
+			}
+			return cache.get(key);
 		}
-		return cache.get(key);
+		return createTemplate(name);
 	}
 
 	public void renderTemplate(JadeTemplate template, Map<String, Object> model, Writer writer) throws JadeCompilerException {
@@ -79,9 +81,8 @@ public class JadeConfiguration {
 		return writer.toString();
 	}
 
-	private JadeTemplate createTemplate(String name, long lastModified) throws JadeException, IOException {
+	private JadeTemplate createTemplate(String name) throws JadeException, IOException {
 		JadeTemplate template = new JadeTemplate();
-		template.setLastmodified(lastModified);
 
 		Parser parser = new Parser(name, templateLoader);
 		Node root = parser.parse();
@@ -138,6 +139,14 @@ public class JadeConfiguration {
 		} catch (IOException e) {
 			return false;
 		}
+	}
+
+	public boolean isCaching() {
+		return caching;
+	}
+
+	public void setCaching(boolean caching) {
+		this.caching = caching;
 	}
 
 }
