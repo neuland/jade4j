@@ -2,11 +2,18 @@ mixin say(a, b)
   h1= a
   h2= b
 
+mixin tell(a)
+  p
+    block
+    h1= a
+
 mixin hello
   h3 world
   
 mixin say("hello", "world")
 mixin hello
 
-+say("hello", "world")
++tell("again")
+  +say("hello", "world")
+  | told
 +hello

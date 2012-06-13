@@ -421,7 +421,7 @@ public class Lexer {
 	}
 
 	private Token block() {
-		Matcher matcher = scanner.getMatcherForPattern("^block +(?:(prepend|append) +)?([^\\n]+)");
+		Matcher matcher = scanner.getMatcherForPattern("^block *(?:(prepend|append) +)?([^\\n]*)");
 		if (matcher.find(0) && matcher.groupCount() > 1) {
 			String val = matcher.group(1);
 			String mode = StringUtils.isNotBlank(val) ? val : "replace";
