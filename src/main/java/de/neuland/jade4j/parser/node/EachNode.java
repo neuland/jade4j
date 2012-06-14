@@ -24,6 +24,9 @@ public class EachNode extends Node {
 		} catch (ExpressionException e) {
 			throw new JadeCompilerException(this, template.getTemplateLoader(), e);
 		}
+		if (result == null) {
+			throw new JadeCompilerException(this, template.getTemplateLoader(), "[" + code + "] has to be iterable but was null");
+		}
 		model.pushScope();
 		run(writer, model, result, template);
 		model.popScope();
