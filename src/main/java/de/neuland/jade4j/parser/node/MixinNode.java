@@ -4,7 +4,6 @@ import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
-import java.util.ArrayList;
 
 public class MixinNode extends MixinInjectNode {
 
