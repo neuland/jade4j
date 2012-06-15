@@ -1,7 +1,6 @@
 package de.neuland.jade4j.parser;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -284,15 +283,42 @@ public class Parser {
 	}
 
 	private Parser createParser(String templateName) {
-		URI currentUri = URI.create(filename);
-		URI templateUri = currentUri.resolve(templateName);
-		try {
-			return new Parser(templateUri.toString(), templateLoader);
+                String resolvedName = resolveFilename(templateName);
+                
+                try {
+			return new Parser(resolvedName, templateLoader);
 		} catch (IOException e) {
 			throw new JadeParserException(filename, lexer.getLineno(), templateLoader, "the template [" + templateName
 					+ "] could not be opened\n" + e.getMessage());
 		}
 	}
+        
+        private String resolveFilename(String templateName) {
+                String resolvedName;
+                if(templateName.startsWith("/")) {
+                    //If starting with slash then its an absolute filename
+                    resolvedName = templateName;
+                } else {
+                    resolvedName = filename;
+                    resolvedName = resolvedName.replace("\\", "/");
+                    
+                    //Remove endling slash
+                    if(resolvedName.endsWith("/")) {  
+                        resolvedName = resolvedName.substring(0, resolvedName.length()-1);
+                    }
+                    
+                    int lastSlashIndex = resolvedName.lastIndexOf("/");
+                    if(lastSlashIndex>=0 && lastSlashIndex < resolvedName.length()-1) {
+                        //If slashes found then replace the part after the last slash.
+                        resolvedName = resolvedName.substring(0,lastSlashIndex+1) + templateName;
+                    } else {
+                        //..or else treat the templatename as the complete name
+                        resolvedName = templateName;
+                    }
+                    
+                }
+                return resolvedName;
+        }
 
 	private BlockNode parseYield() {
 		nextToken();
