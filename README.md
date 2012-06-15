@@ -162,6 +162,12 @@ JadeTemplate t2 = config.getTemplate("index.jade");
 t1.equals(t2) // true
 ```
 
+For development mode you can also disable caching completly:
+
+```java
+config.setCaching(false);
+```
+
 <a name="api-output"></a>
 ### Output Formatting
 
