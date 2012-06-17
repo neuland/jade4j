@@ -52,10 +52,11 @@ public class CssClassTest extends TokenTest {
 		assertToken(15, Text.class, "Hello Berlin");
 		assertToken(16, Newline.class, "newline");
 		assertToken(16, Text.class, "Hello Tokyo");
-		assertToken(17, Outdent.class, "outdent");
-		assertToken(17, Outdent.class, "outdent");
-		assertToken(17, Outdent.class, "outdent");
-		assertToken(17, Eos.class, "eos");
+		assertToken(17, Newline.class, "newline");
+		assertToken(18, Outdent.class, "outdent");
+		assertToken(18, Outdent.class, "outdent");
+		assertToken(18, Outdent.class, "outdent");
+		assertToken(18, Eos.class, "eos");
 	}
 
 	@SuppressWarnings("rawtypes")

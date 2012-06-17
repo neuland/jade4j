@@ -30,8 +30,9 @@ public class OutdentTest extends TokenTest {
 		assertToken(6, Text.class,     "Hello Berlin");
 		assertToken(7, Newline.class,  "newline");
 		assertToken(7, Text.class,     "Hello Tokyo");
-		assertToken(8, Outdent.class,  "outdent");
-		assertToken(8, Eos.class,      "eos");
+		assertToken(8, Newline.class,  "newline");
+		assertToken(9, Outdent.class,  "outdent");
+		assertToken(9, Eos.class,      "eos");
 	}
 	
     @SuppressWarnings("rawtypes")

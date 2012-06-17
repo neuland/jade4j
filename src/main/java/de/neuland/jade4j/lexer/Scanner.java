@@ -36,8 +36,9 @@ public class Scanner {
             String s = in.readLine();
             while (s != null) {
                 if (StringUtils.isNotBlank(s)) {
-                    sb.append(s.replaceAll(" *$", "")).append("\n");
+                    sb.append(s.replaceAll(" *$", ""));
                 }
+                sb.append("\n");
                 s = in.readLine();
             }
             input = sb.toString();
@@ -55,9 +56,7 @@ public class Scanner {
     }
 
     public boolean beginnsWithWhitespace() {
-        // return input != null && input.length() > 0 && (charAt(0) == ' ' ||
-        // charAt(0) == '\t');
-        return (charAt(0) == ' ' || charAt(0) == '\t');
+        return (input.charAt(0) == ' ' || input.charAt(0) == '\t');
     }
 
     public boolean isNotEmpty() {
@@ -91,12 +90,16 @@ public class Scanner {
     }
 
     public boolean isIntendantionViolated() {
-        return getInput() != null && getInput().length() > 0
-                && (' ' == getInput().charAt(0) || '\t' == getInput().charAt(0));
+        return input != null && input.length() > 0
+                && (' ' == input.charAt(0) || '\t' == input.charAt(0));
     }
 
     public boolean isBlankLine() {
-        return getInput() != null && getInput().length() > 0 && '\n' == getInput().charAt(0);
+        return input != null && input.length() > 0 && '\n' == input.charAt(0);
+    }
+
+    public boolean isAdditionalBlankline() {
+        return input.length() > 2 && input.charAt(0) == '\n' && input.charAt(1) == '\n';
     }
 
 }

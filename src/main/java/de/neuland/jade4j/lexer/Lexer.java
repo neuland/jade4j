@@ -14,7 +14,7 @@ import de.neuland.jade4j.template.TemplateLoader;
 public class Lexer {
 	@SuppressWarnings("unused")
 	private LinkedList<String> options;
-	private Scanner scanner;
+	Scanner scanner;
 	private LinkedList<Token> deferredTokens;
 	private int lastIndents = -1;
 	private int lineno;
@@ -42,6 +42,7 @@ public class Lexer {
 	}
 
 	public Token next() {
+	    handleBlankLines();
 		Token token = null;
 		if (token == null) {
 			token = deferred();
@@ -141,7 +142,14 @@ public class Lexer {
 		return token;
 	}
 
-	public void consume(int len) {
+    public void handleBlankLines() {
+        while(scanner.isAdditionalBlankline()) {
+		    consume(1);
+		    lineno++;
+		}
+    }
+
+    public void consume(int len) {
 		scanner.consume(len);
 	}
 
