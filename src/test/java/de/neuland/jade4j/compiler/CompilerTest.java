@@ -112,6 +112,11 @@ public class CompilerTest {
 	}
 
 	@Test
+	public void whitespace() {
+		run("whitespace");
+	}
+
+	@Test
 	public void locals() {
 		run("locals");
 	}

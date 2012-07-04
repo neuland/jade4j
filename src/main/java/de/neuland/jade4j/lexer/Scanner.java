@@ -36,7 +36,7 @@ public class Scanner {
             String s = in.readLine();
             while (s != null) {
                 if (StringUtils.isNotBlank(s)) {
-                    sb.append(s.replaceAll(" *$", ""));
+                    sb.append(s);
                 }
                 sb.append("\n");
                 s = in.readLine();

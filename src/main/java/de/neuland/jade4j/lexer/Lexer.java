@@ -8,7 +8,32 @@ import java.util.regex.Matcher;
 import org.apache.commons.lang3.StringUtils;
 
 import de.neuland.jade4j.exceptions.JadeLexerException;
-import de.neuland.jade4j.lexer.token.*;
+import de.neuland.jade4j.lexer.token.Block;
+import de.neuland.jade4j.lexer.token.CaseToken;
+import de.neuland.jade4j.lexer.token.Colon;
+import de.neuland.jade4j.lexer.token.Comment;
+import de.neuland.jade4j.lexer.token.Conditional;
+import de.neuland.jade4j.lexer.token.CssClass;
+import de.neuland.jade4j.lexer.token.CssId;
+import de.neuland.jade4j.lexer.token.Default;
+import de.neuland.jade4j.lexer.token.Doctype;
+import de.neuland.jade4j.lexer.token.Dot;
+import de.neuland.jade4j.lexer.token.Eos;
+import de.neuland.jade4j.lexer.token.Expression;
+import de.neuland.jade4j.lexer.token.ExtendsToken;
+import de.neuland.jade4j.lexer.token.Filter;
+import de.neuland.jade4j.lexer.token.Include;
+import de.neuland.jade4j.lexer.token.Indent;
+import de.neuland.jade4j.lexer.token.Mixin;
+import de.neuland.jade4j.lexer.token.MixinInject;
+import de.neuland.jade4j.lexer.token.Newline;
+import de.neuland.jade4j.lexer.token.Outdent;
+import de.neuland.jade4j.lexer.token.Tag;
+import de.neuland.jade4j.lexer.token.Text;
+import de.neuland.jade4j.lexer.token.Token;
+import de.neuland.jade4j.lexer.token.When;
+import de.neuland.jade4j.lexer.token.While;
+import de.neuland.jade4j.lexer.token.Yield;
 import de.neuland.jade4j.template.TemplateLoader;
 
 public class Lexer {
@@ -129,10 +154,10 @@ public class Lexer {
 			token = colon();
 		}
 		if (token == null) {
-			token = text();
+			token = dot();
 		}
 		if (token == null) {
-			token = dot();
+			token = text();
 		}
 		if (token == null) {
 			throw new JadeLexerException("token not recognized " + scanner.getInput().substring(0, 5), filename, getLineno(),
@@ -185,9 +210,9 @@ public class Lexer {
 		String result = null;
 		Matcher matcher = scanner.getMatcherForPattern(regexp);
 		if (matcher.find(0) && matcher.groupCount() > 0) {
-			result = matcher.group(1);
 			int end = matcher.end();
 			consume(end);
+			return matcher.group(1);
 		}
 		return result;
 	}
@@ -391,10 +416,8 @@ public class Lexer {
 	}
 
 	private Token text() {
-		String val = scan("^(?:\\|)? ([^\\n]+)");
-		// TODO: regex differs from original implementation. this implementation
-		// requires one blank after pipe
-		if (StringUtils.isNotBlank(val)) {
+		String val = scan("^(?:\\| ?| ?)?([^\\n]+)");
+		if (StringUtils.isNotEmpty(val)) {
 			return new Text(val, lineno);
 		}
 		return null;
