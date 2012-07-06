@@ -28,6 +28,18 @@ public class JadeModelTest {
 		assertEquals("new world", model.get("hello"));
 		model.popScope();
 		assertEquals("world", model.get("hello"));
+	}
+	
+	@Test
+	public void defaults() throws Exception {
+		Map<String, Object> defaults = new HashMap<String, Object>();
+		defaults.put("hello", "world");
 
+		model = new JadeModel(defaults);
+		model.put("new", true);
+		
+		assertFalse(defaults.containsKey("new"));
+		assertTrue(model.containsKey("new"));
+		assertEquals(model.get("hello"), "world");
 	}
 }

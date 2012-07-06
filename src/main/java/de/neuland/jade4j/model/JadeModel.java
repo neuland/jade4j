@@ -22,18 +22,21 @@ public class JadeModel implements Map<String, Object> {
 	private static final String LOCALS = "locals";
 
 	@SuppressWarnings("unused")
-    private static final Logger logger = LoggerFactory.getLogger(JadeModel.class);
+	private static final Logger logger = LoggerFactory.getLogger(JadeModel.class);
 
 	private Deque<Map<String, Object>> scopes = new LinkedList<Map<String, Object>>();
 	private Map<String, MixinNode> mixins = new HashMap<String, MixinNode>();
 	private Map<String, Filter> filter = new HashMap<String, Filter>();
 
-	public JadeModel(Map<String, Object> model) {
-		if (model == null) {
-			model = new HashMap<String, Object>();
+	public JadeModel(Map<String, Object> defaults) {
+		Map<String, Object> rootScope = new HashMap<String, Object>();
+		scopes.add(rootScope);
+
+		if (defaults != null) {
+			putAll(defaults);
 		}
-		model.put(LOCALS, this);
-		scopes.add(model);
+
+		put(LOCALS, this);
 	}
 
 	public void pushScope() {
