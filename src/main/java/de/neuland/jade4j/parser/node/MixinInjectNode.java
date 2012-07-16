@@ -13,16 +13,22 @@ import de.neuland.jade4j.template.JadeTemplate;
 public class MixinInjectNode extends Node {
     
     protected List<String> arguments = new ArrayList<String>();
-    
+
     @Override
     public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
         MixinNode mixin = model.getMixin(getName());
         if (mixin == null) {
             throw new JadeCompilerException(this, template.getTemplateLoader(), "mixin " + getName() + " is not defined");
         }
-        
-        //clone it
-        mixin = new MixinNode(mixin);
+
+	    // Clone mixin
+	    try {
+	        mixin = (MixinNode)mixin.clone();
+	    }
+	    catch (CloneNotSupportedException e) {
+		    // Can't happen
+		    throw new IllegalStateException(e);
+	    }
         
         if(hasBlock()) {
             Node injectionPoint = getInjectionPoint(mixin.getBlock());
