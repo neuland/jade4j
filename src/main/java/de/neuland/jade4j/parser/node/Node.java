@@ -1,13 +1,14 @@
 package de.neuland.jade4j.parser.node;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 
-public abstract class Node {
+public abstract class Node implements Cloneable {
 
 	protected LinkedList<Node> nodes = new LinkedList<Node>();
     protected int lineNumber;
@@ -84,4 +85,26 @@ public abstract class Node {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
+
+	@Override
+	public Node clone() throws CloneNotSupportedException {
+		Node clone = (Node) super.clone();
+
+		// Deep copy block
+		if (clone.block != null) {
+			clone.block = clone.block.clone();
+		}
+
+		// Deep copy nodes
+		if (clone.nodes != null) {
+			List<Node> nodes = clone.nodes;
+			// Create a new linked list
+			clone.nodes = new LinkedList<Node>();
+			for (Node node : nodes) {
+				clone.nodes.add(node.clone());
+			}
+		}
+
+		return clone;
+	}
 }
