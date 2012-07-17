@@ -208,6 +208,11 @@ public class CompilerTest {
 	}
 
 	@Test
+	public void mixinBlocks() {
+		run("mixin_blocks");
+	}
+
+	@Test
 	public void include1() {
 		run("include_1");
 	}
