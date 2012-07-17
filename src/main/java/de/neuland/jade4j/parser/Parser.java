@@ -204,6 +204,24 @@ public class Parser {
 		if (StringUtils.isNotBlank(mixinInjectToken.getArguments())) {
 			node.setArguments(mixinInjectToken.getArguments());
 		}
+
+        while (true) {
+	        Token incomingToken = peek();
+	        if (incomingToken instanceof CssId) {
+		        Token tok = nextToken();
+		        node.addAttribute("id", tok.getValue());
+	        } else if (incomingToken instanceof CssClass) {
+		        Token tok = nextToken();
+		        node.addAttribute("class", tok.getValue());
+		    // TODO Add attribute support in addition to argument support, need to fix lexer.
+	        //} else if (incomingToken instanceof Attribute) {
+		    //    Attribute tok = (Attribute) nextToken();
+		    //    node.addAttributes(tok.getAttributes());
+		    //    continue;
+	        } else {
+		        break;
+	        }
+        }
 		if (peek() instanceof Indent) {
 			node.setBlock(block());
 		}

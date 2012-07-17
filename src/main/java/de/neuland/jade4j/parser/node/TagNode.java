@@ -16,29 +16,11 @@ import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.parser.expression.ExpressionHandler;
 import de.neuland.jade4j.template.JadeTemplate;
 
-public class TagNode extends Node {
-	private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
-	private Map<String, List<Object>> preparedAttributeValues = new HashMap<String, List<Object>>();
+public class TagNode extends AttributedNode {
 	private boolean textOnly;
 	private Node textNode;
 	private Node codeNode;
-	private String[] selfClosing = { "meta", "img", "link", "input", "area", "base", "col", "br", "hr", "source" };
-
-	public Map<String, Object> getAttributes() {
-		return attributes;
-	}
-
-	public void addAttribute(String key, Object value) {
-		if ("class".equals(key) && attributes.containsKey(key)) {
-			attributes.put(key, new StringBuilder((String) attributes.get(key)).append(" ").append(value).toString());
-		} else {
-			attributes.put(key, value);
-		}
-	}
-
-	public String getAttribute(String key) {
-		return (String) attributes.get(key);
-	}
+	private static final String[] selfClosing = { "meta", "img", "link", "input", "area", "base", "col", "br", "hr", "source" };
 
 	public void setTextOnly(boolean textOnly) {
 		this.textOnly = textOnly;
@@ -55,12 +37,6 @@ public class TagNode extends Node {
 
 	public boolean isTextOnly() {
 		return this.textOnly;
-	}
-
-	public void addAttributes(Map<String, Object> attributeMap) {
-		for (String key : attributeMap.keySet()) {
-			addAttribute(key, attributeMap.get(key));
-		}
 	}
 
 	public Node getTextNode() {
