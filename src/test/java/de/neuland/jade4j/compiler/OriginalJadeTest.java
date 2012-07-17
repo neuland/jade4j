@@ -25,7 +25,7 @@ public class OriginalJadeTest {
 
 	private String[] manualCompared = new String[] { "attrs", "attrs.js", "code.conditionals", "code.iteration", "comments",
 			"escape-chars", "filters.coffeescript", "filters.less", "filters.markdown", "filters.stylus", "html", "include-only-text-body",
-			"include-only-text", "include-with-text-head", "include-with-text", "mixin.blocks", "quotes", "script.whitespace", "scripts", "scripts.non-js",
+			"include-only-text", "include-with-text-head", "include-with-text", "mixin.blocks", "mixin.merge", "quotes", "script.whitespace", "scripts", "scripts.non-js",
 			"source", "styles", "template", "text-block", "text", "vars", "yield-title", "doctype.default" };
 
 	@Test

@@ -1,7 +1,9 @@
 package de.neuland.jade4j.parser.node;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import ognl.Ognl;
 import ognl.OgnlException;
@@ -10,11 +12,11 @@ import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 
-public class MixinInjectNode extends Node {
-    
+public class MixinInjectNode extends AttributedNode {
+
     protected List<String> arguments = new ArrayList<String>();
 
-    @Override
+	@Override
     public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
         MixinNode mixin = model.getMixin(getName());
         if (mixin == null) {
@@ -38,7 +40,9 @@ public class MixinInjectNode extends Node {
         }
         
         model.pushScope();
+
         writeVariables(model, mixin, template);
+		writeAttributes(model, mixin, template);
         mixin.getBlock().execute(writer, model, template);
         
         model.popScope();
@@ -89,6 +93,15 @@ public class MixinInjectNode extends Node {
             }
         }
     }
+
+	private void writeAttributes(JadeModel model, MixinNode mixin, JadeTemplate template) {
+		for (Node node : mixin.getBlock().getNodes()) {
+			if (node instanceof AttributedNode) {
+				AttributedNode attributedNode = (AttributedNode) node;
+				attributedNode.addAttributes(attributes);
+			}
+		}
+	}
     
     public List<String> getArguments() {
         return arguments;
