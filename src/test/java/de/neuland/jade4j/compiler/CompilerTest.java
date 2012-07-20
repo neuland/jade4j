@@ -213,6 +213,16 @@ public class CompilerTest {
 	}
 
 	@Test
+	public void mixinAttrs() {
+		run("mixin_attrs", true);
+	}
+
+	@Test
+	public void mixinMerge() {
+		run("mixin_merge", true);
+	}
+
+	@Test
 	public void include1() {
 		run("include_1");
 	}
