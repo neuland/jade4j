@@ -95,12 +95,7 @@ public class MixinInjectNode extends AttributedNode {
     }
 
 	private void writeAttributes(JadeModel model, MixinNode mixin, JadeTemplate template) {
-		for (Node node : mixin.getBlock().getNodes()) {
-			if (node instanceof AttributedNode) {
-				AttributedNode attributedNode = (AttributedNode) node;
-				attributedNode.addAttributes(attributes);
-			}
-		}
+		model.put("attributes", mergeInheritedAttributes(model));
 	}
     
     public List<String> getArguments() {

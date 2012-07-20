@@ -194,13 +194,14 @@ public class Parser {
 		return node;
 	}
         
-        private Node parseMixinInject() {
-                Token token = expect(MixinInject.class);
+    private Node parseMixinInject() {
+        Token token = expect(MixinInject.class);
 		MixinInject mixinInjectToken = (MixinInject) token;
 		MixinInjectNode node = new MixinInjectNode();
 		node.setName(mixinInjectToken.getValue());
 		node.setLineNumber(mixinInjectToken.getLineNumber());
 		node.setFileName(filename);
+
 		if (StringUtils.isNotBlank(mixinInjectToken.getArguments())) {
 			node.setArguments(mixinInjectToken.getArguments());
 		}
@@ -213,20 +214,21 @@ public class Parser {
 	        } else if (incomingToken instanceof CssClass) {
 		        Token tok = nextToken();
 		        node.addAttribute("class", tok.getValue());
-		    // TODO Add attribute support in addition to argument support, need to fix lexer.
-	        //} else if (incomingToken instanceof Attribute) {
-		    //    Attribute tok = (Attribute) nextToken();
-		    //    node.addAttributes(tok.getAttributes());
-		    //    continue;
+	        } else if (incomingToken instanceof Attribute) {
+		        Attribute tok = (Attribute) nextToken();
+		        node.addAttributes(tok.getAttributes());
 	        } else {
 		        break;
 	        }
         }
-		if (peek() instanceof Indent) {
+
+	    if (peek() instanceof Text) {
+		    node.setBlock(parseText());
+	    } else if (peek() instanceof Indent) {
 			node.setBlock(block());
 		}
 		return node;
-        }
+    }
 
 	private Node parseCssClassOrId() {
 		Token tok = nextToken();
