@@ -69,7 +69,9 @@ running the above code through `String html = Jade4J.render("./index.jade", mode
 
 ## Syntax
 
-see the original [visionmedia/jade documentation](https://github.com/visionmedia/jade#a6).
+We have put up an [interactive jade documentation](http://naltatis.github.com/jade-syntax-docs/).
+
+See also the original [visionmedia/jade documentation](https://github.com/visionmedia/jade#a6).
 
 ## Usage
 
