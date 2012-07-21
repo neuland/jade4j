@@ -13,12 +13,14 @@ import de.neuland.jade4j.lexer.token.Block;
 import de.neuland.jade4j.lexer.token.CaseToken;
 import de.neuland.jade4j.lexer.token.Colon;
 import de.neuland.jade4j.lexer.token.Comment;
-import de.neuland.jade4j.lexer.token.Conditional;
+import de.neuland.jade4j.lexer.token.ElseIf;
+import de.neuland.jade4j.lexer.token.If;
 import de.neuland.jade4j.lexer.token.CssClass;
 import de.neuland.jade4j.lexer.token.CssId;
 import de.neuland.jade4j.lexer.token.Default;
 import de.neuland.jade4j.lexer.token.Doctype;
 import de.neuland.jade4j.lexer.token.Dot;
+import de.neuland.jade4j.lexer.token.Else;
 import de.neuland.jade4j.lexer.token.Eos;
 import de.neuland.jade4j.lexer.token.Expression;
 import de.neuland.jade4j.lexer.token.ExtendsToken;
@@ -68,7 +70,7 @@ public class Lexer {
 	}
 
 	public Token next() {
-	    handleBlankLines();
+		handleBlankLines();
 		Token token = null;
 		if (token == null) {
 			token = deferred();
@@ -168,14 +170,14 @@ public class Lexer {
 		return token;
 	}
 
-    public void handleBlankLines() {
-        while(scanner.isAdditionalBlankline()) {
-		    consume(1);
-		    lineno++;
+	public void handleBlankLines() {
+		while (scanner.isAdditionalBlankline()) {
+			consume(1);
+			lineno++;
 		}
-    }
+	}
 
-    public void consume(int len) {
+	public void consume(int len) {
 		scanner.consume(len);
 	}
 
@@ -375,13 +377,16 @@ public class Lexer {
 			String type = matcher.group(1);
 			String condition = matcher.group(2);
 			consume(matcher.end());
-			Conditional conditional = new Conditional(condition, lineno);
-			conditional.setInverseCondition("unless".equals(type));
-			conditional.setAlternativeCondition(type.startsWith("else"));
-			conditional.setConditionActive(!"else".equals(type));
-			return conditional;
+			if ("else".equals(type)) {
+				return new Else(null, lineno);
+			} else if ("else if".equals(type)) {
+				return new ElseIf(condition, lineno);
+			} else {
+				If ifToken = new If(condition, lineno);
+				ifToken.setInverseCondition("unless".equals(type));
+				return ifToken;
+			}
 		}
-		// TODO: Make else own Token!
 		return null;
 	}
 

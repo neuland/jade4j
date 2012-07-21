@@ -19,16 +19,18 @@ import de.neuland.jade4j.lexer.token.Block;
 import de.neuland.jade4j.lexer.token.CaseToken;
 import de.neuland.jade4j.lexer.token.Colon;
 import de.neuland.jade4j.lexer.token.Comment;
-import de.neuland.jade4j.lexer.token.Conditional;
 import de.neuland.jade4j.lexer.token.CssClass;
 import de.neuland.jade4j.lexer.token.CssId;
 import de.neuland.jade4j.lexer.token.Default;
 import de.neuland.jade4j.lexer.token.Doctype;
 import de.neuland.jade4j.lexer.token.Dot;
+import de.neuland.jade4j.lexer.token.Else;
+import de.neuland.jade4j.lexer.token.ElseIf;
 import de.neuland.jade4j.lexer.token.Eos;
 import de.neuland.jade4j.lexer.token.Expression;
 import de.neuland.jade4j.lexer.token.ExtendsToken;
 import de.neuland.jade4j.lexer.token.Filter;
+import de.neuland.jade4j.lexer.token.If;
 import de.neuland.jade4j.lexer.token.Include;
 import de.neuland.jade4j.lexer.token.Indent;
 import de.neuland.jade4j.lexer.token.Mixin;
@@ -50,6 +52,7 @@ import de.neuland.jade4j.parser.node.DoctypeNode;
 import de.neuland.jade4j.parser.node.EachNode;
 import de.neuland.jade4j.parser.node.ExpressionNode;
 import de.neuland.jade4j.parser.node.FilterNode;
+import de.neuland.jade4j.parser.node.IfConditionNode;
 import de.neuland.jade4j.parser.node.LiteralNode;
 import de.neuland.jade4j.parser.node.MixinInjectNode;
 import de.neuland.jade4j.parser.node.MixinNode;
@@ -109,7 +112,7 @@ public class Parser {
 		if (token instanceof Mixin) {
 			return parseMixin();
 		}
-                if (token instanceof MixinInject) {
+		if (token instanceof MixinInject) {
 			return parseMixinInject();
 		}
 		if (token instanceof Block) {
@@ -139,7 +142,7 @@ public class Parser {
 		if (token instanceof CssClass || token instanceof CssId) {
 			return parseCssClassOrId();
 		}
-		if (token instanceof Conditional) {
+		if (token instanceof If) {
 			return parseConditional();
 		}
 		if (token instanceof CaseToken) {
@@ -193,9 +196,9 @@ public class Parser {
 		}
 		return node;
 	}
-        
-    private Node parseMixinInject() {
-        Token token = expect(MixinInject.class);
+
+	private Node parseMixinInject() {
+		Token token = expect(MixinInject.class);
 		MixinInject mixinInjectToken = (MixinInject) token;
 		MixinInjectNode node = new MixinInjectNode();
 		node.setName(mixinInjectToken.getValue());
@@ -206,29 +209,29 @@ public class Parser {
 			node.setArguments(mixinInjectToken.getArguments());
 		}
 
-        while (true) {
-	        Token incomingToken = peek();
-	        if (incomingToken instanceof CssId) {
-		        Token tok = nextToken();
-		        node.addAttribute("id", tok.getValue());
-	        } else if (incomingToken instanceof CssClass) {
-		        Token tok = nextToken();
-		        node.addAttribute("class", tok.getValue());
-	        } else if (incomingToken instanceof Attribute) {
-		        Attribute tok = (Attribute) nextToken();
-		        node.addAttributes(tok.getAttributes());
-	        } else {
-		        break;
-	        }
-        }
+		while (true) {
+			Token incomingToken = peek();
+			if (incomingToken instanceof CssId) {
+				Token tok = nextToken();
+				node.addAttribute("id", tok.getValue());
+			} else if (incomingToken instanceof CssClass) {
+				Token tok = nextToken();
+				node.addAttribute("class", tok.getValue());
+			} else if (incomingToken instanceof Attribute) {
+				Attribute tok = (Attribute) nextToken();
+				node.addAttributes(tok.getAttributes());
+			} else {
+				break;
+			}
+		}
 
-	    if (peek() instanceof Text) {
-		    node.setBlock(parseText());
-	    } else if (peek() instanceof Indent) {
+		if (peek() instanceof Text) {
+			node.setBlock(parseText());
+		} else if (peek() instanceof Indent) {
 			node.setBlock(block());
 		}
 		return node;
-    }
+	}
 
 	private Node parseCssClassOrId() {
 		Token tok = nextToken();
@@ -392,6 +395,10 @@ public class Parser {
 		node.setLineNumber(eachToken.getLineNumber());
 		node.setFileName(filename);
 		node.setBlock(block());
+		if (peek() instanceof Else) {
+			nextToken();
+			node.setElseNode(block());
+		}
 		return node;
 	}
 
@@ -549,33 +556,34 @@ public class Parser {
 	}
 
 	private Node parseConditional() {
-		Token token = expect(Conditional.class);
-		Conditional conditionalToken = (Conditional) token;
-		ConditionalNode conditionalNode = new ConditionalNode();
-		conditionalNode.setValue(conditionalToken.getValue());
-		conditionalNode.setConditionActive(conditionalToken.isConditionActive());
-		conditionalNode.setInverseCondition(conditionalToken.isInverseCondition());
-		conditionalNode.setLineNumber(conditionalToken.getLineNumber());
-		conditionalNode.setFileName(filename);
+		If conditionalToken = (If) expect(If.class);
+		ConditionalNode conditional = new ConditionalNode();
+		conditional.setLineNumber(conditionalToken.getLineNumber());
+		conditional.setFileName(filename);
 
-		while (peek() instanceof Newline) {
-			nextToken();
+		List<IfConditionNode> conditions = conditional.getConditions();
+
+		IfConditionNode main = new IfConditionNode(conditionalToken.getValue(), conditionalToken.getLineNumber());
+		main.setInverse(conditionalToken.isInverseCondition());
+		main.setBlock(block());
+		conditions.add(main);
+
+		while (peek() instanceof ElseIf) {
+			ElseIf token = (ElseIf) expect(ElseIf.class);
+			IfConditionNode elseIf = new IfConditionNode(token.getValue(), token.getLineNumber());
+			elseIf.setBlock(block());
+			conditions.add(elseIf);
 		}
 
-		if (peek() instanceof Indent) {
-			Node blockNode = block();
-			conditionalNode.setBlock(blockNode);
+		if (peek() instanceof Else) {
+			Else token = (Else) expect(Else.class);
+			IfConditionNode elseNode = new IfConditionNode(null, token.getLineNumber());
+			elseNode.setDefault(true);
+			elseNode.setBlock(block());
+			conditions.add(elseNode);
 		}
 
-		if (peek() instanceof Conditional) {
-			Conditional next = (Conditional) peek();
-			if (next.isAlternativeCondition()) {
-				Node elseNode = parseExpr();
-				conditionalNode.setElseNode(elseNode);
-			}
-		}
-
-		return conditionalNode;
+		return conditional;
 	}
 
 	private Node parseCase() {

@@ -1,12 +1,11 @@
 package de.neuland.jade4j.lexer.token;
 
-public class Conditional extends Token {
+public class If extends Token {
 
 	private boolean inverseCondition = false;
-	private boolean conditionActive = false;
 	private boolean alternativeCondition = false;
 	
-	public Conditional(String value, int lineNumber) {
+	public If(String value, int lineNumber) {
         super(value, lineNumber);
     }
 
@@ -16,14 +15,6 @@ public class Conditional extends Token {
 
 	public void setInverseCondition(boolean inverseCondition) {
 		this.inverseCondition = inverseCondition;
-	}
-
-	public boolean isConditionActive() {
-		return conditionActive;
-	}
-
-	public void setConditionActive(boolean conditionActive) {
-		this.conditionActive = conditionActive;
 	}
 
 	public boolean isAlternativeCondition() {

@@ -15,6 +15,7 @@ public class EachNode extends Node {
 
 	private String key;
 	private String code;
+	private Node elseNode;
 
 	@Override
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
@@ -47,6 +48,10 @@ public class EachNode extends Node {
 
 	private void runCollection(Collection<Object> result, JadeModel model, IndentWriter writer, JadeTemplate template) {
 		int index = 0;
+		if (result.size() == 0) {
+			getElseNode().execute(writer, model, template);
+			return;
+		}
 		for (Object entry : result) {
 			model.put(getValue(), entry);
 			model.put(getKey(), index);
@@ -57,6 +62,10 @@ public class EachNode extends Node {
 
 	private void runArray(Object[] result, JadeModel model, IndentWriter writer, JadeTemplate template) {
 		int index = 0;
+		if (result.length == 0) {
+			getElseNode().execute(writer, model, template);
+			return;
+		}
 		for (Object entry : result) {
 			model.put(getValue(), entry);
 			model.put(getKey(), index);
@@ -67,6 +76,10 @@ public class EachNode extends Node {
 
 	private void runMap(Map<String, Object> result, JadeModel model, IndentWriter writer, JadeTemplate template) {
 		Set<String> keys = result.keySet();
+		if (keys.size() == 0) {
+			getElseNode().execute(writer, model, template);
+			return;
+		}
 		for (String key : keys) {
 			model.put(getValue(), result.get(key));
 			model.put(getKey(), key);
@@ -88,6 +101,14 @@ public class EachNode extends Node {
 
 	public void setKey(String key) {
 		this.key = key;
+	}
+
+	public Node getElseNode() {
+		return elseNode;
+	}
+
+	public void setElseNode(Node elseNode) {
+		this.elseNode = elseNode;
 	}
 
 }
