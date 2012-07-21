@@ -92,19 +92,18 @@ public class TagNode extends AttributedNode {
 	}
 
 	private String attributes(JadeModel model, JadeTemplate template) {
-		StringBuilder sb = new StringBuilder("");
-		for (String name : this.attributes.keySet()) {
-			if (this.attributes.containsKey(name)) {
-				Object value = this.attributes.get(name);
-				String attributeString;
-				try {
-					attributeString = getAttributeString(name, value, model, template);
-				} catch (ExpressionException e) {
-					throw new JadeCompilerException(this, template.getTemplateLoader(), e);
-				}
-				sb.append(attributeString);
+		StringBuilder sb = new StringBuilder();
+
+		Map<String, Object> mergedAttributes = mergeInheritedAttributes(model);
+
+		for (Map.Entry<String, Object> entry : mergedAttributes.entrySet()) {
+			try {
+				sb.append(getAttributeString(entry.getKey(), entry.getValue(), model, template));
+			} catch (ExpressionException e) {
+				throw new JadeCompilerException(this, template.getTemplateLoader(), e);
 			}
 		}
+
 		return sb.toString();
 	}
 

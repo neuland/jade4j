@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -530,13 +531,23 @@ public class Lexer {
 		}
 		return null;
 	}
-        
-        private Token mixinInject() {
-		Matcher matcher = scanner.getMatcherForPattern("^\\++([-\\w]+)(?: *\\((.*)\\))?");
-		if (matcher.find(0) && matcher.groupCount() > 1) {
+
+	private Token mixinInject() {
+		Matcher matcher = scanner.getMatcherForPattern("^\\+([-\\w]+)");
+		if (matcher.find(0) && matcher.groupCount() > 0) {
 			MixinInject tok = new MixinInject(matcher.group(1), lineno);
-			tok.setArguments(matcher.group(2));
 			consume(matcher.end());
+
+			matcher = scanner.getMatcherForPattern("^ *\\((.*?)\\)");
+
+			if (matcher.find(0) && matcher.groupCount() > 0) {
+				// verify group does not contain attributes
+				Matcher attributeMatcher = Pattern.compile("^ *[-\\w]+ *=").matcher(matcher.group(1));
+				if (!attributeMatcher.find(0)) {
+					tok.setArguments(matcher.group(1));
+					consume(matcher.end());
+				}
+			}
 			return tok;
 		}
 		return null;
