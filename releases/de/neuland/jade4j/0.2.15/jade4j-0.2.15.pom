@@ -4,13 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.neuland</groupId>
 	<artifactId>jade4j</artifactId>
-	<version>0.2.0</version>
+	<version>0.2.15</version>
 	<name>jade templating engine for Java VM</name>
 	<issueManagement>
 		<url>https://github.com/neuland/jade4j/issues</url>
 		<system>GitHub Issues</system>
 	</issueManagement>
-
 	<licenses>
 		<license>
 			<name>MIT License</name>
@@ -42,19 +41,21 @@
 			<id>naltatis</id>
 		</developer>
 	</developers>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+
 	<distributionManagement>
-  	<repository>
-  		<id>repo</id>
-  		<url>https://github.com/neuland/jade4j/raw/master/releases</url>
-  	</repository>
-  	<snapshotRepository>
-  		<id>snapshot-repo</id>
-  		<url>https://github.com/neuland/jade4j/raw/master/snapshots</url>
-  	</snapshotRepository>
-  </distributionManagement>
+		<repository>
+			<id>repo</id>
+			<url>https://github.com/neuland/jade4j/raw/master/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshot-repo</id>
+			<url>https://github.com/neuland/jade4j/raw/master/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<build>
 		<plugins>
 			<plugin>
@@ -70,8 +71,20 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.12</version>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<excludes>
+						<include>**/log4j.xml</include>
+						<include>**/log4j.dtd</include>
+					</excludes>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
+
 	<dependencies>
 		<dependency>
 			<groupId>ognl</groupId>
@@ -111,13 +124,14 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>1.6.0</version>
 		</dependency>
+
+		<!-- Testing -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.6.0</version>
+			<scope>test</scope>
 		</dependency>
-
-		<!-- Testing -->
 		<dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-all</artifactId>
