@@ -49,7 +49,7 @@ public class EachNode extends Node {
 	private void runCollection(Collection<Object> result, JadeModel model, IndentWriter writer, JadeTemplate template) {
 		int index = 0;
 		if (result.size() == 0) {
-			getElseNode().execute(writer, model, template);
+			executeElseNode(model, writer, template);
 			return;
 		}
 		for (Object entry : result) {
@@ -63,7 +63,7 @@ public class EachNode extends Node {
 	private void runArray(Object[] result, JadeModel model, IndentWriter writer, JadeTemplate template) {
 		int index = 0;
 		if (result.length == 0) {
-			getElseNode().execute(writer, model, template);
+			executeElseNode(model, writer, template);
 			return;
 		}
 		for (Object entry : result) {
@@ -77,13 +77,19 @@ public class EachNode extends Node {
 	private void runMap(Map<String, Object> result, JadeModel model, IndentWriter writer, JadeTemplate template) {
 		Set<String> keys = result.keySet();
 		if (keys.size() == 0) {
-			getElseNode().execute(writer, model, template);
+			executeElseNode(model, writer, template);
 			return;
 		}
 		for (String key : keys) {
 			model.put(getValue(), result.get(key));
 			model.put(getKey(), key);
 			getBlock().execute(writer, model, template);
+		}
+	}
+
+	private void executeElseNode(JadeModel model, IndentWriter writer, JadeTemplate template) {
+		if (elseNode != null) {
+			elseNode.execute(writer, model, template);				
 		}
 	}
 

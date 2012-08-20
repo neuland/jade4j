@@ -1,3 +1,5 @@
+include includes/mixins
+
 mixin say(a, b)
   h1= a
   h2= b
@@ -17,3 +19,5 @@ mixin hello
   +say("hello", "world")
   | told
 +hello
+
++includedFoo(1+1)
