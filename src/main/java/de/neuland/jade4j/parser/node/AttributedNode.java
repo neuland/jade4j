@@ -58,12 +58,16 @@ public abstract class AttributedNode extends Node {
 	 * "class" attribute.
 	 */
 	private void addAttribute(Map<String, Object> map, String key, Object value) {
-		if ("class".equals(key) && attributes.containsKey(key)) {
-			attributes.put(key, new StringBuilder((String) attributes.get(key)).append(" ").append(value).toString());
-		} else {
-			attributes.put(key, value);
-		}
-	}
+        if ("class".equals(key) && attributes.containsKey(key)) {
+           if(value instanceof ExpressionString) {
+                attributes.put(key, new ExpressionString(new StringBuilder("\"").append((String) attributes.get(key)).append(" \" + ").append(((ExpressionString) value).getValue()).toString()));
+            } else {
+                attributes.put(key, new StringBuilder((String) attributes.get(key)).append(" ").append(value).toString());
+            }
+        } else {
+            attributes.put(key, value);
+        }
+    }
 
 	@Override
 	public AttributedNode clone() throws CloneNotSupportedException {
