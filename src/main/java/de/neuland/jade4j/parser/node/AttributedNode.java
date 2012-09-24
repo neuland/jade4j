@@ -1,12 +1,12 @@
 package de.neuland.jade4j.parser.node;
 
-
-import de.neuland.jade4j.model.JadeModel;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import de.neuland.jade4j.model.JadeModel;
 
 public abstract class AttributedNode extends Node {
 
@@ -17,8 +17,7 @@ public abstract class AttributedNode extends Node {
 	public void addAttribute(String key, Object value) {
 		if ("attributes".equals(key)) {
 			inheritsAttributes = true;
-		}
-		else {
+		} else {
 			addAttribute(attributes, key, value);
 		}
 	}
@@ -43,10 +42,11 @@ public abstract class AttributedNode extends Node {
 		if (inheritsAttributes) {
 			Object o = model.get("attributes");
 			if (o != null && o instanceof Map) {
-				Map<?,?> inheritedAttributes = (Map)o;
+				@SuppressWarnings("unchecked")
+				Map<String, Object> inheritedAttributes = (Map<String, Object>) o;
 
-				for (Map.Entry entry : inheritedAttributes.entrySet()) {
-					addAttribute(mergedAttributes, (String)entry.getKey(), entry.getValue());
+				for (Entry<String, Object> entry : inheritedAttributes.entrySet()) {
+					addAttribute(mergedAttributes, (String) entry.getKey(), entry.getValue());
 				}
 			}
 		}
@@ -54,14 +54,21 @@ public abstract class AttributedNode extends Node {
 	}
 
 	/**
-	 * Puts the specified key-value pair in the specified map.  Provides special processing in the case of the
-	 * "class" attribute.
+	 * Puts the specified key-value pair in the specified map. Provides special
+	 * processing in the case of the "class" attribute.
 	 */
-	private void addAttribute(Map<String, Object> map, String key, Object value) {
+	private void addAttribute(Map<String, Object> map, String key, Object value1) {
 		if ("class".equals(key) && attributes.containsKey(key)) {
-			attributes.put(key, new StringBuilder((String) attributes.get(key)).append(" ").append(value).toString());
+			String value2 = (String) attributes.get(key);
+			if (value1 instanceof ExpressionString) {
+				String expression = ((ExpressionString) value1).getValue();
+				attributes.put(key, value2 + " #{" + expression + "}");
+			} else {
+				attributes.put(key, value2 + " " + value1);
+			}
+
 		} else {
-			attributes.put(key, value);
+			attributes.put(key, value1);
 		}
 	}
 
