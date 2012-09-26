@@ -101,8 +101,9 @@ html
     p#detail= message
     h2 In #{filename} at line #{linenumber}.
     div
-      for line, i in lines
-        if i > linenumber - 6 && i < linenumber + 3
-          pre(class=(i+1 == linenumber ? "error" : false))
-            span.line= i+1
+      if lines
+        for line, i in lines
+          if i > linenumber - 6 && i < linenumber + 3
+            pre(class=(i+1 == linenumber ? "error" : false))
+              span.line= i+1
             span.code= line
