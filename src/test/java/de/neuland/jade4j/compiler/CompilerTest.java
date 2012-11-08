@@ -219,6 +219,11 @@ public class CompilerTest {
 	}
 
 	@Test
+	public void mixinNested() {
+		run("mixin_nested");
+	}
+
+	@Test
 	public void mixinAttrs() {
 		run("mixin_attrs", true);
 	}
