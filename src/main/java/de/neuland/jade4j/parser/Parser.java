@@ -71,11 +71,13 @@ public class Parser {
 	private final TemplateLoader templateLoader;
 	private Parser extending;
 	private final String filename;
+	private LinkedList<Parser> contexts = new LinkedList<Parser>();
 
 	public Parser(String filename, TemplateLoader templateLoader) throws IOException {
 		this.filename = filename;
 		this.templateLoader = templateLoader;
 		lexer = new Lexer(filename, templateLoader);
+		getContexts().push(this);
 	}
 
 	public Node parse() {
@@ -93,11 +95,9 @@ public class Parser {
 			}
 		}
 		if (extending != null) {
-			// TODO check this:
-			// this.context(parser) ???
+			getContexts().push(extending);
 			Node rootNode = extending.parse();
-			// TODO check this too:
-			// this.context()
+			getContexts().pop();
 			return rootNode;
 		}
 
@@ -281,7 +281,10 @@ public class Parser {
 		String templateName = includeToken.getValue().trim();
 
 		Parser parser = createParser(templateName);
+		parser.setBlocks(blocks);
+		contexts.push(parser);
 		Node ast = parser.parse();
+		contexts.pop();
 
 		if (peek() instanceof Indent && ast instanceof BlockNode) {
 			((BlockNode) ast).getIncludeBlock().push(block());
@@ -298,7 +301,7 @@ public class Parser {
 		Parser parser = createParser(templateName);
 
 		parser.setBlocks(blocks);
-		// TODO: contexts ??
+		parser.setContexts(contexts);
 		extending = parser;
 
 		LiteralNode node = new LiteralNode();
@@ -737,5 +740,13 @@ public class Parser {
 
 	public void setBlocks(Map<String, Node> blocks) {
 		this.blocks = blocks;
+	}
+
+	public LinkedList<Parser> getContexts() {
+		return contexts;
+	}
+
+	public void setContexts(LinkedList<Parser> contexts) {
+		this.contexts = contexts;
 	}
 }

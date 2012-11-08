@@ -247,6 +247,11 @@ public class CompilerTest {
 	public void extendsLayout() {
 		run("extends");
 	}
+	
+	@Test
+	public void extendsLayoutWithInclude() {
+		run("extends_layout_include");
+	}
 
 	@Test
 	public void largeBodyTextWithPipes() {
