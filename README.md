@@ -83,7 +83,7 @@ We are using Github for Maven hosting. Just add this repository ...
 <repositories>
   <repository>
     <id>jade4j-releases</id>
-    <url>https://github.com/neuland/jade4j/raw/master/releases</url>
+    <url>https://raw.github.com/neuland/spring-jade4j/master/releases</url>
   </repository>
 </repositories>
 ```
