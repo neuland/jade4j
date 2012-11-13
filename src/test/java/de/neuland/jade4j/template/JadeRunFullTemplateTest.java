@@ -24,6 +24,7 @@ public class JadeRunFullTemplateTest {
 		//	cfg.setDirectoryForTemplateLoading(new File("/where/you/store/templates"));
 		Map<String, Object> root = new HashMap<String, Object>();
 		root.put("hello", "world");
+		root.put("hallo", null);
 		JadeModel model = new JadeModel(root);
 		
 		JadeTemplate temp = cfg.getTemplate(getResourcePath("fullrun"));

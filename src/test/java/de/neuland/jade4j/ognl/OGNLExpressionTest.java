@@ -1,17 +1,8 @@
 package de.neuland.jade4j.ognl;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import ognl.Ognl;
-import ognl.OgnlContext;
-import ognl.OgnlException;
-
-import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class OGNLExpressionTest {
-
+/*
 	private Map<String, Object> getDefaultModel() {
 		Map<String, Object> defaultModel = new HashMap<String,Object>();
 		defaultModel.put("booleanTrue", true);
@@ -139,7 +130,7 @@ public class OGNLExpressionTest {
 	}
 	
 	
-	
+	*/
 	
 	
 

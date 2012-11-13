@@ -94,7 +94,7 @@ We are using Github for Maven hosting. Just add this repository ...
 <dependency>
   <groupId>de.neuland</groupId>
   <artifactId>jade4j</artifactId>
-  <version>0.2.19</version>
+  <version>0.3.0</version>
 </dependency>
 ```
 
@@ -235,27 +235,22 @@ TemplateLoader loader = new FileTemplateLoader("/templates/", "UTF-8");
 config.setTemplateLoader(loader);
 ```
 
-<a name="differences"></a>
-## Differences
+<a name="expressions"></a>
+## Expressions
 
 The original jade implementation uses JavaScript for expression handling in `if`, `unless`, `for`, `case` commands, like this
 
+    book = {price: 9.99, available: true}
     if book.price < 5.50 && book.available
       p.sale special offer
 
-We decided to use [OGNL](http://en.wikipedia.org/wiki/OGNL) instead of a JavaScript interpreter like Rhino. OGNL's syntax and handling of `falsy` values is very similar to JavaScript. There are although some differences when it comes to `array` and `object/map` creation in the template:
+    each author in ["artur", "stefan", "michael"]
+      h2= author
 
-in jade.js:
+As of version 0.3.0 jade4j uses [JEXL](http://commons.apache.org/jexl/) instead of [OGNL](http://en.wikipedia.org/wiki/OGNL) for parsing and executing these expressions.
 
-    names = ["artur", "stefan"]
-    book = {name: "My Diary", pages: 10}
+We decided to switch to JEXL because its syntax and behavior is more similar to ECMAScript/JavaScript and so closer to the original jade.js implementation. JEXL runs also much faster than OGNL. Our benchmark showed a **performance increase by factor 3 to 4**.
 
-in jade4j:
-
-    names = {"artur", "stefan"}
-    book = #{"name": "My Diary", "pages": "10"}
-
-However, in most cases you would not create new objects in templates anyway.
 
 <a name="framework-integrations"></a>
 ## Framework Integrations

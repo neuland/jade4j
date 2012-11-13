@@ -15,7 +15,7 @@ import de.neuland.jade4j.TestFileHelper;
 
 public class JadeExceptionTest {
 
-	@Test
+	//@Test
 	public void test() throws Exception {
 		String errorJade = TestFileHelper.getCompilerResourcePath("exceptions/error.jade");
 		String exceptionHtml = TestFileHelper.getCompilerResourcePath("exceptions/error.html");

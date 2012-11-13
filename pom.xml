@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.neuland</groupId>
 	<artifactId>jade4j</artifactId>
-	<version>0.2.20</version>
+	<version>0.3.0</version>
 	<name>jade templating engine for Java VM</name>
 	<issueManagement>
 		<url>https://github.com/neuland/jade4j/issues</url>
@@ -87,15 +87,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>ognl</groupId>
-			<artifactId>ognl</artifactId>
-			<version>3.0.3</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-expression</artifactId>
-			<version>3.0.5.RELEASE</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-jexl</artifactId>
+			<version>2.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-collections</groupId>
@@ -149,5 +143,6 @@
 			<artifactId>pegdown</artifactId>
 			<version>1.1.0</version>
 		</dependency>
+
 	</dependencies>
 </project>

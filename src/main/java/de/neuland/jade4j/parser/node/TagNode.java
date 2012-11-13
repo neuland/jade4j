@@ -120,8 +120,7 @@ public class TagNode extends AttributedNode {
 			}
 		} else if (attribute instanceof ExpressionString) {
 			String expression = ((ExpressionString) attribute).getValue();
-			Object expressionValue;
-			expressionValue = ExpressionHandler.evaluateExpression(expression, model);
+			Object expressionValue = ExpressionHandler.evaluateExpression(expression, model);
 			if (expressionValue == null) {
 				return "";
 			}

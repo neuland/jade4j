@@ -64,9 +64,9 @@ public class Utils {
 			} else if (entry instanceof ExpressionString) {
 				ExpressionString expression = (ExpressionString) entry;
 				String stringValue = "";
-				Object value = ExpressionHandler.evaluateExpression(expression.getValue(), model);
+				String value = ExpressionHandler.evaluateStringExpression(expression.getValue(), model);
 				if (value != null) {
-					stringValue = value.toString();
+					stringValue = value;
 				}
 				if (expression.isEscape()) {
 					stringValue = escapeHTML(stringValue);

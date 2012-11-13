@@ -1,8 +1,10 @@
 package de.neuland.jade4j.parser.node;
 
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.collections.IteratorUtils;
 
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.ExpressionException;
@@ -35,39 +37,28 @@ public class EachNode extends Node {
 
 	@SuppressWarnings("unchecked")
 	private void run(IndentWriter writer, JadeModel model, Object result, JadeTemplate template) {
-		if (result instanceof Collection) {
-			runCollection((Collection<Object>) result, model, writer, template);
+		if (result instanceof Iterable<?>) {
+			runIterator(((Iterable<?>) result).iterator(), model, writer, template);
 		}
 		if (result.getClass().isArray()) {
-			runArray((Object[]) result, model, writer, template);
+			Iterator<?> iterator = IteratorUtils.arrayIterator(result);
+			runIterator(iterator, model, writer, template);
 		}
 		if (result instanceof Map) {
 			runMap((Map<String, Object>) result, model, writer, template);
 		}
 	}
 
-	private void runCollection(Collection<Object> result, JadeModel model, IndentWriter writer, JadeTemplate template) {
+	private void runIterator(Iterator<?> iterator, JadeModel model, IndentWriter writer, JadeTemplate template) {
 		int index = 0;
-		if (result.size() == 0) {
-			executeElseNode(model, writer, template);
-			return;
-		}
-		for (Object entry : result) {
-			model.put(getValue(), entry);
-			model.put(getKey(), index);
-			getBlock().execute(writer, model, template);
-			index++;
-		}
-	}
 
-	private void runArray(Object[] result, JadeModel model, IndentWriter writer, JadeTemplate template) {
-		int index = 0;
-		if (result.length == 0) {
+		if (!iterator.hasNext()) {
 			executeElseNode(model, writer, template);
 			return;
 		}
-		for (Object entry : result) {
-			model.put(getValue(), entry);
+
+		while (iterator.hasNext()) {
+			model.put(getValue(), iterator.next());
 			model.put(getKey(), index);
 			getBlock().execute(writer, model, template);
 			index++;
@@ -89,7 +80,7 @@ public class EachNode extends Node {
 
 	private void executeElseNode(JadeModel model, IndentWriter writer, JadeTemplate template) {
 		if (elseNode != null) {
-			elseNode.execute(writer, model, template);				
+			elseNode.execute(writer, model, template);
 		}
 	}
 

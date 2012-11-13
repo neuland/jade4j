@@ -106,6 +106,11 @@ public class CompilerTest {
 	public void condition() {
 		run("condition");
 	}
+	
+	@Test
+	public void conditionTypes() {
+		run("condition_types");
+	}
 
 	@Test
 	public void escape() {

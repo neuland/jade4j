@@ -1,10 +1,10 @@
 package de.neuland.jade4j.parser.expression;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.apache.commons.jexl2.Expression;
+import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl2.MapContext;
+import org.apache.commons.lang3.StringUtils;
 
-import ognl.Ognl;
-import ognl.OgnlException;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.model.JadeModel;
 
@@ -12,40 +12,30 @@ public class ExpressionHandler {
 
 	private static final int MAX_ENTRIES = 5000;
 
-	private static Map<String, Object> cache = new LinkedHashMap<String, Object>(MAX_ENTRIES + 1, .75F, true) {
-		private static final long serialVersionUID = -5019455452524450589L;
+	private static JexlEngine jexl;
 
-		public boolean removeEldestEntry(Map.Entry<String, Object> eldest) {
-			return size() > MAX_ENTRIES;
-		}
-	};
+	static {
+		jexl = new JexlEngine(new JadeIntrospect(null), null, null, null);
+		jexl.setLenient(true);
+		jexl.setSilent(true);
+		jexl.setCache(MAX_ENTRIES);
+	}
 
 	public static Boolean evaluateBooleanExpression(String expression, JadeModel model) throws ExpressionException {
-		try {
-			Object tree = getCompiledExpression(expression);
-			return (Boolean) Ognl.getValue(tree, (Object) model, Boolean.class);
-		} catch (Throwable e) {
-			throw new ExpressionException(expression, e);
-		}
+		return BooleanUtil.convert(evaluateExpression(expression, model));
 	}
 
 	public static Object evaluateExpression(String expression, JadeModel model) throws ExpressionException {
 		try {
-			Object tree = getCompiledExpression(expression);
-			return Ognl.getValue(tree, model);
+			Expression e = jexl.createExpression(expression);
+			return e.evaluate(new MapContext(model));
 		} catch (Exception e) {
 			throw new ExpressionException(expression, e);
 		}
 	}
 
-	protected static Object getCompiledExpression(String expression) throws OgnlException {
-		if (!cache.containsKey(expression)) {
-			cache.put(expression, compileExpression(expression));
-		}
-		return cache.get(expression);
-	}
-
-	protected static Object compileExpression(String expression) throws OgnlException {
-		return Ognl.parseExpression(expression);
+	public static String evaluateStringExpression(String expression, JadeModel model) throws ExpressionException {
+		Object result = evaluateExpression(expression, model);
+		return result == null ? "" : result.toString();
 	}
 }
