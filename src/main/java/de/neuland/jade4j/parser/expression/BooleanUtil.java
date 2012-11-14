@@ -26,7 +26,7 @@ public class BooleanUtil {
 		} else if (in instanceof String) {
 			return !StringUtils.isEmpty((String) in);
 		} else {
-			throw new RuntimeException("cannot convert type: " + in.getClass().getName() + " to: " + Boolean.class.getName());
+			return true;
 		}
 
 	}

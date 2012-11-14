@@ -30,6 +30,7 @@ public class BooleanUtilTest {
 		trues.add(Boolean.TRUE);
 		trues.add(Arrays.asList("a"));
 		trues.add(new int[] { 1, 2 });
+		trues.add(new Object());
 
 		for (Object object : falses) {
 			assertFalse(object + " (" + object.getClass().getName() + ") should be false", BooleanUtil.convert(object));
