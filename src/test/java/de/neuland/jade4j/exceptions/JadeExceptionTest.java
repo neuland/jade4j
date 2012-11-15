@@ -15,7 +15,7 @@ import de.neuland.jade4j.TestFileHelper;
 
 public class JadeExceptionTest {
 
-	//@Test
+	@Test
 	public void test() throws Exception {
 		String errorJade = TestFileHelper.getCompilerResourcePath("exceptions/error.jade");
 		String exceptionHtml = TestFileHelper.getCompilerResourcePath("exceptions/error.html");
@@ -23,11 +23,11 @@ public class JadeExceptionTest {
 			Jade4J.render(errorJade, new HashMap<String, Object>());
 			fail();
 		} catch (JadeException e) {
-			assertTrue(e.getMessage().startsWith("unable to evaluate [non.existing.query]"));
+			assertTrue(e.getMessage().startsWith("unable to evaluate [non.existing.query()]"));
 			assertEquals(9, e.getLineNumber());
 			assertEquals(errorJade, e.getFilename());
 			String expectedHtml = readFile(exceptionHtml);
-			String html = e.toHtmlString();
+			String html = e.toHtmlString("<html><head><title>broken");
 			assertEquals(removeAbsolutePath(expectedHtml), removeAbsolutePath(html));
 		}
 	}

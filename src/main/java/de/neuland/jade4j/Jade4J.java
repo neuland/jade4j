@@ -88,11 +88,14 @@ public class Jade4J {
 		return writer.toString();
 	}
 
-	public static String render(URL url, Map<String, Object> model) throws IOException, JadeCompilerException {
+	public static String render(URL url, Map<String, Object> model, boolean pretty) throws IOException, JadeCompilerException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-		JadeTemplate template = new JadeTemplate();
-		template = getTemplate(reader, url.getPath());
-		return render(template, model);
+		JadeTemplate template = getTemplate(reader, url.getPath());
+		return render(template, model, pretty);
+	}
+
+	public static String render(URL url, Map<String, Object> model) throws IOException, JadeCompilerException {
+		return render(url, model, false);
 	}
 
 }

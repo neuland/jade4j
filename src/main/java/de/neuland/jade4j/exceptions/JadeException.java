@@ -59,16 +59,23 @@ public abstract class JadeException extends RuntimeException {
 	}
 
 	public String toHtmlString() {
+		return toHtmlString(null);
+	}
+
+	public String toHtmlString(String generatedHtml) {
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("filename", filename);
 		model.put("linenumber", lineNumber);
 		model.put("message", getMessage());
 		model.put("lines", getTemplateLines());
 		model.put("exception", getName());
+		if (generatedHtml != null) {
+			model.put("html", generatedHtml);
+		}
 
 		try {
 			URL url = JadeException.class.getResource("/error.jade");
-			return Jade4J.render(url, model);
+			return Jade4J.render(url, model, true);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

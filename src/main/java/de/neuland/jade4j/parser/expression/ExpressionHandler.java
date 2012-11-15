@@ -3,7 +3,6 @@ package de.neuland.jade4j.parser.expression;
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.MapContext;
-import org.apache.commons.lang3.StringUtils;
 
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.model.JadeModel;
@@ -17,7 +16,7 @@ public class ExpressionHandler {
 	static {
 		jexl = new JexlEngine(new JadeIntrospect(null), null, null, null);
 		jexl.setLenient(true);
-		jexl.setSilent(true);
+		jexl.setSilent(false);
 		jexl.setCache(MAX_ENTRIES);
 	}
 

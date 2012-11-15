@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.neuland</groupId>
 	<artifactId>jade4j</artifactId>
-	<version>0.3.1</version>
+	<version>0.3.3</version>
 	<name>jade templating engine for Java VM</name>
 	<issueManagement>
 		<url>https://github.com/neuland/jade4j/issues</url>
