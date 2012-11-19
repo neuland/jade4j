@@ -18,13 +18,7 @@ public class Attribute extends Token {
 	}
 
 	public void addAttribute(String name, String value) {
-		if ("true".equals(value)) {
-			addBooleanAttribute(name, Boolean.TRUE);
-		} else if ("false".equals(value)) {
-			addBooleanAttribute(name, Boolean.FALSE);
-		} else {
-			attributes.put(name, value);
-		}
+		attributes.put(name, value);
 	}
 
 	public void addExpressionAttribute(String name, String expression) {
