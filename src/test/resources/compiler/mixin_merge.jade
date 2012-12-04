@@ -3,6 +3,7 @@ mixin foo
   p.baz.quux(attributes) Two
   p(attributes) Three
   p.bar(attributes, class="baz") Four
+  p.baz(attributes, class=2+3) Five
 
 body
   +foo.hello

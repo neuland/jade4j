@@ -57,19 +57,23 @@ public abstract class AttributedNode extends Node {
 	 * Puts the specified key-value pair in the specified map. Provides special
 	 * processing in the case of the "class" attribute.
 	 */
-	private void addAttribute(Map<String, Object> map, String key, Object value1) {
+	private void addAttribute(Map<String, Object> map, String key, Object newValue) {
 		if ("class".equals(key) && attributes.containsKey(key)) {
-			String value2 = (String) attributes.get(key);
-			if (value1 instanceof ExpressionString) {
-				String expression = ((ExpressionString) value1).getValue();
-				attributes.put(key, value2 + " #{" + expression + "}");
-			} else {
-				attributes.put(key, value2 + " " + value1);
-			}
+			String value1 = attributeValueToString(attributes.get(key));
+			String value2 = attributeValueToString(newValue);
+			attributes.put(key, value1 + " " + value2);
 
 		} else {
-			attributes.put(key, value1);
+			attributes.put(key, newValue);
 		}
+	}
+
+	private String attributeValueToString(Object value) {
+		if (value instanceof ExpressionString) {
+			String expression = ((ExpressionString) value).getValue();
+			return "#{" + expression + "}";
+		}
+		return value.toString();
 	}
 
 	@Override
