@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import de.neuland.jade4j.expression.BooleanUtil;
+
 public class BooleanUtilTest {
 
 	@Test

@@ -1,0 +1,13 @@
+//- evaluate non existing variables to null
+h1= nothing
+
+//- evaluate non existing properties to null
+user = {}
+h2= user.address
+h3= user.address.street
+
+//- doing it inline
+h4= ["a","b"].contains(user.address)
+
+unless nothing || user.address
+  h5 success

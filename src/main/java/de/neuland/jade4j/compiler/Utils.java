@@ -8,8 +8,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import de.neuland.jade4j.exceptions.ExpressionException;
+import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
-import de.neuland.jade4j.parser.expression.ExpressionHandler;
 import de.neuland.jade4j.parser.node.ExpressionString;
 
 public class Utils {

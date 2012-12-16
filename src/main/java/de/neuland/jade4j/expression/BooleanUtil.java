@@ -1,4 +1,4 @@
-package de.neuland.jade4j.parser.expression;
+package de.neuland.jade4j.expression;
 
 import java.util.List;
 

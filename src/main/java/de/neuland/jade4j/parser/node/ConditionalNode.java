@@ -6,8 +6,8 @@ import java.util.List;
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
+import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
-import de.neuland.jade4j.parser.expression.ExpressionHandler;
 import de.neuland.jade4j.template.JadeTemplate;
 
 public class ConditionalNode extends Node {

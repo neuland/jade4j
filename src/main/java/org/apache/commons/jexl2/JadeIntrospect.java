@@ -1,4 +1,4 @@
-package de.neuland.jade4j.parser.expression;
+package org.apache.commons.jexl2;
 
 import java.lang.reflect.Field;
 
@@ -22,6 +22,7 @@ public class JadeIntrospect extends UberspectImpl {
 	/**
 	 * Overwriting method to replace "getGetExecutor" call with "getJadeGetExecutor"
 	 */
+	@SuppressWarnings("deprecation")
 	@Override
 	public JexlPropertyGet getPropertyGet(Object obj, Object identifier, JexlInfo info) {
 		JexlPropertyGet get = getJadeGetExecutor(obj, identifier);

@@ -17,6 +17,7 @@ import org.junit.Test;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.TestFileHelper;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.filter.MarkdownFilter;
@@ -268,6 +269,25 @@ public class CompilerTest {
 	public void filterPlain() {
 		run("filter_plain");
 	}
+	
+	@Test(expected=JadeCompilerException.class)
+	public void expressionException() throws IOException {
+		tryToRender("expression_exception");
+	}
+
+	@Test(expected=JadeCompilerException.class)
+	public void expressionWrongMethodCall() throws IOException {
+		tryToRender("expression_method_invocation_exception");
+	}
+	
+	@Test
+	public void expressionLenientVariableEvaluation() throws IOException {
+		run("expression_lenient");
+	}
+	
+	private void tryToRender(String file) throws IOException {
+		Jade4J.render(TestFileHelper.getCompilerResourcePath(file+".jade"), new HashMap<String, Object>());
+	}
 
 
 	@Test
@@ -310,7 +330,7 @@ public class CompilerTest {
 		Node root = parser.parse();
 		Compiler compiler = new Compiler(root);
 		compiler.setPrettyPrint(pretty);
-        String expected = readFile(testName + expectedFileNameExtension );
+        String expected = readFile(testName + expectedFileNameExtension);
 		model.addFilter("markdown", new MarkdownFilter());
 		model.addFilter("plain", new PlainFilter());
 		String html;
