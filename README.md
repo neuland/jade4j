@@ -15,8 +15,8 @@ jade4j's intention is to be able to process jade templates in Java without the n
     - [Filters](#api-filters)
     - [Model Defaults](#api-model-defaults)
     - [Template Loader](#api-template-loader)
-- [Error Handling](#errorhandling)
-- [Differences](#differences)
+- [Expressions](#expressions)
+- [Framework Integrations](#framework-integrations)
 - [Authors](#authors)
 - [License](#license)
 
@@ -240,9 +240,9 @@ config.setTemplateLoader(loader);
 
 The original jade implementation uses JavaScript for expression handling in `if`, `unless`, `for`, `case` commands, like this
 
-    book = {price: 9.99, available: true}
-    if book.price < 5.50 && book.available
-      p.sale special offer
+    book = {"price": 4.99, "title": "The Book"}
+    if book.price < 5.50 && !book.soldOut
+      p.sale special offer: #{book.title}
 
     each author in ["artur", "stefan", "michael"]
       h2= author
@@ -251,6 +251,7 @@ As of version 0.3.0 jade4j uses [JEXL](http://commons.apache.org/jexl/) instead 
 
 We decided to switch to JEXL because its syntax and behavior is more similar to ECMAScript/JavaScript and so closer to the original jade.js implementation. JEXL runs also much faster than OGNL. Our benchmark showed a **performance increase by factor 3 to 4**.
 
+We are using a slightly modified JEXL version which to have better controll of the exception handling. JEXL now runs in a semi-strict mode, where non existing values and properties silently evaluate to `null`/`false` where as invalid method calls lead to a `JadeCompilerException`.
 
 <a name="framework-integrations"></a>
 ## Framework Integrations
