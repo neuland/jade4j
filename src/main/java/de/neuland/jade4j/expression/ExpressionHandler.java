@@ -36,4 +36,8 @@ public class ExpressionHandler {
 		Object result = evaluateExpression(expression, model);
 		return result == null ? "" : result.toString();
 	}
+	
+	public static void setCache(boolean cache) {
+		jexl.setCache(cache ? MAX_ENTRIES : 0);
+	}
 }

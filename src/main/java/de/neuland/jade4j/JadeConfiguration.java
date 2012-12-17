@@ -1,9 +1,20 @@
 package de.neuland.jade4j;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+
 import de.neuland.jade4j.Jade4J.Mode;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.exceptions.JadeException;
+import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.filter.CDATAFilter;
 import de.neuland.jade4j.filter.Filter;
 import de.neuland.jade4j.filter.PlainFilter;
@@ -13,14 +24,6 @@ import de.neuland.jade4j.parser.node.Node;
 import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.template.TemplateLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
 
 public class JadeConfiguration {
 
@@ -32,7 +35,7 @@ public class JadeConfiguration {
 	private static Logger logger = LoggerFactory.getLogger(JadeConfiguration.class);
 
 	private boolean prettyPrint = false;
-	private boolean caching = false;
+	private boolean caching = true;
 	private Mode mode = Jade4J.Mode.HTML;
 
 	private Map<String, Filter> filters = new HashMap<String, Filter>();
@@ -45,24 +48,23 @@ public class JadeConfiguration {
 		setFilter(FILTER_CDATA, new CDATAFilter());
 	}
 
-    private Map<String, JadeTemplate> cache = new ConcurrentLinkedHashMap.Builder<String, JadeTemplate>()
-            .maximumWeightedCapacity(MAX_ENTRIES+1)
-            .build();
+	private Map<String, JadeTemplate> cache = new ConcurrentLinkedHashMap.Builder<String, JadeTemplate>().maximumWeightedCapacity(
+			MAX_ENTRIES + 1).build();
 
 	public JadeTemplate getTemplate(String name) throws IOException, JadeException {
 		if (caching) {
 			long lastModified = templateLoader.getLastModified(name);
 			String key = name + "-" + lastModified;
 
-            JadeTemplate template = cache.get(key);
+			JadeTemplate template = cache.get(key);
 
-            if (template!=null) {
-                return template;
-            } else {
-                JadeTemplate newTemplate = createTemplate(name);
-                cache.put(key, newTemplate);
-                return newTemplate;
-            }
+			if (template != null) {
+				return template;
+			} else {
+				JadeTemplate newTemplate = createTemplate(name);
+				cache.put(key, newTemplate);
+				return newTemplate;
+			}
 		}
 
 		return createTemplate(name);
@@ -147,8 +149,11 @@ public class JadeConfiguration {
 		return caching;
 	}
 
-	public void setCaching(boolean caching) {
-		this.caching = caching;
+	public void setCaching(boolean cache) {
+		if (cache != this.caching) {
+			ExpressionHandler.setCache(cache);
+			this.caching = cache;
+		}
 	}
 
 }
