@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/DECORATION/1.3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.3.0 http://maven.apache.org/xsd/decoration-1.3.0.xsd"
+  name="${project.name}">
+
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>1.3.0</version>
+  </skin>
+
+  <custom>
+    <fluidoSkin>
+      <topBarEnabled>true</topBarEnabled>
+      <sideBarEnabled>true</sideBarEnabled>
+      </fluidoSkin>
+  </custom>
+
+  <publishDate format="dd MMMM yyyy" position="left" />
+  <version position="left" />
+
+  <body>
+  	<!-- http://maven.apache.org/doxia/doxia-sitetools/doxia-decoration-model/decoration.html 
+  	<item collapse=.. ref=.. name=.. href="README" img=.. position=.. alt=.. border=.. width=.. height=.. target=.. title=.. >
+  	-->
+    <menu name="Documentation">
+      <item href="intro.html" name="Documentation" />
+    </menu>
+
+    <menu ref="reports" inherit="bottom" />
+  </body>
+</project>
