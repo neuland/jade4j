@@ -6,6 +6,8 @@
 	<artifactId>jade4j</artifactId>
 	<version>0.3.8</version>
 	<name>jade templating engine for Java VM</name>
+	<description>Jade templating engine for Java VM</description>
+	
 	<issueManagement>
 		<url>https://github.com/neuland/jade4j/issues</url>
 		<system>GitHub Issues</system>
@@ -23,6 +25,10 @@
 		<connection>scm:git:git://github.com/neuland/jade4j.git</connection>
 		<developerConnection>scm:git:git@github.com:neuland/jade4j.git</developerConnection>
 	</scm>
+	<ciManagement>
+		<system>Travis-ci</system>
+		<url>https://travis-ci.org/neuland/jade4j</url>
+	</ciManagement>
 
 	<developers>
 		<developer>
@@ -82,6 +88,23 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
+			<!-- http://stackoverflow.com/questions/14829190/how-to-use-markdown-for-maven-project-site -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.2</version>
+				<!-- http://maven.apache.org/doxia/references/index.html -->
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.maven.doxia</groupId>
+						<artifactId>doxia-module-markdown</artifactId>
+						<version>1.3</version>
+					</dependency>
+				</dependencies>
+				
+			</plugin>
+
 		</plugins>
 	</build>
 
