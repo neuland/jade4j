@@ -11,18 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.neuland.jade4j.filter.Filter;
 import de.neuland.jade4j.parser.node.MixinNode;
 
 public class JadeModel implements Map<String, Object> {
 
 	private static final String LOCALS = "locals";
-
-	@SuppressWarnings("unused")
-	private static final Logger logger = LoggerFactory.getLogger(JadeModel.class);
 
 	private Deque<Map<String, Object>> scopes = new LinkedList<Map<String, Object>>();
 	private Map<String, MixinNode> mixins = new HashMap<String, MixinNode>();
