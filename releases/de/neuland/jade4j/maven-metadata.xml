@@ -3,7 +3,7 @@
   <groupId>de.neuland</groupId>
   <artifactId>jade4j</artifactId>
   <versioning>
-    <release>0.3.8</release>
+    <release>0.3.9</release>
     <versions>
       <version>0.2.0</version>
       <version>0.2.1</version>
@@ -34,7 +34,8 @@
       <version>0.3.6</version>
       <version>0.3.7</version>
       <version>0.3.8</version>
+      <version>0.3.9</version>
     </versions>
-    <lastUpdated>20121217083755</lastUpdated>
+    <lastUpdated>20130304210129</lastUpdated>
   </versioning>
 </metadata>
