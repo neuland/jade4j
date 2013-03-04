@@ -1,5 +1,6 @@
 package de.neuland.jade4j.expression;
 
+import de.neuland.jade4j.exceptions.UnknownVariableException;
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JadeJexlEngine;
 import org.apache.commons.jexl2.JexlEngine;
@@ -27,6 +28,8 @@ public class ExpressionHandler {
 		try {
 			Expression e = jexl.createExpression(expression);
 			return e.evaluate(new MapContext(model));
+        } catch (UnknownVariableException e) {
+            throw e;
 		} catch (Exception e) {
 			throw new ExpressionException(expression, e);
 		}

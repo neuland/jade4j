@@ -7,7 +7,7 @@ public class JadeJexlEngine extends JexlEngine {
 	 * using a semi strict interpreter and non strict arithmetic
 	 */
 	public JadeJexlEngine() {
-		super(new JadeIntrospect(null), null, null, null);
+		super(new JadeIntrospect(null), new JadeJexlArithmetic(true), null, null);
 		setStrict(false);
 	}
 

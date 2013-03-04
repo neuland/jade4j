@@ -3,6 +3,7 @@ package de.neuland.jade4j.parser.node;
 import java.util.List;
 import java.util.Map;
 
+import de.neuland.jade4j.exceptions.UnknownVariableException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -162,6 +163,8 @@ public class TagNode extends AttributedNode {
 		List<Object> prepared = preparedAttributeValues.get(name);
 		try {
 			return Utils.interpolate(prepared, model);
+        } catch (UnknownVariableException e) {
+            throw new JadeCompilerException(this, template.getTemplateLoader(), e);
 		} catch (ExpressionException e) {
 			throw new JadeCompilerException(this, template.getTemplateLoader(), e);
 		}
