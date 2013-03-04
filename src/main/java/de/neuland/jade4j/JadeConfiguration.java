@@ -6,9 +6,6 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 
 import de.neuland.jade4j.Jade4J.Mode;
@@ -30,9 +27,6 @@ public class JadeConfiguration {
 	private static final String FILTER_CDATA = "cdata";
 
 	private static final String FILTER_PLAIN = "plain";
-
-	@SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.getLogger(JadeConfiguration.class);
 
 	private boolean prettyPrint = false;
 	private boolean caching = true;
