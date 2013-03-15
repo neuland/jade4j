@@ -20,39 +20,26 @@ public class JadeRunFullTemplateTest {
 	
 	@Test
 	public void testFullRun() throws IOException {
-        String templateName = "fullrun";
-        String expected = "<div><div>Hi everybody</div></div>";
-        assertTemplateRendering(templateName, expected);
-	}
+		JadeConfiguration cfg = new JadeConfiguration();
+		//	cfg.setDirectoryForTemplateLoading(new File("/where/you/store/templates"));
+		Map<String, Object> root = new HashMap<String, Object>();
+		root.put("hello", "world");
+		root.put("hallo", null);
+		JadeModel model = new JadeModel(root);
 
-	@Test
-	public void testFullRunForMixinWithConditional() throws IOException {
-        String templateName = "mixin_with_conditional";
-        String expected = "<div class=\"wrapper conditional\"><label>another nested label</label></div>";
-        assertTemplateRendering(templateName, expected);
-	}
-
-    private void assertTemplateRendering(String templateName, String expected) throws IOException {
-        JadeConfiguration cfg = new JadeConfiguration();
-        //	cfg.setDirectoryForTemplateLoading(new File("/where/you/store/templates"));
-        Map<String, Object> root = new HashMap<String, Object>();
-        root.put("hello", "world");
-        root.put("hallo", null);
-        JadeModel model = new JadeModel(root);
-
-        JadeTemplate temp = cfg.getTemplate(getResourcePath(templateName));
+		JadeTemplate temp = cfg.getTemplate(getResourcePath("fullrun"));
 
 //		Writer out = new OutputStreamWriter(System.err);
-        StringWriter out = new StringWriter();
-        try {
+		StringWriter out = new StringWriter();
+		try {
             temp.process(model, out);
         } catch (JadeCompilerException e) {
             e.printStackTrace();
             fail();
         }
-        out.flush();
-        assertEquals(expected, out.toString());
-    }
+		out.flush();
+		assertEquals("<div><div>Hi everybody</div></div>", out.toString());
+	}
 
     public String getResourcePath(String fileName) {
     	try {
