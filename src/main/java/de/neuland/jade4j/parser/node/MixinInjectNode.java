@@ -53,7 +53,20 @@ public class MixinInjectNode extends AttributedNode {
 				return node;
 			}
 
-			if (node.hasBlock()) {
+            if(node instanceof ConditionalNode){
+                List<IfConditionNode> conditions = ((ConditionalNode) node).getConditions();
+                Node blockForIfConditionNode = conditions.get(0).getBlock();
+
+                if(!blockForIfConditionNode.hasNodes()) return blockForIfConditionNode;
+
+                Node nodeFromTree = getInjectionPoint(blockForIfConditionNode);
+                if (nodeFromTree != null) {
+                    return nodeFromTree;
+                }
+            }
+
+
+            if (node.hasBlock()) {
 				if (!node.getBlock().hasNodes()) {
 					return node.getBlock();
 				}

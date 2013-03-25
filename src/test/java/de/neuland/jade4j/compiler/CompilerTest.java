@@ -239,7 +239,12 @@ public class CompilerTest {
 		run("mixin_merge", true);
 	}
 
-	@Test
+    @Test
+    public void mixin_with_conditional() {
+        run("mixin_with_conditional");
+    }
+
+    @Test
 	public void include1() {
 		run("include_1");
 	}

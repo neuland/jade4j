@@ -26,7 +26,7 @@ public class JadeRunFullTemplateTest {
 		root.put("hello", "world");
 		root.put("hallo", null);
 		JadeModel model = new JadeModel(root);
-		
+
 		JadeTemplate temp = cfg.getTemplate(getResourcePath("fullrun"));
 
 //		Writer out = new OutputStreamWriter(System.err);
@@ -40,10 +40,10 @@ public class JadeRunFullTemplateTest {
 		out.flush();
 		assertEquals("<div><div>Hi everybody</div></div>", out.toString());
 	}
-	
+
     public String getResourcePath(String fileName) {
     	try {
-			return TestFileHelper.getRootResourcePath() + "/template/fullrun";
+			return TestFileHelper.getRootResourcePath() + "/template/" + fileName;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
