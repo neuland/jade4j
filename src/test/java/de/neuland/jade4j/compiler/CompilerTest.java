@@ -53,6 +53,11 @@ public class CompilerTest {
 		run("complex_indent_outdent_file");
 	}
 
+    @Test
+    public void blockQuote(){
+        run("blockquote");
+    }
+
 	@Test
 	public void cssClassAndId() {
 		run("css_class_and_id");
