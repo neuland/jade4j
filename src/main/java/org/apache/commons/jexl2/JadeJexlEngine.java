@@ -2,14 +2,13 @@ package org.apache.commons.jexl2;
 
 
 public class JadeJexlEngine extends JexlEngine {
-    private static JexlEngine jexl;
+    private static JexlEngine jexl = new JadeJexlEngine();
     private static final int MAX_ENTRIES = 5000;
 
-    public static synchronized JexlEngine getInstance() {
-        if (jexl == null) {
-            jexl = new JadeJexlEngine();
-            jexl.setCache(MAX_ENTRIES);
-        }
+    static {
+        jexl.setCache(MAX_ENTRIES);
+    }
+    public static JexlEngine getInstance() {
         return jexl;
     }
 
