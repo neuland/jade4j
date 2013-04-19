@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.jexl2.JadeJexlEngine;
 import org.junit.Test;
 
 import com.google.gson.Gson;
@@ -53,6 +54,11 @@ public class CompilerTest {
 		run("complex_indent_outdent_file");
 	}
 
+    @Test
+    public void blockQuote(){
+        run("blockquote");
+    }
+
 	@Test
 	public void cssClassAndId() {
 		run("css_class_and_id");
@@ -81,6 +87,14 @@ public class CompilerTest {
 	@Test
 	public void whileTag() {
 		run("while");
+	}
+
+	@Test
+	public void mathExpression() {
+        final HashMap<String, Object> funcs = new HashMap<String, Object>();
+        funcs.put("math", new Math());
+        JadeJexlEngine.getInstance().setFunctions(funcs);
+		run("math_expression");
 	}
 
 	@Test

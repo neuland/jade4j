@@ -21,6 +21,7 @@ import de.neuland.jade4j.parser.node.Node;
 import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.template.TemplateLoader;
+import org.apache.commons.jexl2.JadeJexlEngine;
 
 public class JadeConfiguration {
 
@@ -143,9 +144,9 @@ public class JadeConfiguration {
 		return caching;
 	}
 
-	public void setCaching(boolean cache) {
+    public void setCaching(boolean cache) {
 		if (cache != this.caching) {
-			ExpressionHandler.setCache(cache);
+			JadeJexlEngine.setCache(cache);
 			this.caching = cache;
 		}
 	}
