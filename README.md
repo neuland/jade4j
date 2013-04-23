@@ -13,6 +13,7 @@ jade4j's intention is to be able to process jade templates in Java without the n
     - [Caching](#api-caching)
     - [Output Formatting](#api-output)
     - [Filters](#api-filters)
+    - [Helpers](#api-helpers)
     - [Model Defaults](#api-model-defaults)
     - [Template Loader](#api-template-loader)
 - [Expressions](#expressions)
@@ -211,6 +212,29 @@ jade4j comes with a `plain` and `cdata` filter. `plain` takes your input to pass
     config.setFilter("coffeescript", new CoffeeScriptFilter());
 
 To implement your own filter you have to implement the `Filter` Interface. If your filter doesn't use any data from the model you can inherit from the abstract `CachingFilter` and also get caching for free. See the [neuland/jade4j-coffeescript-filter](https://github.com/neuland/jade4j-coffeescript-filter) project as an example.
+
+<a name="api-helpers"></a>
+### Helpers
+
+If you need to call custom java functions the easiest way is to create helper classes and put an instance into the model.
+
+```java
+public class MathHelper {
+    public long round(double number) {
+        return Math.round(number);
+    }
+}
+```
+
+```java
+model.put("math", new MathHelper());
+```
+
+Note: Helpers don't have their own namespace, so you have to be carefull not to overwrite them with other variables.
+
+```
+p= math.round(1.44)
+```
 
 <a name="api-model-defaults"></a>
 ### Model Defaults
