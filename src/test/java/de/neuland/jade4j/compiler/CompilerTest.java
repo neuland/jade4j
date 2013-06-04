@@ -58,6 +58,11 @@ public class CompilerTest {
         run("blockquote");
     }
 
+    @Test
+    public void blockquotes(){
+        run("blockquotes");
+    }
+
 	@Test
 	public void cssClassAndId() {
 		run("css_class_and_id");
