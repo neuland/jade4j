@@ -20,7 +20,7 @@ public class JadeJexlInterpreter extends Interpreter {
 	protected Object unknownVariable(JexlException xjexl) {
 		// don't throw the exception
 		if (!silent) {
-			logger.warn(xjexl.getMessage());
+			logger.trace(xjexl.getMessage());
 		}
 		return null;
 	}
