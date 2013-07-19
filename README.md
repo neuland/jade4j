@@ -286,10 +286,10 @@ JEXL comes with the three builtin functions `new`, `size` and `empty`. For prope
 ```
 book = {size: 540}
 book.size // does not work
-book["size"] // 540
+book["size"] // works
 ```
 
-You can read more about this in the [JEXL documentation]((see [jexl documentation](http://commons.apache.org/proper/commons-jexl/reference/syntax.html#Language_Elements)))
+You can read more about this in the [JEXL documentation](see [jexl documentation](http://commons.apache.org/proper/commons-jexl/reference/syntax.html#Language_Elements).
 
 <a name="framework-integrations"></a>
 ## Framework Integrations
