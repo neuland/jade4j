@@ -17,6 +17,7 @@ jade4j's intention is to be able to process jade templates in Java without the n
     - [Model Defaults](#api-model-defaults)
     - [Template Loader](#api-template-loader)
 - [Expressions](#expressions)
+- [Reserved Words](#reserved-words)
 - [Framework Integrations](#framework-integrations)
 - [Authors](#authors)
 - [License](#license)
@@ -275,7 +276,20 @@ As of version 0.3.0 jade4j uses [JEXL](http://commons.apache.org/jexl/) instead 
 
 We decided to switch to JEXL because its syntax and behavior is more similar to ECMAScript/JavaScript and so closer to the original jade.js implementation. JEXL runs also much faster than OGNL. Our benchmark showed a **performance increase by factor 3 to 4**.
 
-We are using a slightly modified JEXL version which to have better controll of the exception handling. JEXL now runs in a semi-strict mode, where non existing values and properties silently evaluate to `null`/`false` where as invalid method calls lead to a `JadeCompilerException`.
+We are using a slightly modified JEXL version which to have better control of the exception handling. JEXL now runs in a semi-strict mode, where non existing values and properties silently evaluate to `null`/`false` where as invalid method calls lead to a `JadeCompilerException`.
+
+<a name="reserved-words"></a>
+## Reserved Words
+
+JEXL comes with the three builtin functions `new`, `size` and `empty`. For properties with this name the `.` notation does not work, but you can access them with `[]`.
+
+```
+book = {size: 540}
+book.size // does not work
+book["size"] // 540
+```
+
+You can read more about this in the [JEXL documentation]((see [jexl documentation](http://commons.apache.org/proper/commons-jexl/reference/syntax.html#Language_Elements)))
 
 <a name="framework-integrations"></a>
 ## Framework Integrations
