@@ -45,6 +45,8 @@ public class Scanner {
             if (StringUtils.isNotBlank(input)) {
                 input = sb.toString().replaceAll("\\r\\n|\\r", "\\n");
             }
+            in.close();
+            reader.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
