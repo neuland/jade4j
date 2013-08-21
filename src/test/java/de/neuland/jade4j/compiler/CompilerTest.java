@@ -316,6 +316,11 @@ public class CompilerTest {
 		run("interpolation");
 	}
 
+    @Test
+    public void mixinVariableAttribute() {
+        run("mixin_variable_attribute");
+    }
+
 	@Test
 	public void xml() {
 	    String tmp = expectedFileNameExtension;

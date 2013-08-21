@@ -118,8 +118,7 @@ public class TagNode extends AttributedNode {
                 value = null;
             }
         } else if (attribute instanceof ExpressionString) {
-            String expression = ((ExpressionString) attribute).getValue();
-            Object expressionValue = ExpressionHandler.evaluateExpression(expression, model);
+            Object expressionValue = evaluateExpression((ExpressionString) attribute, model);
             if (expressionValue == null) {
                 return "";
             }
@@ -151,6 +150,15 @@ public class TagNode extends AttributedNode {
             }
         }
         return sb.toString();
+    }
+
+    private Object evaluateExpression(ExpressionString attribute, JadeModel model) throws ExpressionException {
+        String expression = ((ExpressionString) attribute).getValue();
+        Object result = ExpressionHandler.evaluateExpression(expression, model);
+        if (result instanceof ExpressionString) {
+            return evaluateExpression((ExpressionString) result, model);
+        }
+        return result;
     }
 
     private String getInterpolatedAttributeValue(String name, Object attribute, JadeModel model, JadeTemplate template)
