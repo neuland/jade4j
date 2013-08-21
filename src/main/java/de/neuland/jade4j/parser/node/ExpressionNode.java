@@ -34,6 +34,14 @@ public class ExpressionNode extends Node {
 				string = StringEscapeUtils.escapeHtml4(string);
 			}
 			writer.append(string);
+
+            if (hasBlock()) {
+                writer.increment();
+                block.execute(writer, model, template);
+                writer.decrement();
+                writer.newline();
+            }
+
 		} catch (ExpressionException e) {
 			throw new JadeCompilerException(this, template.getTemplateLoader(), e);
 		}

@@ -632,7 +632,7 @@ public class Parser {
 		block = lookahead(i) instanceof Indent;
 		if (block) {
 			skip(i - 1);
-			codeNode.setBlock((BlockNode) parseBlock());
+			codeNode.setBlock((BlockNode) block());
 		}
 		return codeNode;
 	}

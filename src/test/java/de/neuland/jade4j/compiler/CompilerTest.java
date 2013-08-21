@@ -322,6 +322,11 @@ public class CompilerTest {
         run("mixin_variable_attribute");
     }
 
+    @Test
+    public void inlineTextAndContent() {
+        run("inline_text_and_content");
+    }
+
     @Test(expected = JadeLexerException.class)
     public void shouldThrowGoodExceptions() {
         run("invalid");
