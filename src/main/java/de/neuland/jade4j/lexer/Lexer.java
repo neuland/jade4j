@@ -564,6 +564,9 @@ public class Lexer {
 		}
 
 		int index = indexOfDelimiters('(', ')');
+        if (index == 0) {
+            throw new JadeLexerException("invalid attribute definition; missing )", filename, getLineno(), templateLoader);
+        }
 		String string = scanner.getInput().substring(1, index);
 		consume(index + 1);
 

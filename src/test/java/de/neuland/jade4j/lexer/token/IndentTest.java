@@ -99,4 +99,5 @@ public class IndentTest extends TokenTest {
         assertToken("outdent");
         assertToken("tbody");
     }
+
 }
