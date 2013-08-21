@@ -96,7 +96,7 @@ We are using Github for Maven hosting. Just add this repository ...
 <dependency>
   <groupId>de.neuland</groupId>
   <artifactId>jade4j</artifactId>
-  <version>0.3.12</version>
+  <version>0.3.13</version>
 </dependency>
 ```
 
