@@ -40,4 +40,8 @@ public class ExpressionHandler {
 	public static void setCache(boolean cache) {
 		jexl.setCache(cache ? MAX_ENTRIES : 0);
 	}
+
+    public static void clearCache() {
+        jexl.clearCache();
+    }
 }
