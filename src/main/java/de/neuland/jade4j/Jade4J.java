@@ -63,6 +63,25 @@ public class Jade4J {
 		template.process(new JadeModel(model), writer);
 	}
 
+    public static String render(URL url, Map<String, Object> model) throws IOException, JadeCompilerException {
+        return render(url, model, false);
+    }
+
+    public static String render(URL url, Map<String, Object> model, boolean pretty) throws IOException, JadeCompilerException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+        JadeTemplate template = getTemplate(reader, url.getPath());
+        return render(template, model, pretty);
+    }
+
+    public static String render(Reader reader, String filename, Map<String, Object> model) throws IOException, JadeCompilerException {
+        return render(reader, filename, model, false);
+    }
+
+    public static String render(Reader reader, String filename, Map<String, Object> model, boolean pretty) throws IOException, JadeCompilerException {
+        JadeTemplate template = getTemplate(reader, filename);
+        return render(template, model, pretty);
+    }
+
 	public static JadeTemplate getTemplate(String filename) throws IOException {
 		return createTemplate(filename, new FileTemplateLoader("", "UTF-8"));
 	}
@@ -88,14 +107,5 @@ public class Jade4J {
 		return writer.toString();
 	}
 
-	public static String render(URL url, Map<String, Object> model, boolean pretty) throws IOException, JadeCompilerException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-		JadeTemplate template = getTemplate(reader, url.getPath());
-		return render(template, model, pretty);
-	}
-
-	public static String render(URL url, Map<String, Object> model) throws IOException, JadeCompilerException {
-		return render(url, model, false);
-	}
 
 }
