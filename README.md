@@ -166,6 +166,12 @@ JadeTemplate t2 = config.getTemplate("index.jade");
 t1.equals(t2) // true
 ```
 
+You can clear the template and expression cache by calling
+
+```java
+config.clearCache();
+```
+
 For development mode you can also disable caching completly:
 
 ```java
