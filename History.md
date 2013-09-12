@@ -1,5 +1,8 @@
 # History
 
+## 0.3.15 / 2013-09-12
+* added support for including non jade files (js, css, ...) inside a template
+
 ## 0.3.14 / 2013-08-24
 * added ability to clear expression and template caches
 * added new convenience method to Jade4J thats lets you use Reader #49
