@@ -40,7 +40,7 @@ public class JadeConfiguration {
 		setFilter(FILTER_PLAIN, new PlainFilter());
 		setFilter(FILTER_CDATA, new CDATAFilter());
         setFilter(FILTER_SCRIPT, new JsFilter());
-        setFilter(FILTER_STYLE, new CssFilter());
+        setFilter(FILTER_STYLE, new CssFilter_());
         setFilter(FILTER_SVG, new PlainFilter());
 	}
 
