@@ -1,20 +1,11 @@
 package de.neuland.jade4j;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
-
 import de.neuland.jade4j.Jade4J.Mode;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.exceptions.JadeException;
 import de.neuland.jade4j.expression.ExpressionHandler;
-import de.neuland.jade4j.filter.CDATAFilter;
-import de.neuland.jade4j.filter.Filter;
-import de.neuland.jade4j.filter.PlainFilter;
+import de.neuland.jade4j.filter.*;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.parser.Parser;
 import de.neuland.jade4j.parser.node.Node;
@@ -22,13 +13,21 @@ import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.template.TemplateLoader;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
+
 public class JadeConfiguration {
 
 	private static final String FILTER_CDATA = "cdata";
-
 	private static final String FILTER_PLAIN = "plain";
+    private static final String FILTER_STYLE = "css";
+    private static final String FILTER_SCRIPT = "js";
+    private static final String FILTER_SVG = "svg";
 
-	private boolean prettyPrint = false;
+    private boolean prettyPrint = false;
 	private boolean caching = true;
 	private Mode mode = Jade4J.Mode.HTML;
 
@@ -40,6 +39,9 @@ public class JadeConfiguration {
 	public JadeConfiguration() {
 		setFilter(FILTER_PLAIN, new PlainFilter());
 		setFilter(FILTER_CDATA, new CDATAFilter());
+        setFilter(FILTER_SCRIPT, new JsFilter());
+        setFilter(FILTER_STYLE, new CssFilter());
+        setFilter(FILTER_SVG, new PlainFilter());
 	}
 
 	private Map<String, JadeTemplate> cache = new ConcurrentLinkedHashMap.Builder<String, JadeTemplate>().maximumWeightedCapacity(
