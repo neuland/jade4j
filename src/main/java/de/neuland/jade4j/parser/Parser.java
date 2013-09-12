@@ -1,13 +1,18 @@
 package de.neuland.jade4j.parser;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.neuland.jade4j.exceptions.JadeParserException;
@@ -64,7 +69,8 @@ import de.neuland.jade4j.template.TemplateLoader;
 
 public class Parser {
 
-	private Lexer lexer;
+    public static final Pattern FILE_EXTENSION_PATTERN = Pattern.compile(".*\\.\\w+$");
+    private Lexer lexer;
 	private Map<String, Node> blocks = new LinkedHashMap<String, Node>();
 	private String[] textOnlyTags = { "script", "style" };
 	private Integer _spaces = null;
@@ -280,6 +286,25 @@ public class Parser {
 		Include includeToken = (Include) token;
 		String templateName = includeToken.getValue().trim();
 
+        String extension = FilenameUtils.getExtension(templateName);
+        if (!"".equals(extension) && !"jade".equals(extension)) {
+            FilterNode node = new FilterNode();
+            node.setLineNumber(lexer.getLineno());
+            node.setFileName(filename);
+            node.setValue(extension);
+            try {
+                Reader reader = templateLoader.getReader(resolvePath(templateName));
+                Node textNode = new TextNode();
+                textNode.setFileName(filename);
+                textNode.setLineNumber(lexer.getLineno());
+                textNode.setValue(IOUtils.toString(reader));
+                node.setTextBlock(textNode);
+            } catch (IOException e) {
+                throw new JadeParserException(filename, lexer.getLineno(), templateLoader, "the included file [" + templateName + "] could not be opened\n" + e.getMessage());
+            }
+            return node;
+        }
+
 		Parser parser = createParser(templateName);
 		parser.setBlocks(blocks);
 		contexts.push(parser);
@@ -293,7 +318,7 @@ public class Parser {
 		return ast;
 	}
 
-	private Node parseExtends() {
+    private Node parseExtends() {
 		Token token = expect(ExtendsToken.class);
 		ExtendsToken extendsToken = (ExtendsToken) token;
 		String templateName = extendsToken.getValue().trim();
@@ -310,17 +335,21 @@ public class Parser {
 	}
 
 	private Parser createParser(String templateName) {
-		URI currentUri = URI.create(filename);
-		URI templateUri = currentUri.resolve(templateName);
-		try {
-			return new Parser(templateUri.toString(), templateLoader);
+        try {
+            return new Parser(resolvePath(templateName), templateLoader);
 		} catch (IOException e) {
 			throw new JadeParserException(filename, lexer.getLineno(), templateLoader, "the template [" + templateName
 					+ "] could not be opened\n" + e.getMessage());
 		}
 	}
 
-	private BlockNode parseYield() {
+    private String resolvePath(String templateName) {
+        URI currentUri = URI.create(filename);
+        URI templateUri = currentUri.resolve(templateName);
+        return templateUri.toString();
+    }
+
+    private BlockNode parseYield() {
 		nextToken();
 		BlockNode block = (BlockNode) new BlockNode();
 		block.setLineNumber(lexer.getLineno());

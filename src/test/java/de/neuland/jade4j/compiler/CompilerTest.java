@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.neuland.jade4j.exceptions.JadeLexerException;
+import de.neuland.jade4j.filter.CssFilter;
+import de.neuland.jade4j.filter.JsFilter;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
@@ -318,6 +320,11 @@ public class CompilerTest {
 	}
 
     @Test
+    public void includeNonJade() {
+        run("include_non_jade");
+    }
+
+    @Test
     public void mixinVariableAttribute() {
         run("mixin_variable_attribute");
     }
@@ -364,6 +371,9 @@ public class CompilerTest {
         String expected = readFile(testName + expectedFileNameExtension);
 		model.addFilter("markdown", new MarkdownFilter());
 		model.addFilter("plain", new PlainFilter());
+        model.addFilter("js", new JsFilter());
+        model.addFilter("css", new CssFilter());
+        model.addFilter("svg", new PlainFilter());
 		String html;
         try {
             html = compiler.compileToString(model);

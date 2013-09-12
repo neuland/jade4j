@@ -1,14 +1,19 @@
 package de.neuland.jade4j.template;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.regex.Pattern;
 
 public class FileTemplateLoader implements TemplateLoader {
-	
-	private String encoding = "UTF-8";
+
+    private String encoding = "UTF-8";
 	private String suffix = ".jade";
 	private String basePath = "";
 	
@@ -31,9 +36,14 @@ public class FileTemplateLoader implements TemplateLoader {
 	private File getFile(String name) {
 		// TODO Security
 		String filename = basePath + name;
-		if (!filename.endsWith(suffix)) {
-			filename += suffix;
-		}
+		if (hasNoExtension(filename)) {
+        	filename += suffix;
+        }
+
 		return new File(filename);
 	}
+
+    private boolean hasNoExtension(String filename) {
+        return "".equals(FilenameUtils.getExtension(filename));
+    }
 }
