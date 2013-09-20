@@ -339,6 +339,11 @@ public class CompilerTest {
         run("invalid");
     }
 
+    @Test(expected = JadeLexerException.class)
+    public void shouldThrowGoodExceptions2() {
+        run("invalid2");
+    }
+
 	@Test
 	public void xml() {
 	    String tmp = expectedFileNameExtension;
