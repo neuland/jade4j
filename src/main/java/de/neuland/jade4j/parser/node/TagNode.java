@@ -58,12 +58,12 @@ public class TagNode extends AttributedNode {
             writer.append(">");
             return;
         }
-        if (isSelfClosing(template)) {
+        if (isSelfClosing(template) || isTrailingSlashSelfClosing() ) {
             writer.append("/>");
             return;
         }
         writer.append(">");
-        if (hasTextNode()) {
+        if (hasTextNode() && !textNode.getValue().equals("/")) {
             textNode.execute(writer, model, template);
         }
         if (hasBlock()) {
@@ -86,6 +86,10 @@ public class TagNode extends AttributedNode {
 
     public boolean isSelfClosing(JadeTemplate template) {
         return !template.isXml() && ArrayUtils.contains(selfClosing, name);
+    }
+
+    public boolean isTrailingSlashSelfClosing(){
+        return (hasTextNode() && textNode.getValue().equals("/"));
     }
 
     private String attributes(JadeModel model, JadeTemplate template) {
