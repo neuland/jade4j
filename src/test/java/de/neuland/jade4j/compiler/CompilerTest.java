@@ -15,6 +15,7 @@ import de.neuland.jade4j.exceptions.JadeLexerException;
 import de.neuland.jade4j.filter.CssFilter;
 import de.neuland.jade4j.filter.JsFilter;
 import org.apache.commons.io.FileUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.gson.Gson;
@@ -232,10 +233,21 @@ public class CompilerTest {
 		run("mixin");
 	}
 
+    @Test
+    @Ignore
+    public void mixinParams() {
+        run("mixin_params");
+    }
+
 	@Test
 	public void mixinBlocks() {
 		run("mixin_blocks");
 	}
+
+    @Test
+    public void selfClosingTag() {
+        run("self_closing_tag");
+    }
 
 	@Test
 	public void mixinNested() {

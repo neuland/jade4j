@@ -6,37 +6,10 @@ import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.neuland.jade4j.lexer.token.*;
 import org.apache.commons.lang3.StringUtils;
 
 import de.neuland.jade4j.exceptions.JadeLexerException;
-import de.neuland.jade4j.lexer.token.Block;
-import de.neuland.jade4j.lexer.token.CaseToken;
-import de.neuland.jade4j.lexer.token.Colon;
-import de.neuland.jade4j.lexer.token.Comment;
-import de.neuland.jade4j.lexer.token.ElseIf;
-import de.neuland.jade4j.lexer.token.If;
-import de.neuland.jade4j.lexer.token.CssClass;
-import de.neuland.jade4j.lexer.token.CssId;
-import de.neuland.jade4j.lexer.token.Default;
-import de.neuland.jade4j.lexer.token.Doctype;
-import de.neuland.jade4j.lexer.token.Dot;
-import de.neuland.jade4j.lexer.token.Else;
-import de.neuland.jade4j.lexer.token.Eos;
-import de.neuland.jade4j.lexer.token.Expression;
-import de.neuland.jade4j.lexer.token.ExtendsToken;
-import de.neuland.jade4j.lexer.token.Filter;
-import de.neuland.jade4j.lexer.token.Include;
-import de.neuland.jade4j.lexer.token.Indent;
-import de.neuland.jade4j.lexer.token.Mixin;
-import de.neuland.jade4j.lexer.token.MixinInject;
-import de.neuland.jade4j.lexer.token.Newline;
-import de.neuland.jade4j.lexer.token.Outdent;
-import de.neuland.jade4j.lexer.token.Tag;
-import de.neuland.jade4j.lexer.token.Text;
-import de.neuland.jade4j.lexer.token.Token;
-import de.neuland.jade4j.lexer.token.When;
-import de.neuland.jade4j.lexer.token.While;
-import de.neuland.jade4j.lexer.token.Yield;
 import de.neuland.jade4j.template.TemplateLoader;
 
 public class Lexer {
@@ -305,7 +278,7 @@ public class Lexer {
 	// },
 
 	private Token tag() {
-		Matcher matcher = scanner.getMatcherForPattern("^(\\w[-:\\w]*)");
+		Matcher matcher = scanner.getMatcherForPattern("^(\\w[-:\\w]*)(\\/?)");
 		if (matcher.find(0) && matcher.groupCount() > 0) {
 			consume(matcher.end());
 			Tag tok;
@@ -319,6 +292,9 @@ public class Lexer {
 			} else {
 				tok = new Tag(name, lineno);
 			}
+            if (!matcher.group(2).isEmpty()) {
+                tok.setSelfClosing(true);
+            }
 			return tok;
 		}
 		return null;
@@ -571,8 +547,14 @@ public class Lexer {
 		String string = scanner.getInput().substring(1, index);
 		consume(index + 1);
 
-		AttributeLexer lexer = new AttributeLexer();
-		return lexer.getToken(string, lineno);
+        Attribute attribute = new AttributeLexer().getToken(string, lineno);
+
+        if (scanner.getInput().charAt(0) == '/') {
+            consume(1);
+            attribute.setSelfClosing(true);
+        }
+
+        return attribute;
 	}
 
 	private int indexOfDelimiters(char start, char end) {

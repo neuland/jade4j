@@ -17,7 +17,9 @@ public class TagNode extends AttributedNode {
     private boolean textOnly;
     private Node textNode;
     private Node codeNode;
-    private static final String[] selfClosing = {"meta", "img", "link", "input", "area", "base", "col", "br", "hr", "source"};
+    private static final String[] selfClosingTags = {"meta", "img", "link", "input", "area", "base", "col", "br", "hr", "source"};
+    private boolean selfClosing = false;
+
 
     public void setTextOnly(boolean textOnly) {
         this.textOnly = textOnly;
@@ -58,12 +60,17 @@ public class TagNode extends AttributedNode {
             writer.append(">");
             return;
         }
-        if (isSelfClosing(template) || isTrailingSlashSelfClosing() ) {
+        if (selfClosing) {
+            boolean empty = isEmpty();
+            System.out.println(name);
+            System.out.println(empty);
+        }
+        if (isSelfClosing(template) || (selfClosing && isEmpty())) {
             writer.append("/>");
             return;
         }
         writer.append(">");
-        if (hasTextNode() && !textNode.getValue().equals("/")) {
+        if (hasTextNode()) {
             textNode.execute(writer, model, template);
         }
         if (hasBlock()) {
@@ -80,16 +87,16 @@ public class TagNode extends AttributedNode {
         writer.append(">");
     }
 
+    private boolean isEmpty() {
+        return !hasBlock() && !hasTextNode() && !hasCodeNode();
+    }
+
     public boolean isTerse(JadeTemplate template) {
         return isSelfClosing(template) && template.isTerse();
     }
 
     public boolean isSelfClosing(JadeTemplate template) {
-        return !template.isXml() && ArrayUtils.contains(selfClosing, name);
-    }
-
-    public boolean isTrailingSlashSelfClosing(){
-        return (hasTextNode() && textNode.getValue().equals("/"));
+        return !template.isXml() && ArrayUtils.contains(selfClosingTags, name);
     }
 
     private String attributes(JadeModel model, JadeTemplate template) {
@@ -176,5 +183,13 @@ public class TagNode extends AttributedNode {
         } catch (ExpressionException e) {
             throw new JadeCompilerException(this, template.getTemplateLoader(), e);
         }
+    }
+
+    public void setSelfClosing(boolean selfClosing) {
+        this.selfClosing = selfClosing;
+    }
+
+    public boolean isSelfClosing() {
+        return selfClosing;
     }
 }

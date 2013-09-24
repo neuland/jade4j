@@ -188,8 +188,7 @@ public class Parser {
 	}
 
 	private Node parseMixin() {
-		Token token = expect(Mixin.class);
-		Mixin mixinToken = (Mixin) token;
+        Mixin mixinToken = (Mixin) expect(Mixin.class);
 		MixinNode node = new MixinNode();
 		node.setName(mixinToken.getValue());
 		node.setLineNumber(mixinToken.getLineNumber());
@@ -475,6 +474,7 @@ public class Parser {
 		tagNode.setFileName(filename);
 		tagNode.setName(name);
 		tagNode.setValue(name);
+        tagNode.setSelfClosing(token.isSelfClosing());
 
 		while (true) {
 			Token incomingToken = peek();
@@ -489,7 +489,8 @@ public class Parser {
 			} else if (incomingToken instanceof Attribute) {
 				Attribute tok = (Attribute) nextToken();
 				tagNode.addAttributes(tok.getAttributes());
-				continue;
+                tagNode.setSelfClosing(tok.isSelfClosing());
+                continue;
 			} else {
 				break;
 			}

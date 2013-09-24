@@ -8,6 +8,7 @@ public abstract class Token {
     private String mode;
     private String name;
     private int indents;
+    private boolean selfClosing = false;
 
     public Token(String value, int lineNumber) {
         this.value = value;
@@ -67,5 +68,13 @@ public abstract class Token {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public boolean isSelfClosing() {
+        return selfClosing;
+    }
+
+    public void setSelfClosing(boolean selfClosing) {
+        this.selfClosing = selfClosing;
     }
 }
