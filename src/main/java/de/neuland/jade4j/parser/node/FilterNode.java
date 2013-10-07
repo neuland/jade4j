@@ -31,10 +31,10 @@ public class FilterNode extends Node {
 	@Override
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
 		Filter filter = model.getFilter(getValue());
-		if (filter == null) {
-			throw new JadeCompilerException(this, template.getTemplateLoader(), "filter [" + getValue() + "] does not exist");
+        String result = textBlock.getValue();
+		if (filter != null) {
+            result = filter.convert(result, attributes, model);
 		}
-		String result = filter.convert(textBlock.getValue(), attributes, model);
 		try {
 			result = Utils.interpolate(result, model, false);
 		} catch (ExpressionException e) {
