@@ -391,9 +391,9 @@ public class Parser {
         return block;
     }
 
-    private List<Node> whenBlock() {
+    private List<CaseConditionNode> whenBlock() {
         expect(Indent.class);
-        List<Node> caseConditionalNodes = new LinkedList<Node>();
+        List<CaseConditionNode> caseConditionalNodes = new LinkedList<CaseConditionNode>();
         while (!(peek() instanceof Outdent) && !(peek() instanceof Eos)) {
             if (peek() instanceof Newline) {
                 nextToken();
@@ -630,7 +630,7 @@ public class Parser {
         return node;
     }
 
-    private Node parseCaseCondition() {
+    private CaseConditionNode parseCaseCondition() {
         CaseConditionNode node = new CaseConditionNode();
         Token token = null;
         if (peek() instanceof When) {

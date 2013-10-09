@@ -91,19 +91,14 @@ public abstract class Node implements Cloneable {
 		Node clone = (Node) super.clone();
 
 		// Deep copy block
-		if (clone.block != null) {
-			clone.block = clone.block.clone();
+		if (this.block != null) {
+			clone.block = this.block.clone();
 		}
 
-		// Deep copy nodes
-		if (clone.nodes != null) {
-			List<Node> nodes = clone.nodes;
-			// Create a new linked list
-			clone.nodes = new LinkedList<Node>();
-			for (Node node : nodes) {
-				clone.nodes.add(node.clone());
-			}
-		}
+        clone.nodes = new LinkedList<Node>();
+        for (Node node : this.nodes) {
+            clone.nodes.add(node.clone());
+        }
 
 		return clone;
 	}

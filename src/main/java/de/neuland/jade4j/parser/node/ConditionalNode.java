@@ -41,4 +41,15 @@ public class ConditionalNode extends Node {
 		this.conditions = conditions;
 	}
 
+    @Override
+    public ConditionalNode clone() throws CloneNotSupportedException {
+        ConditionalNode clone = (ConditionalNode) super.clone();
+
+        clone.conditions = new LinkedList<IfConditionNode>();
+        for(IfConditionNode condition : conditions) {
+            clone.conditions.add((IfConditionNode) condition.clone());
+        }
+
+        return clone;
+    }
 }

@@ -7,20 +7,7 @@ import de.neuland.jade4j.template.JadeTemplate;
 
 public class MixinNode extends MixinInjectNode {
 
-        public MixinNode() {
-        }
-
-        public MixinNode(MixinNode node) {
-            this.block = node.block;
-            this.fileName = node.fileName;
-            this.lineNumber = node.lineNumber;
-            this.name = node.name;
-            this.value = node.value;
-            this.nodes.addAll(node.nodes);
-            this.arguments.addAll(node.arguments);
-        }
-        
-	@Override
+    @Override
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
 		if (hasBlock()) {
 			model.setMixin(getName(), this);

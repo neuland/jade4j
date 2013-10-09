@@ -1,0 +1,12 @@
+mixin foo(val)
+  if val
+    fooA
+      block
+  else
+    fooB
+      block
+
++foo(true)
+  |barA
++foo(false)
+  |barB

@@ -3,8 +3,6 @@ package de.neuland.jade4j.parser.node;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.expression.ExpressionHandler;
@@ -31,10 +29,10 @@ public class MixinInjectNode extends AttributedNode {
 		}
 
 		if (hasBlock()) {
-			Node injectionPoint = getInjectionPoint(mixin.getBlock());
-			if (injectionPoint != null) {
-				injectionPoint.getNodes().add(block);
-			}
+			List<BlockNode> injectionPoints = getInjectionPoints(mixin.getBlock());
+            for (BlockNode point : injectionPoints) {
+                point.getNodes().add(block);
+            }
 		}
 
 		model.pushScope();
@@ -47,42 +45,24 @@ public class MixinInjectNode extends AttributedNode {
 
 	}
 
-	private Node getInjectionPoint(Node block) {
+	private List<BlockNode> getInjectionPoints(Node block) {
+        List<BlockNode> result = new ArrayList<BlockNode>();
 		for (Node node : block.getNodes()) {
 			if (node instanceof BlockNode && !node.hasNodes()) {
-				return node;
-			}
-
-            if(node instanceof ConditionalNode){
-                List<IfConditionNode> conditions = ((ConditionalNode) node).getConditions();
-                Node blockForIfConditionNode = conditions.get(0).getBlock();
-
-                if(!blockForIfConditionNode.hasNodes()) return blockForIfConditionNode;
-
-                Node nodeFromTree = getInjectionPoint(blockForIfConditionNode);
-                if (nodeFromTree != null) {
-                    return nodeFromTree;
+                result.add((BlockNode) node);
+			} else if(node instanceof ConditionalNode){
+                for (IfConditionNode condition : ((ConditionalNode) node).getConditions()) {
+                    result.addAll(getInjectionPoints(condition.getBlock()));
                 }
+            } else if(node instanceof CaseNode){
+                for (CaseConditionNode condition : ((CaseNode) node).getCaseConditionNodes()) {
+                    result.addAll(getInjectionPoints(condition.getBlock()));
+                }
+            } else if (node.hasBlock()) {
+                result.addAll(getInjectionPoints(node.getBlock()));
             }
-
-
-            if (node.hasBlock()) {
-				if (!node.getBlock().hasNodes()) {
-					return node.getBlock();
-				}
-
-				Node nodeFromTree = getInjectionPoint(node.getBlock());
-				if (nodeFromTree != null) {
-					return nodeFromTree;
-				}
-			}
-
-			Node nodeFromTree = getInjectionPoint(node);
-			if (nodeFromTree != null) {
-				return nodeFromTree;
-			}
 		}
-		return null;
+		return result;
 	}
 
 	private void writeVariables(JadeModel model, MixinNode mixin, JadeTemplate template) {

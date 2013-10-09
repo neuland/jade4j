@@ -1,26 +1,24 @@
 
 
-mixin form(method, action)
-  form(method=method, action=action)
-    csrf_token_from_somewhere = 'hey'
-    input(type='hidden', name='_csrf', value=csrf_token_from_somewhere)
+mixin form(method)
+  form(method=method)
+    input(type='hidden', name='_csrf')
     block
 
-html
-  body
-    +form('GET', '/search')
-      input(type='text', name='query', placeholder='Search')
-      input(type='submit', value='Search')
 
 html
   body
-    +form('POST', '/search')
-      input(type='text', name='query', placeholder='Search')
-      input(type='submit', value='Search')
+    +form('GET')
+      input(name="field1")
 
 html
   body
-    +form('POST', '/search')
+    +form('POST')
+      input(name="field2")
+
+html
+  body
+    +form('POST')
 
 mixin bar()
   #bar

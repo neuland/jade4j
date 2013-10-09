@@ -1,0 +1,13 @@
+mixin foo(val)
+  case val
+    when "special"
+      special
+        block
+    default
+      standard
+        block
+
++foo("special")
+  |hello
++foo("nope")
+  |world

@@ -80,13 +80,13 @@ public abstract class AttributedNode extends Node {
 	public AttributedNode clone() throws CloneNotSupportedException {
 		AttributedNode clone = (AttributedNode) super.clone();
 
-		if (clone.attributes != null) {
-			// shallow copy
-			clone.attributes = new LinkedHashMap<String, Object>(clone.attributes);
+        // shallow copy
+		if (this.attributes != null) {
+			clone.attributes = new LinkedHashMap<String, Object>(this.attributes);
 		}
 
 		// clear prepared attribute values, will be rebuilt on execute
-		preparedAttributeValues = new HashMap<String, List<Object>>();
+		clone.preparedAttributeValues = new HashMap<String, List<Object>>();
 
 		return clone;
 	}

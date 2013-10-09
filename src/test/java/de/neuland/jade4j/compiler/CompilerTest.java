@@ -244,6 +244,21 @@ public class CompilerTest {
     }
 
     @Test
+    public void mixinMultipleBlocks() {
+        run("mixin_multiple_blocks");
+    }
+
+    @Test
+    public void mixinMultipleBlocksIf() {
+        run("mixin_multiple_blocks_if");
+    }
+
+    @Test
+    public void mixinMultipleBlocksCase() {
+        run("mixin_multiple_blocks_case");
+    }
+
+    @Test
     public void selfClosingTag() {
         run("self_closing_tag");
     }
