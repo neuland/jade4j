@@ -1,5 +1,10 @@
 # History
 
+## 0.3.17 / 2013-10-09
+* added sources to maven repository
+* added support for multiple block statements in one mixin
+* fixed issues when using if/case statements inside a mixin
+
 ## 0.3.16 / 2013-10-07
 * allowed including files without having to register a specific filter
 * enabled self closing tags with trailing "/" #57
