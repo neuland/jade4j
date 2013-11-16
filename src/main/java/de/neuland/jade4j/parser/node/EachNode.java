@@ -39,12 +39,10 @@ public class EachNode extends Node {
 	private void run(IndentWriter writer, JadeModel model, Object result, JadeTemplate template) {
 		if (result instanceof Iterable<?>) {
 			runIterator(((Iterable<?>) result).iterator(), model, writer, template);
-		}
-		if (result.getClass().isArray()) {
+		} else if (result.getClass().isArray()) {
 			Iterator<?> iterator = IteratorUtils.arrayIterator(result);
 			runIterator(iterator, model, writer, template);
-		}
-		if (result instanceof Map) {
+		} else if (result instanceof Map) {
 			runMap((Map<String, Object>) result, model, writer, template);
 		}
 	}
