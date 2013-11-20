@@ -1,5 +1,11 @@
 # History
 
+## 0.4.0 / 2013-11-20
+* we are now on maven central #25
+* adapted pom to meet sonatype requirements
+* changed artifact group id
+* fixed double output of objects implementing Map and Iterable interfaces #63
+
 ## 0.3.17 / 2013-10-09
 * added sources to maven repository
 * added support for multiple block statements in one mixin

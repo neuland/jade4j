@@ -2,10 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>de.neuland</groupId>
+    <groupId>de.neuland-bfi</groupId>
     <artifactId>jade4j</artifactId>
-    <version>0.3.17</version>
-    <name>jade templating engine for Java VM</name>
+    <version>0.4.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>jade4j</name>
+    <description>Java implementation of the jade templating language</description>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+    <url>https://github.com/neuland/jade4j</url>
+
     <issueManagement>
         <url>https://github.com/neuland/jade4j/issues</url>
         <system>GitHub Issues</system>
@@ -17,6 +26,7 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
 
     <scm>
         <url>https://github.com/neuland/jade4j</url>
@@ -46,6 +56,36 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <profiles>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.1</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+<!-- 
     <distributionManagement>
         <repository>
             <id>repo</id>
@@ -56,6 +96,8 @@
             <url>https://github.com/neuland/jade4j/raw/master/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
+ -->
+    
     <build>
         <plugins>
             <plugin>
@@ -76,9 +118,22 @@
                 <executions>
                     <execution>
                         <id>attach-sources</id>
-                        <phase>deploy</phase>
+                        <!-- phase>deploy</phase -->
                         <goals>
                             <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>
