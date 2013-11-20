@@ -79,8 +79,8 @@ See also the original [visionmedia/jade documentation](https://github.com/vision
 
 ### via Maven
 
-As of release 0.4.0 we changed maven hosting to sonatype. using Github Maven Repository is no longer
-required
+As of release 0.4.0 we changed maven hosting to sonatype. Using Github Maven Repository is no longer
+required.
 
 Please be aware that we had to change the group id from 'de.neuland' to 'de.neuland-bfi' in order to
 meet sonatype conventions for group naming.
