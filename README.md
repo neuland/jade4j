@@ -52,7 +52,7 @@ model.put("books", books);
 model.put("pageName", "My Bookshelf")
 ```
 
-running the above code through `String html = Jade4J.render("./index.jade", model)` will result in the following output:
+Running the above code through `String html = Jade4J.render("./index.jade", model)` will result in the following output:
 
 ```html
 <!DOCTYPE html>
@@ -79,7 +79,7 @@ See also the original [visionmedia/jade documentation](https://github.com/vision
 
 ### via Maven
 
-As of release 0.4.0 we changed maven hosting to sonatype. Using Github Maven Repository is no longer
+As of release 0.4.0, we have changed maven hosting to sonatype. Using Github Maven Repository is no longer
 required.
 
 Please be aware that we had to change the group id from 'de.neuland' to 'de.neuland-bfi' in order to
@@ -95,7 +95,7 @@ Just add following dependency definitions to your `pom.xml`.
 </dependency>
 ```
 
-### build it yourself
+### Build it yourself
 
 Clone this repository ...
 
@@ -137,7 +137,7 @@ Jade4J.render(template, model, writer);
 <a name="api"></a>
 ## Full API
 
-If you need more control you can instanciate a `JadeConfiguration` object.
+If you need more control you can instantiate a `JadeConfiguration` object.
 
 ```java
 JadeConfiguration config = new JadeConfiguration();
@@ -153,7 +153,7 @@ config.renderTemplate(template, model);
 <a name="api-caching"></a>
 ### Caching
 
-The `JadeConfiguration` handles template caching for you. If you request the same unmodified template twice you'll get the same instance and avoid unnecesarry parsing.
+The `JadeConfiguration` handles template caching for you. If you request the same unmodified template twice you'll get the same instance and avoid unnecessary parsing.
 
 ```java
 JadeTemplate t1 = config.getTemplate("index.jade");
@@ -161,13 +161,13 @@ JadeTemplate t2 = config.getTemplate("index.jade");
 t1.equals(t2) // true
 ```
 
-You can clear the template and expression cache by calling
+You can clear the template and expression cache by calling the following:
 
 ```java
 config.clearCache();
 ```
 
-For development mode you can also disable caching completly:
+For development mode, you can also disable caching completely:
 
 ```java
 config.setCaching(false);
@@ -176,7 +176,7 @@ config.setCaching(false);
 <a name="api-output"></a>
 ### Output Formatting
 
-By default Jade4J produces compressed HTML without unneeded whitespace. You can change this behaviour by enabling PrettyPrint.
+By default, Jade4J produces compressed HTML without unneeded whitespace. You can change this behaviour by enabling PrettyPrint:
 
 ```java
 config.setPrettyPrint(true);
@@ -195,7 +195,7 @@ config.setMode(Jade4J.Mode.XML);    // <input checked="true"></input>
 <a name="api-filters"></a>
 ### Filters
 
-Filters allow embedding content like `markdown` or `coffeescript` into your jade template.
+Filters allow embedding content like `markdown` or `coffeescript` into your jade template:
 
     script
       :coffeescript
@@ -213,7 +213,7 @@ jade4j comes with a `plain` and `cdata` filter. `plain` takes your input to pass
 
     config.setFilter("coffeescript", new CoffeeScriptFilter());
 
-To implement your own filter you have to implement the `Filter` Interface. If your filter doesn't use any data from the model you can inherit from the abstract `CachingFilter` and also get caching for free. See the [neuland/jade4j-coffeescript-filter](https://github.com/neuland/jade4j-coffeescript-filter) project as an example.
+To implement your own filter, you have to implement the `Filter` Interface. If your filter doesn't use any data from the model you can inherit from the abstract `CachingFilter` and also get caching for free. See the [neuland/jade4j-coffeescript-filter](https://github.com/neuland/jade4j-coffeescript-filter) project as an example.
 
 <a name="api-helpers"></a>
 ### Helpers
@@ -241,7 +241,7 @@ p= math.round(1.44)
 <a name="api-model-defaults"></a>
 ### Model Defaults
 
-If you are using multiple templates, you might have the need for a set of default objects that are available in all templates.
+If you are using multiple templates you might have the need for a set of default objects that are available in all templates.
 
 ```java
 Map<String, Object> defaults = new HashMap<String, Object>();
@@ -254,7 +254,7 @@ config.setSharedVariables(defaults);
 <a name="api-template-loader"></a>
 ### Template Loader
 
-By default jade4j searches for template files in your work directory. By specifying your own `FileTemplateLoader` you can alter that behaviour. You can also implement the `TemplateLoader` interface to create your own.
+By default, jade4j searches for template files in your work directory. By specifying your own `FileTemplateLoader`, you can alter that behavior. You can also implement the `TemplateLoader` interface to create your own.
 
 ```java
 TemplateLoader loader = new FileTemplateLoader("/templates/", "UTF-8");
@@ -273,9 +273,9 @@ The original jade implementation uses JavaScript for expression handling in `if`
     each author in ["artur", "stefan", "michael"]
       h2= author
 
-As of version 0.3.0 jade4j uses [JEXL](http://commons.apache.org/jexl/) instead of [OGNL](http://en.wikipedia.org/wiki/OGNL) for parsing and executing these expressions.
+As of version 0.3.0, jade4j uses [JEXL](http://commons.apache.org/jexl/) instead of [OGNL](http://en.wikipedia.org/wiki/OGNL) for parsing and executing these expressions.
 
-We decided to switch to JEXL because its syntax and behavior is more similar to ECMAScript/JavaScript and so closer to the original jade.js implementation. JEXL runs also much faster than OGNL. Our benchmark showed a **performance increase by factor 3 to 4**.
+We decided to switch to JEXL because its syntax and behavior is more similar to ECMAScript/JavaScript and so closer to the original jade.js implementation. JEXL runs also much faster than OGNL. In our benchmark, it showed a **performance increase by factor 3 to 4**.
 
 We are using a slightly modified JEXL version which to have better control of the exception handling. JEXL now runs in a semi-strict mode, where non existing values and properties silently evaluate to `null`/`false` where as invalid method calls lead to a `JadeCompilerException`.
 
@@ -311,7 +311,7 @@ Special thanks to [TJ Holowaychuk](https://github.com/visionmedia) the creator o
 
 The MIT License
 
-Copyright (C) 2011-2013 [neuland Büro für Informatik](http://www.neuland-bfi.de/), Bremen, Germany
+Copyright (C) 2011-2014 [neuland Büro für Informatik](http://www.neuland-bfi.de/), Bremen, Germany
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
