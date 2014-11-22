@@ -29,6 +29,9 @@ public class MixinInjectNode extends AttributedNode {
 		}
 
 		if (hasBlock()) {
+
+			model.put("block", true);
+
 			List<BlockNode> injectionPoints = getInjectionPoints(mixin.getBlock());
             for (BlockNode point : injectionPoints) {
                 point.getNodes().add(block);
