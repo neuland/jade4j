@@ -412,6 +412,7 @@ public class CompilerTest {
         model.addFilter("svg", new PlainFilter());
         String html;
         try {
+            debugOutput(testName);
             html = compiler.compileToString(model);
             assertEquals(testName, expected.trim(), html.trim());
         } catch (JadeCompilerException e) {
