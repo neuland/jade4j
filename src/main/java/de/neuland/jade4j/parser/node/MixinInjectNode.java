@@ -29,9 +29,6 @@ public class MixinInjectNode extends AttributedNode {
 		}
 
 		if (hasBlock()) {
-
-			model.put("block", true);
-
 			List<BlockNode> injectionPoints = getInjectionPoints(mixin.getBlock());
             for (BlockNode point : injectionPoints) {
                 point.getNodes().add(block);
@@ -39,11 +36,10 @@ public class MixinInjectNode extends AttributedNode {
 		}
 
 		model.pushScope();
-
+		model.put("block", hasBlock());
 		writeVariables(model, mixin, template);
 		writeAttributes(model, mixin, template);
 		mixin.getBlock().execute(writer, model, template);
-
 		model.popScope();
 
 	}
