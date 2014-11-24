@@ -60,11 +60,6 @@ public class TagNode extends AttributedNode {
             writer.append(">");
             return;
         }
-        if (selfClosing) {
-            boolean empty = isEmpty();
-            System.out.println(name);
-            System.out.println(empty);
-        }
         if (isSelfClosing(template) || (selfClosing && isEmpty())) {
             writer.append("/>");
             return;
