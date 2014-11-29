@@ -1,5 +1,10 @@
 # History
 
+## 0.4.1 / 2014-11-29
+* fixed tab support #79
+* .jade file extension appending is now done before the template loader #71
+* added support for mixin default blocks #80
+
 ## 0.4.0 / 2013-11-20
 * we are now on maven central #25
 * adapted pom to meet sonatype requirements
