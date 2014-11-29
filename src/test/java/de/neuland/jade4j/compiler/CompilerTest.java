@@ -304,6 +304,9 @@ public class CompilerTest {
     }
 
     @Test
+    public void indentTabs() { run("indent_tabs"); }
+
+    @Test
     public void extendsLayout() {
         run("extends");
     }

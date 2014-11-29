@@ -611,14 +611,14 @@ public class Lexer {
             matcher = scanner.getMatcherForPattern(re);
 
             // spaces
-            if (matcher.find(0) && matcher.groupCount() < 2) {
+            if (matcher.find(0) && matcher.group(1).length() == 0) {
                 re = "^\\n( *)";
                 indentType = "spaces";
                 matcher = scanner.getMatcherForPattern(re);
             }
 
             // established
-            if (matcher.find(0) && matcher.groupCount() > 0)
+            if (matcher.find(0) && matcher.group(1).length() > 0)
                 this.indentRe = re;
             this.indentType = indentType;
         }
