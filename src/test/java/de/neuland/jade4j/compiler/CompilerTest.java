@@ -259,6 +259,16 @@ public class CompilerTest {
     }
 
     @Test
+    public void mixinDefaultBlock() {
+        run("mixin_default_block");
+    }
+
+    @Test
+    public void mixinDefaultBlockNested() {
+        run("mixin_default_block_nested");
+    }
+
+    @Test
     public void selfClosingTag() {
         run("self_closing_tag");
     }

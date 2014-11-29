@@ -36,11 +36,10 @@ public class MixinInjectNode extends AttributedNode {
 		}
 
 		model.pushScope();
-
+		model.put("block", hasBlock());
 		writeVariables(model, mixin, template);
 		writeAttributes(model, mixin, template);
 		mixin.getBlock().execute(writer, model, template);
-
 		model.popScope();
 
 	}
