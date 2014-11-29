@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.neuland.jade4j.lexer.token.*;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.neuland.jade4j.exceptions.JadeLexerException;
@@ -31,9 +32,9 @@ public class Lexer {
     private String indentType;
 
     public Lexer(String filename, TemplateLoader templateLoader) throws IOException {
-        this.filename = filename;
+        this.filename = ensureJadeExtension(filename);
         this.templateLoader = templateLoader;
-        reader = templateLoader.getReader(filename);
+        reader = templateLoader.getReader(this.filename);
         options = new LinkedList<String>();
         scanner = new Scanner(reader);
         deferredTokens = new LinkedList<Token>();
@@ -681,6 +682,13 @@ public class Lexer {
             return new Colon(val, lineno);
         }
         return null;
+    }
+
+    private String ensureJadeExtension(String templateName) {
+        if ( StringUtils.isBlank(FilenameUtils.getExtension(templateName))) {
+            return templateName + ".jade";
+        }
+        return templateName;
     }
 
     public boolean getPipeless() {

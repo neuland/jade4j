@@ -334,12 +334,20 @@ public class Parser {
     }
 
     private Parser createParser(String templateName) {
+        templateName = ensureJadeExtension(templateName);
         try {
             return new Parser(resolvePath(templateName), templateLoader);
         } catch (IOException e) {
             throw new JadeParserException(filename, lexer.getLineno(), templateLoader, "the template [" + templateName
                     + "] could not be opened\n" + e.getMessage());
         }
+    }
+
+    private String ensureJadeExtension(String templateName) {
+        if ( StringUtils.isBlank(FilenameUtils.getExtension(templateName))) {
+            return templateName + ".jade";
+        }
+        return templateName;
     }
 
     private String resolvePath(String templateName) {

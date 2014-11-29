@@ -35,15 +35,6 @@ public class FileTemplateLoader implements TemplateLoader {
 
 	private File getFile(String name) {
 		// TODO Security
-		String filename = basePath + name;
-		if (hasNoExtension(filename)) {
-        	filename += suffix;
-        }
-
-		return new File(filename);
+        return new File(basePath + name);
 	}
-
-    private boolean hasNoExtension(String filename) {
-        return "".equals(FilenameUtils.getExtension(filename));
-    }
 }
