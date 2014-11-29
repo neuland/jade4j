@@ -79,7 +79,7 @@ See also the original [visionmedia/jade documentation](https://github.com/vision
 
 ### via Maven
 
-As of release 0.4.0, we have changed maven hosting to sonatype. Using Github Maven Repository is no longer
+As of release 0.4.1, we have changed maven hosting to sonatype. Using Github Maven Repository is no longer
 required.
 
 Please be aware that we had to change the group id from 'de.neuland' to 'de.neuland-bfi' in order to
@@ -91,7 +91,7 @@ Just add following dependency definitions to your `pom.xml`.
 <dependency>
   <groupId>de.neuland-bfi</groupId>
   <artifactId>jade4j</artifactId>
-  <version>0.4.0</version>
+  <version>0.4.1</version>
 </dependency>
 ```
 
