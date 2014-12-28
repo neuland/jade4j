@@ -6,10 +6,11 @@ import static org.junit.Assert.fail;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import de.neuland.jade4j.helper.beans.IterableMap;
 import org.junit.Test;
 
 import de.neuland.jade4j.JadeConfiguration;
@@ -46,9 +47,9 @@ public class JadeRunFullTemplateTest {
     @Test
     public void testEachLoopWithIterableMap() throws Exception {
 
-        IterableMap users = new IterableMap();
-        users.put("bob", "Robert Smith");
-        users.put("alex", "Alex Supertramp");
+        List<String> users = new ArrayList<String>();
+        users.add("Robert Smith");
+        users.add("Alex Supertramp");
 
         Map<String, Object> root = new HashMap<String, Object>();
         root.put("users", users);

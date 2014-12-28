@@ -1,13 +1,13 @@
 package de.neuland.jade4j.lexer.token;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.neuland.jade4j.parser.node.ExpressionString;
 
 public class Attribute extends Token {
 
-	Map<String, Object> attributes = new HashMap<String, Object>();
+	Map<String, Object> attributes = new LinkedHashMap<String, Object>();
 
 	public Attribute(String value, int lineNumber) {
 		super(value, lineNumber);
