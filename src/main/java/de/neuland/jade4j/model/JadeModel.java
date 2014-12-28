@@ -88,7 +88,7 @@ public class JadeModel implements Map<String, Object> {
 	}
 
 	@Override
-	// adds the object to the highest scope
+	// gets the object from the highest scope
 	public Object get(Object key) {
 		for (Iterator<Map<String, Object>> i = scopes.descendingIterator(); i.hasNext();) {
 			Map<String, Object> scope = i.next();
@@ -123,7 +123,7 @@ public class JadeModel implements Map<String, Object> {
 	}
 
 	@Override
-	// addes all map entries to the current scope map
+	// adds all map entries to the current scope map
 	public void putAll(Map<? extends String, ? extends Object> m) {
 		scopes.getLast().putAll(m);
 	}
@@ -149,7 +149,7 @@ public class JadeModel implements Map<String, Object> {
 	}
 
 	@Override
-	// returns the size of all unique keys
+	// return all current values
 	public Collection<Object> values() {
 		List<Object> values = new ArrayList<Object>();
 		for (String key : keySet()) {
