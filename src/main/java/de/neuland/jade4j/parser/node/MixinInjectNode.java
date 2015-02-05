@@ -8,6 +8,7 @@ import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
+import de.neuland.jade4j.util.ArgumentSplitter;
 
 public class MixinInjectNode extends AttributedNode {
 
@@ -103,8 +104,6 @@ public class MixinInjectNode extends AttributedNode {
 
 	public void setArguments(String arguments) {
 		this.arguments.clear();
-		for (String argument : arguments.split(",")) {
-			this.arguments.add(argument.trim());
-		}
+		this.arguments = ArgumentSplitter.split(arguments);
 	}
 }
