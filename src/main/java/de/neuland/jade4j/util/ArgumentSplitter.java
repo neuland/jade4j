@@ -55,17 +55,7 @@ public class ArgumentSplitter {
     }
 
     private void pushArg(StringBuilder sb) {
-        // remove comma, if constant string argument, remove quotes
-        String tmp = sb.toString().trim().replaceAll("^,", "").trim();
-        for (String s : new String[]{"\"", "'"}) {
-            if ( tmp.startsWith(s) && tmp.endsWith(s)) {
-                tmp = tmp.substring(1, tmp.length()-1);
-                break;
-            }
-        }
-        // add argument to list
-        argList.add(tmp);
-        // and reset builder for next argument building
+        argList.add(sb.toString().trim().replaceAll("^,", "").trim());
         sb = new StringBuilder(arguments.length());
     }
 
