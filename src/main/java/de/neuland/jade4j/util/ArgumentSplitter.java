@@ -11,7 +11,6 @@ public class ArgumentSplitter {
     private static final char argumentDelimiter = ',';
     private final String arguments;
     private List<String> argList = new ArrayList<String>();
-    private StringBuilder sb;
 
     public static List<String> split(String arguments) {
         return new ArgumentSplitter(arguments).splitArguments();
@@ -24,7 +23,7 @@ public class ArgumentSplitter {
     private List<String> splitArguments() {
 
         final int argLength = arguments.length();
-        sb = new StringBuilder(argLength);
+        StringBuilder sb = new StringBuilder(argLength);
         boolean insideQuotas = false;
 
         for (int i = 0; i < argLength; i++) {
@@ -35,17 +34,18 @@ public class ArgumentSplitter {
                 insideQuotas = !insideQuotas;
             }
 
-            // detect argument delimiter
+            // detect argument delimiter, then push argument
             else if (ch == argumentDelimiter && !insideQuotas) {
-                pushArg();
+                pushArg(sb);
+                sb = new StringBuilder(argLength);
             }
             sb.append(ch);
         }
-        pushArg();
+        pushArg(sb);
         return argList;
     }
 
-    private void pushArg() {
+    private void pushArg(StringBuilder sb) {
         String tmp = sb.toString().trim().replaceAll("^,", "").trim();
         for (String s : new String[]{"\"", "'"}) {
             if ( tmp.startsWith(s) && tmp.endsWith(s)) {
