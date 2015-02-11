@@ -317,6 +317,16 @@ public class CompilerTest {
     }
 
     @Test
+    public void mixinWithCommaSinglearg() {
+        run("mixin_with_comma_singlearg");
+    }
+
+    @Test
+    public void mixinWithCommaMorearg() {
+        run("mixin_with_comma_morearg");
+    }
+
+    @Test
     public void largeBodyTextWithPipes() {
         // TODO add missing newline
         run("large_body_text_with_pipes");
