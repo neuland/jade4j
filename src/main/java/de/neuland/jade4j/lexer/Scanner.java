@@ -38,7 +38,7 @@ public class Scanner {
                 if (StringUtils.isNotBlank(s)) {
                     // Check to see if "- var" was added to variable assignments
                     // and remove it
-                    s = s.replaceFirst("\\-([\\s|\\S]*?)var(\\s*|\\S*)", "");
+                    s = s.replaceFirst("(^)(\\s*)\\-(\\s*)var(\\s*)", "");
                     sb.append(s);
                 }
                 sb.append("\n");
