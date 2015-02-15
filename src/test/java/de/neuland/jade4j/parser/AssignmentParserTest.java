@@ -20,7 +20,7 @@ public class AssignmentParserTest extends ParserTest {
 		loadInParser("assignment.jade");
 		block = (BlockNode) root;
 		LinkedList<Node> nodes = block.getNodes();
-		assertEquals(2, nodes.size());
+		assertEquals(4, nodes.size());
 		
 		AssigmentNode assignment = (AssigmentNode) block.getNodes().get(0);
 		assertEquals("hello", assignment.getName());
@@ -28,5 +28,12 @@ public class AssignmentParserTest extends ParserTest {
 
 		TagNode tag = (TagNode) block.getNodes().get(1);
 		assertNotNull(tag);
+
+        AssigmentNode assignmentTwo = (AssigmentNode) block.getNodes().get(2);
+        assertEquals("goodnight", assignmentTwo.getName());
+        assertEquals("\"moon\"", assignmentTwo.getValue());
+
+        TagNode tagTwo = (TagNode) block.getNodes().get(3);
+        assertNotNull(tagTwo);
 	}
 }
