@@ -20,7 +20,7 @@ public class AssignmentParserTest extends ParserTest {
 		loadInParser("assignment.jade");
 		block = (BlockNode) root;
 		LinkedList<Node> nodes = block.getNodes();
-		assertEquals(6, nodes.size());
+		assertEquals(7, nodes.size());
 		
 		AssigmentNode assignment = (AssigmentNode) block.getNodes().get(0).getBlock().getNodes().get(0);
 		assertEquals("hello", assignment.getName());
@@ -29,17 +29,24 @@ public class AssignmentParserTest extends ParserTest {
 		TagNode tag = (TagNode) block.getNodes().get(0).getBlock().getNodes().get(1);
 		assertNotNull(tag);
 
-        AssigmentNode assignmentTwo = (AssigmentNode) block.getNodes().get(1);
-        assertEquals("goodnight", assignmentTwo.getName());
-        assertEquals("\"moon\"", assignmentTwo.getValue());
+        AssigmentNode assignmentTwo = (AssigmentNode) block.getNodes().get(1).getBlock().getNodes().get(0);
+        assertEquals("hello", assignmentTwo.getName());
+        assertEquals("\"world\"", assignmentTwo.getValue());
 
-        TagNode tagTwo = (TagNode) block.getNodes().get(2);
+        TagNode tagTwo = (TagNode) block.getNodes().get(1).getBlock().getNodes().get(1);
         assertNotNull(tagTwo);
 
-        AssigmentNode assignmentThree = (AssigmentNode) block.getNodes().get(3);
-        assertEquals("\"good\"", assignmentThree.getValue());
+        AssigmentNode assignmentThree = (AssigmentNode) block.getNodes().get(2);
+        assertEquals("goodnight", assignmentThree.getName());
+        assertEquals("\"moon\"", assignmentThree.getValue());
 
-        TagNode tagThree = (TagNode) block.getNodes().get(4);
-        assertNotNull(tagThree);
+        TagNode tagThree = (TagNode) block.getNodes().get(3);
+        assertNotNull(tagTwo);
+
+        AssigmentNode assignmentFour = (AssigmentNode) block.getNodes().get(4);
+        assertEquals("\"good\"", assignmentFour.getValue());
+
+        TagNode tagFour = (TagNode) block.getNodes().get(5);
+        assertNotNull(tagFour);
 	}
 }

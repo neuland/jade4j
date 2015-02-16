@@ -36,10 +36,10 @@ public class Scanner {
             String s = in.readLine();
             while (s != null) {
                 if (StringUtils.isNotBlank(s)) {
-                    // Check to see if "- var" was added to variable assignments
+                    // Check to see if "- var" or "-" was added to variable assignments
                     // and remove it
-                    s = s.replaceFirst("(^)*\\-(\\s*)var(\\s*)", "");
-                    sb.append(s);
+                    String matchedStr = Pattern.compile("(^\\s*)(-\\s*(var)?\\s*)", Pattern.MULTILINE).matcher(s).replaceAll("$1");
+                    sb.append(matchedStr);
                 }
                 sb.append("\n");
                 s = in.readLine();
