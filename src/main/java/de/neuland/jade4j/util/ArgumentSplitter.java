@@ -34,6 +34,7 @@ public class ArgumentSplitter {
         final int argLength = arguments.length();
         StringBuilder sb = new StringBuilder(argLength);
         boolean insideQuotas = false;
+        int bracesBlock = 0;
 
         for (int i = 0; i < argLength; i++) {
             char ch = arguments.charAt(i);
@@ -43,8 +44,16 @@ public class ArgumentSplitter {
                 insideQuotas = !insideQuotas;
             }
 
+            else if (ch == '(') {
+                bracesBlock++;
+            }
+
+            else if (ch == ')') {
+                bracesBlock--;
+            }
+
             // detect argument delimiter, then push argument
-            else if (ch == argumentDelimiter && !insideQuotas) {
+            else if (ch == argumentDelimiter && !insideQuotas && bracesBlock == 0) {
                 pushArg(sb);
                 sb = new StringBuilder(argLength);
             }

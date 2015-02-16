@@ -64,10 +64,16 @@ public class ArgumentSplitterTest  {
         assertEquals( "'2'", args.get(1));
         assertEquals( "'3'", args.get(2));
 
-        args = split("bar(bazz, 'bazz'), 123");
+        args = split("bar(bazz, 'ba(z,z)'), 123");
         assertEquals(args.size(), 2);
-        assertEquals( "bar(bazz, 'bazz')", args.get(0));
+        assertEquals( "bar(bazz, 'ba(z,z)')", args.get(0));
         assertEquals( "123", args.get(1));
+
+        args = split("'aaa', bar(bazz, foo('ba(z,z)')), 123");
+        assertEquals(args.size(), 3);
+        assertEquals("'aaa'", args.get(0));
+        assertEquals( "bar(bazz, foo('ba(z,z)'))", args.get(1));
+        assertEquals( "123", args.get(2));
 
         args = split("123, '1,2,3', \"a,b,c\"");
         assertEquals(args.size(), 3);
