@@ -50,4 +50,8 @@ public class TextNode extends Node {
 	public LinkedList<Node> getNodes() {
 		return nodes;
 	}
+
+	public List<Object> getPreparedValue() {
+		return preparedValue;
+	}
 }

@@ -34,6 +34,10 @@ public class TagNode extends AttributedNode {
         this.codeNode = codeNode;
     }
 
+    public Node getCodeNode() {
+        return codeNode;
+    }
+
     public boolean isTextOnly() {
         return this.textOnly;
     }
