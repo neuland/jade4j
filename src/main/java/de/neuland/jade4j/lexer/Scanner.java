@@ -14,7 +14,7 @@ public class Scanner {
     public Scanner(Reader reader) {
     	initFromReader(reader);
     }
-    
+
     public void consume(int length) {
         input = input.substring(length);
     }
@@ -38,7 +38,7 @@ public class Scanner {
                 if (StringUtils.isNotBlank(s)) {
                     // Check to see if "- var" was added to variable assignments
                     // and remove it
-                    s = s.replaceFirst("(^)(\\s*)\\-(\\s*)var(\\s*)", "");
+                    s = s.replaceFirst("(^)*\\-(\\s*)var(\\s*)", "");
                     sb.append(s);
                 }
                 sb.append("\n");
@@ -55,7 +55,7 @@ public class Scanner {
         }
     }
 
-    
+
     public char charAt(int i) {
         return input.charAt(i);
     }
