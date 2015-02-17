@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Split arguments passed as single String into list of strings, preserve quotes when argument is not simple string constant.
  * For example:
- * foo('a'),'b' -> [ "foo('a')", "b" ]
+ * foo('a'),'b' -&gt; [ "foo('a')", "b" ]
  *
  * @author dusan.zatkovsky, 2/5/15
  */
