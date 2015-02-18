@@ -14,13 +14,14 @@ import de.neuland.jade4j.parser.node.TagNode;
 public class AssignmentParserTest extends ParserTest {
 
 	private BlockNode block;
+    public static final int EXPECTED_NUMBER_OF_NODES = 7;
 
 	@Test
 	public void shouldReturnTagsWithTexts() {
 		loadInParser("assignment.jade");
 		block = (BlockNode) root;
 		LinkedList<Node> nodes = block.getNodes();
-		assertEquals(7, nodes.size());
+		assertEquals(EXPECTED_NUMBER_OF_NODES, nodes.size());
 		
 		AssigmentNode assignment = (AssigmentNode) block.getNodes().get(0).getBlock().getNodes().get(0);
 		assertEquals("hello", assignment.getName());
