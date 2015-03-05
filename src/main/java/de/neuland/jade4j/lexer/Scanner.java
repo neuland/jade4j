@@ -34,11 +34,13 @@ public class Scanner {
             StringBuilder sb = new StringBuilder();
             BufferedReader in = new BufferedReader(reader);
             String s = in.readLine();
+            // Compile RegEx pattern
+            // Checks to see if "- var" or "-" are found in a given string
+            Pattern pattern = Pattern.compile("(^\\s*)(-\\s*(var)?\\s*)", Pattern.MULTILINE);
             while (s != null) {
                 if (StringUtils.isNotBlank(s)) {
-                    // Check to see if "- var" or "-" was added to variable assignments
-                    // and remove it
-                    String matchedStr = Pattern.compile("(^\\s*)(-\\s*(var)?\\s*)", Pattern.MULTILINE).matcher(s).replaceAll("$1");
+                    // Find "- var" or "-" statements and remove them
+                    String matchedStr = pattern.matcher(s).replaceAll("$1");
                     sb.append(matchedStr);
                 }
                 sb.append("\n");
