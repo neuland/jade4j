@@ -391,6 +391,11 @@ public class CompilerTest {
         expectedFileNameExtension = tmp;
     }
 
+    @Test
+    public void reportedIssue90() {
+        run("reportedIssue89");
+    }
+
     private void run(String testName) {
         run(testName, false);
     }
