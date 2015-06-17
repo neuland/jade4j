@@ -14,7 +14,7 @@ import de.neuland.jade4j.parser.node.TagNode;
 public class AssignmentParserTest extends ParserTest {
 
 	private BlockNode block;
-    public static final int EXPECTED_NUMBER_OF_NODES = 7;
+    public static final int EXPECTED_NUMBER_OF_NODES = 8;
 
 	@Test
 	public void shouldReturnTagsWithTexts() {
@@ -49,5 +49,11 @@ public class AssignmentParserTest extends ParserTest {
 
         TagNode tagFour = (TagNode) block.getNodes().get(5);
         assertNotNull(tagFour);
+
+        AssigmentNode assignmentFive = (AssigmentNode) block.getNodes().get(6);
+        assertEquals("\"world\"", assignmentFive.getValue());
+
+        TagNode tagFive = (TagNode) block.getNodes().get(7);
+        assertNotNull(tagFive);
 	}
 }
