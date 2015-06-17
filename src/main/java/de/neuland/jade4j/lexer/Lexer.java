@@ -47,103 +47,130 @@ public class Lexer {
     public Token next() {
         handleBlankLines();
         Token token = null;
-        if (token == null) {
-            token = deferred();
+        if ((token = deferred()) != null) {
+        	return token;
         }
-        if (token == null) {
-            token = eos();
+        
+        if ((token = eos()) != null) {
+           return token;
         }
-        if (token == null) {
-            token = pipelessText();
+        
+        if ((token = pipelessText()) != null) {
+           return token;
         }
-        if (token == null) {
-            token = yield();
+        
+        if ((token = yield()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = doctype();
+        
+        if ((token = doctype()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = caseToken();
+        
+        if ((token = caseToken()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = when();
+        
+        if ((token = when()) != null) {
+           return token;
         }
-        if (token == null) {
-            token = defaultToken();
+        
+        if ((token = defaultToken()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = extendsToken();
+        
+        if ((token = extendsToken()) != null) {
+           return token;
         }
-        if (token == null) {
-            token = append();
+        
+        if ((token = append()) != null) {
+           return token;
         }
-        if (token == null) {
-            token = prepend();
+        
+        if ((token = prepend()) != null) {
+           return token;
         }
-        if (token == null) {
-            token = block();
+        
+        if ((token = block()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = include();
+        
+        if ((token = include()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = mixin();
+        
+        if ((token = mixin()) != null) {
+           return token;
         }
-        if (token == null) {
-            token = mixinInject();
+        
+        if ((token = mixinInject()) != null) {
+           return token;
         }
-        if (token == null) {
-            token = conditional();
+        
+        if ((token = conditional()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = each();
+        
+        if ((token = each()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = whileToken();
+        
+        if ((token = whileToken()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = assignment();
+        
+        if ((token = assignment()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = tag();
+        
+        if ((token = tag()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = filter();
+        
+        if ((token = filter()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = code();
+        
+        if ((token = code()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = id();
+        
+        if ((token = id()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = className();
+        
+        if ((token = className()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = attributes();
+        
+        if ((token = attributes()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = indent();
+        
+        if ((token = indent()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = comment();
+        
+        if ((token = comment()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = colon();
+        
+        if ((token = colon()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = dot();
+        
+        if ((token = dot()) != null) {
+            return token;
         }
-        if (token == null) {
-            token = text();
+        
+        if ((token = text()) != null) {
+            return token;
         }
-        if (token == null) {
-            throw new JadeLexerException("token not recognized " + scanner.getInput().substring(0, 5), filename, getLineno(),
+        
+        throw new JadeLexerException("token not recognized " + scanner.getInput().substring(0, 5), filename, getLineno(),
                     templateLoader);
-        }
-
-        return token;
     }
+    
 
     public void handleBlankLines() {
         while (scanner.isAdditionalBlankline()) {

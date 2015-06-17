@@ -233,10 +233,11 @@ public class CompilerTest {
         run("mixin");
     }
 
-    //@Test
-    //public void mixinParams() {
-    //    run("mixin_params");
-    //}
+    @Ignore
+    @Test
+    public void mixinParams() {
+        run("mixin_params");
+    }
 
     @Test
     public void mixinBlocks() {
@@ -317,6 +318,21 @@ public class CompilerTest {
     }
 
     @Test
+    public void mixinWithCommaSinglearg() {
+        run("mixin_with_comma_singlearg");
+    }
+
+    @Test
+    public void mixinWithCommaMorearg() {
+        run("mixin_with_comma_morearg");
+    }
+
+    @Test
+    public void mixinWithComplexParameter() {
+        run("mixin_with_complex_parameter");
+    }
+
+    @Test
     public void largeBodyTextWithPipes() {
         // TODO add missing newline
         run("large_body_text_with_pipes");
@@ -389,6 +405,11 @@ public class CompilerTest {
         expectedFileNameExtension = ".xml";
         run("xml_doctype");
         expectedFileNameExtension = tmp;
+    }
+
+    @Test
+    public void reportedIssue90() {
+        run("reportedIssue89");
     }
 
     private void run(String testName) {
