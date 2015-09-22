@@ -55,7 +55,18 @@ public abstract class JadeException extends RuntimeException {
 
 	@Override
 	public String toString() {
-		return getClass() + " " + getFilename() + ":" + getLineNumber() + "\n" + getMessage();
+		return getClass() + ": " + getMessage();
+	}
+
+	/**
+	 * Returns the detail message string of this throwable.
+	 *
+	 * @return the detail message string of this {@code Throwable} instance
+	 * (which may be {@code null}).
+	 */
+	@Override
+	public String getMessage() {
+		return super.getMessage() + " in " + getFilename() + ":" + getLineNumber();
 	}
 
 	public String toHtmlString() {

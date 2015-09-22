@@ -7,6 +7,8 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.util.HashMap;
 
+import de.neuland.jade4j.template.FileTemplateLoader;
+import de.neuland.jade4j.template.TemplateLoader;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
@@ -32,8 +34,20 @@ public class JadeExceptionTest {
 		}
 	}
 
+	@Test
+	public void testMessage() throws Exception {
+		try {
+			throw new JadeLexerException("invalid indentation; expecting 2 spaces", "index.jade", 10, new FileTemplateLoader(TestFileHelper.getLexerResourcePath(""), "UTF-8"));
+		}catch(Exception e){
+			assertEquals("invalid indentation; expecting 2 spaces in index.jade:10",e.getMessage());
+			assertEquals("class de.neuland.jade4j.exceptions.JadeLexerException: invalid indentation; expecting 2 spaces in index.jade:10",e.toString());
+		}
+
+	}
+
 	private String removeAbsolutePath(String html) {
 		html = html.replaceAll("(<h2>In ).*(compiler/exceptions/error\\.jade at line 9\\.</h2>)", "$1\\.\\./$2");
+		html = html.replaceAll("(\\s)[^\\s]*(compiler/exceptions/error\\.jade:9)", "$1\\.\\./$2");
 		return html;
 	}
 
