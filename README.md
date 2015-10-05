@@ -232,7 +232,7 @@ public class MathHelper {
 model.put("math", new MathHelper());
 ```
 
-Note: Helpers don't have their own namespace, so you have to be carefull not to overwrite them with other variables.
+Note: Helpers don't have their own namespace, so you have to be careful not to overwrite them with other variables.
 
 ```
 p= math.round(1.44)
