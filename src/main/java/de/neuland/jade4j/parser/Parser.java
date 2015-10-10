@@ -104,10 +104,21 @@ public class Parser {
             getContexts().push(extending);
             Node rootNode = extending.parse();
             getContexts().pop();
+            liftMixins(rootNode,block);
             return rootNode;
         }
 
         return block;
+    }
+
+    private void liftMixins( Node rootNode, Node node ) {
+        if (node instanceof MixinNode) {
+            rootNode.getNodes().add(0,node);
+        } else {
+            for (Node child : node.getNodes()) {
+                liftMixins(rootNode,child);
+            }
+        }
     }
 
     private Node parseExpr() {
