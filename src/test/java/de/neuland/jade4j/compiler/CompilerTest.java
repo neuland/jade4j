@@ -445,7 +445,7 @@ public class CompilerTest {
             assertEquals(testName, expected.trim(), html.trim());
         } catch (JadeCompilerException e) {
             e.printStackTrace();
-            fail();
+            fail(e.getMessage());
         }
     }
 
