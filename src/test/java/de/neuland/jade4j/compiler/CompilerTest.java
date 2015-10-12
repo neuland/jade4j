@@ -233,12 +233,6 @@ public class CompilerTest {
         run("mixin");
     }
 
-    @Ignore
-    @Test
-    public void mixinParams() {
-        run("mixin_params");
-    }
-
     @Test
     public void mixinBlocks() {
         run("mixin_blocks");
