@@ -575,7 +575,7 @@ public class Lexer {
         String string = scanner.getInput().substring(1, index);
         consume(index + 1);
 
-        Attribute attribute = new AttributeLexer().getToken(string, lineno);
+        Attribute attribute = new AttributeLexer(string, filename, lineno, templateLoader).getToken();
 
         if (scanner.getInput().charAt(0) == '/') {
             consume(1);
