@@ -1,8 +1,11 @@
 package de.neuland.jade4j.lexer.token;
 
+import java.util.ArrayList;
+
 public abstract class Token {
 
 	private String value;
+    private ArrayList<String> values;
     private int lineNumber;
     private boolean buffer = false;
     private String mode;
@@ -76,5 +79,13 @@ public abstract class Token {
 
     public void setSelfClosing(boolean selfClosing) {
         this.selfClosing = selfClosing;
+    }
+
+    public ArrayList<String> getValues() {
+        return values;
+    }
+
+    public void setValues(ArrayList<String> values) {
+        this.values = values;
     }
 }

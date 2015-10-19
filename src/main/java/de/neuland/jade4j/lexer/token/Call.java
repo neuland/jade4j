@@ -1,11 +1,11 @@
 package de.neuland.jade4j.lexer.token;
 
 
-public class MixinInject extends Token {
+public class Call extends Token {
 
 	private String arguments;
 
-    public MixinInject(String value, int lineNumber) {
+    public Call(String value, int lineNumber) {
 		super(value, lineNumber);
 	}
 

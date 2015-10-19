@@ -68,4 +68,18 @@ public class CommentTest extends TokenTest {
         assertToken(8, Outdent.class,         "outdent");
         assertToken(8, Comment.class,         "another comment comes here");
     }    
+    @Test
+    public void shouldScanBlockComment2() throws Exception {
+        lexer = initLexer("buffered_block_comment.jade");
+        assertToken(1, Comment.class,         "this is my first comment");
+        assertToken(2, Newline.class,         "newline");
+        assertToken(2, Tag.class,             "div");
+        assertToken(3, Indent.class,          "indent");
+        assertToken(3, Comment.class,         "");
+        assertToken(7, PipelessText.class,    "pipeless-text");
+        assertToken(8, Outdent.class,    "outdent");
+        assertToken(8, Comment.class,    "another comment comes here");
+        assertToken(8, Eos.class,    "eos");
+    }
+
 }
