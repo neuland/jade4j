@@ -15,17 +15,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Collection;
 import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 
-public class OriginalJade20151013Test {
-
-	private String[] manualCompared = new String[] { "attrs", "attrs.js", "code.conditionals", "code.iteration", "comments",
-			"escape-chars", "filters.coffeescript", "filters.less", "filters.markdown", "filters.stylus", "html", "include-only-text-body",
-			"include-only-text", "include-with-text-head", "include-with-text", "mixin.blocks", "mixin.merge", "quotes", "script.whitespace", "scripts", "scripts.non-js",
-			"source", "styles", "template", "text-block", "text", "vars", "yield-title", "doctype.default" };
+public class OriginalJade20150515Test {
 
 	@Test
 	public void testBrowserIndex() throws IOException, JadeCompilerException {
@@ -188,11 +182,6 @@ public class OriginalJade20151013Test {
 	}
 
 	@Test
-	public void testCasesFiltersInline() throws IOException, JadeCompilerException {
-		testJade("cases/filters.inline");
-	}
-
-	@Test
 	public void testCasesFiltersLess() throws IOException, JadeCompilerException {
 		testJade("cases/filters.less");
 	}
@@ -200,11 +189,6 @@ public class OriginalJade20151013Test {
 	@Test
 	public void testCasesFiltersMarkdown() throws IOException, JadeCompilerException {
 		testJade("cases/filters.markdown");
-	}
-
-	@Test
-	public void testCasesFiltersNested() throws IOException, JadeCompilerException {
-		testJade("cases/filters.nested");
 	}
 
 	@Test
@@ -253,11 +237,6 @@ public class OriginalJade20151013Test {
 	}
 
 	@Test
-	public void testCasesIncludeFilterCoffee() throws IOException, JadeCompilerException {
-		testJade("cases/include-filter-coffee");
-	}
-
-	@Test
 	public void testCasesIncludeFilterStylus() throws IOException, JadeCompilerException {
 		testJade("cases/include-filter-stylus");
 	}
@@ -289,7 +268,7 @@ public class OriginalJade20151013Test {
 
 	@Test
 	public void testCasesIncludesWithExtJs() throws IOException, JadeCompilerException {
-		testJade("cases/includesWithExtJs");
+		testJade("cases/includes-with-ext-js");
 	}
 
 	@Test
@@ -319,8 +298,8 @@ public class OriginalJade20151013Test {
 	}
 
 	@Test
-	public void testCasesInheritanceExtendMixin() throws IOException, JadeCompilerException {
-		testJade("cases/inheritance.extend.mixin");
+	public void testCasesInheritanceExtendMixins() throws IOException, JadeCompilerException {
+		testJade("cases/inheritance.extend.mixins");
 	}
 
 	@Test
@@ -341,11 +320,6 @@ public class OriginalJade20151013Test {
 	@Test
 	public void testCasesInlineTag() throws IOException, JadeCompilerException {
 		testJade("cases/inline-tag");
-	}
-
-	@Test
-	public void testCasesInterpolatedElements() throws IOException, JadeCompilerException {
-		testJade("cases/interpolated-elements");
 	}
 
 	@Test
@@ -404,11 +378,6 @@ public class OriginalJade20151013Test {
 	}
 
 	@Test
-	public void testCasesMixinBlockWithSpace() throws IOException, JadeCompilerException {
-		testJade("cases/mixin-block-with-space");
-	}
-
-	@Test
 	public void testCasesMixinHoist() throws IOException, JadeCompilerException {
 		testJade("cases/mixin-hoist");
 	}
@@ -424,13 +393,13 @@ public class OriginalJade20151013Test {
 	}
 
 	@Test
-	public void testCasesMixinRestArgs() throws IOException, JadeCompilerException {
-		testJade("cases/mixin.rest-args");
+	public void testCasesMixinsRestArgs() throws IOException, JadeCompilerException {
+		testJade("cases/mixins.rest-args");
 	}
 
 	@Test
-	public void testCasesMixinUnused() throws IOException, JadeCompilerException {
-		testJade("cases/mixin-unused");
+	public void testCasesMixinsUnused() throws IOException, JadeCompilerException {
+		testJade("cases/mixins-unused");
 	}
 
 	@Test
@@ -479,13 +448,8 @@ public class OriginalJade20151013Test {
 	}
 
 	@Test
-	public void testCasesSelfClosingHtml() throws IOException, JadeCompilerException {
-		testJade("cases/self-closing-html");
-	}
-
-	@Test
 	public void testCasesSinglePeriod() throws IOException, JadeCompilerException {
-		testJade("cases/single.period");
+		testJade("cases/single-period");
 	}
 
 	@Test
@@ -569,7 +533,7 @@ public class OriginalJade20151013Test {
 	}
 
 	private void testJade(String path) throws IOException {
-		File file = new File(TestFileHelper.getOriginal20151013ResourcePath(path+".jade"));
+		File file = new File(TestFileHelper.getOriginal20150515ResourcePath(path+".jade"));
 
 		JadeConfiguration jade = new JadeConfiguration();
 		jade.setMode(Jade4J.Mode.XHTML); // original jade uses xhtml by default
@@ -582,15 +546,7 @@ public class OriginalJade20151013Test {
 		String html = writer.toString();
 
 		String expected = readFile(file.getPath().replace(".jade", ".html"));
-		// System.out.println("\n>> " + file.getName());
-		// System.out.println(html);
-		// System.out.println("-- " + file.getName());
-		// System.out.println(expected);
-		// System.out.println("<< " + file.getName());
-
-		if (!ArrayUtils.contains(manualCompared, file.getName().replace(".jade", ""))) {
-			assertEquals(file.getName(), expected, html);
-		}
+		assertEquals(file.getName(), expected, html);
 	}
 
 	private String readFile(String fileName) {
