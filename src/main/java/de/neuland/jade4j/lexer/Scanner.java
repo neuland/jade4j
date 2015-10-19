@@ -34,11 +34,16 @@ public class Scanner {
             StringBuilder sb = new StringBuilder();
             BufferedReader in = new BufferedReader(reader);
             String s = in.readLine();
+            boolean first = true;
             while (s != null) {
+                if(!first) {
+                    sb.append("\n");
+                }
+                first=false;
                 if (StringUtils.isNotBlank(s)) {
                     sb.append(s);
                 }
-                sb.append("\n");
+
                 s = in.readLine();
             }
             input = sb.toString();
