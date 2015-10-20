@@ -548,10 +548,12 @@ public class Lexer {
             throw new JadeLexerException("`!!!` is deprecated, you must now use `doctype`", filename, getLineno(), templateLoader);
         }
         val = scan("^(?:doctype) *([^\\n]+)?");
-        if (StringUtils.isNotBlank(val) && val.trim() == "5") {
-            throw new JadeLexerException("`doctype 5` is deprecated, you must now use `doctype html`", filename, getLineno(), templateLoader);
+        if (StringUtils.isNotBlank(val)) {
+            if(val.trim() == "5")
+                throw new JadeLexerException("`doctype 5` is deprecated, you must now use `doctype html`", filename, getLineno(), templateLoader);
+            return new Doctype(val, lineno);
         }
-        return new Doctype(val, lineno);
+        return null;
     }
 
     private Token id() {
@@ -569,11 +571,18 @@ public class Lexer {
         }
         return null;
     }
-
+//    text: function() {
+//        return this.scan(/^(?:\| ?| )([^\n]+)/, 'text') ||
+//          this.scan(/^\|?( )/, 'text') ||
+//          this.scan(/^(<[^\n]*)/, 'text');
+//      },
     private Token text() {
         String val = scan("^(?:\\| ?| )([^\\n]+)");
-        if (StringUtils.isNotEmpty(val)) {
-            val = scan("^(<[^\\n]*)");
+        if (StringUtils.isEmpty(val)) {
+            val = scan("^\\|?( )");
+            if (StringUtils.isEmpty(val)) {
+                val = scan("^(<[^\\n]*)");
+            }
         }
         if (StringUtils.isNotEmpty(val)) {
             return new Text(val, lineno);
@@ -912,7 +921,7 @@ public class Lexer {
                 }
             }
 
-            if ('/' == scanner.getInput().charAt(0)) {
+            if (scanner.getInput().length()>0 && '/' == scanner.getInput().charAt(0)) {
                 this.consume(1);
                 tok.setSelfClosing(true);
             }
