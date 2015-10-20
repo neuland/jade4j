@@ -56,12 +56,15 @@ public class Lexer {
     }
 
     public Token next() {
-        handleBlankLines();
-        Token token = null;
+        Token token;
         if ((token = deferred()) != null) {
         	return token;
         }
-        
+
+        if ((token = blank()) != null) {
+        	return token;
+        }
+
         if ((token = eos()) != null) {
            return token;
         }
@@ -166,9 +169,9 @@ public class Lexer {
             return token;
         }
         
-//        if ((token = attributesBlock()) != null) {
-//            return token;
-//        }
+        if ((token = attributesBlock()) != null) {
+            return token;
+        }
 
         if ((token = indent()) != null) {
             return token;
@@ -322,7 +325,31 @@ public class Lexer {
         }
         return null;
     }
+    /**
+     * Blank line.
+     */
 
+//    blank: function() {
+//      var captures;
+//      if (captures = /^\n *\n/.exec(this.input)) {
+//        this.consume(captures[0].length - 1);
+//        ++this.lineno;
+//        if (this.pipeless) return this.tok('text', '');
+//        return this.next();
+//      }
+//    },
+    private Token blank(){
+        Matcher matcher = scanner.getMatcherForPattern("^\\n *\\n");
+        if (matcher.find(0) && matcher.groupCount() > 1) {
+            consume(matcher.end()-1);
+            ++this.lineno;
+
+            if(this.pipeless)
+                return new Text("",lineno);
+            return this.next();
+        }
+        return null;
+    }
     private Token eos() {
         if (scanner.getInput().length() > 0) {
             return null;
@@ -500,14 +527,31 @@ public class Lexer {
 	 * (StringUtils.isNotBlank(val)) { return new Filter(val, lineno); } return
 	 * null; }
 	 */
+    /**
+     * Doctype.
+     */
+
+//    doctype: function() {
+//      if (this.scan(/^!!! *([^\n]+)?/, 'doctype')) {
+//        throw new Error('`!!!` is deprecated, you must now use `doctype`');
+//      }
+//      var node = this.scan(/^(?:doctype) *([^\n]+)?/, 'doctype');
+//      if (node && node.val && node.val.trim() === '5') {
+//        throw new Error('`doctype 5` is deprecated, you must now use `doctype html`');
+//      }
+//      return node;
+//    },
 
     private Token doctype() {
-        Matcher matcher = scanner.getMatcherForPattern("^(?:!!!|doctype) *([^\\n]+)?");
-        if (matcher.find(0) && matcher.groupCount() > 0) {
-            consume(matcher.end());
-            return new Doctype(matcher.group(1), lineno);
+        String val = scan("^!!! *([^\\n]+)?");
+        if (StringUtils.isNotBlank(val)) {
+            throw new JadeLexerException("`!!!` is deprecated, you must now use `doctype`", filename, getLineno(), templateLoader);
         }
-        return null;
+        val = scan("^(?:doctype) *([^\\n]+)?");
+        if (StringUtils.isNotBlank(val) && val.trim() == "5") {
+            throw new JadeLexerException("`doctype 5` is deprecated, you must now use `doctype html`", filename, getLineno(), templateLoader);
+        }
+        return new Doctype(val, lineno);
     }
 
     private Token id() {
@@ -878,7 +922,28 @@ public class Lexer {
         return null;
     }
 
+//      var captures;
+//      if (/^&attributes\b/.test(this.input)) {
+//        this.consume(11);
+//        var args = this.bracketExpression();
+//        this.consume(args.end + 1);
+//        return this.tok('&attributes', args.src);
+//      }
+//    },
 
+    /**
+     * &attributes block
+     */
+    private Token attributesBlock() {
+        Matcher matcher = scanner.getMatcherForPattern("^&attributes\\b");
+        if (matcher.find(0) && matcher.groupCount() > 1) {
+            this.scanner.consume(11);
+            CharacterParser.Match match = this.bracketExpression();
+            this.scanner.consume(match.getEnd()+1);
+            return new AttributesBlock(match.getSrc(),lineno);
+        }
+        return null;
+    }
     private int indexOfDelimiters(char start, char end) {
         String str = scanner.getInput();
         int nstart = 0;
