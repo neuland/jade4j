@@ -19,6 +19,7 @@ public class TagNode extends AttributedNode {
     private Node codeNode;
     private static final String[] selfClosingTags = {"meta", "img", "link", "input", "area", "base", "col", "br", "hr", "source"};
     private boolean selfClosing = false;
+    private boolean buffer = false;
 
 
     public void setTextOnly(boolean textOnly) {
@@ -186,5 +187,13 @@ public class TagNode extends AttributedNode {
 
     public boolean isSelfClosing() {
         return selfClosing;
+    }
+
+    public boolean isBuffer() {
+        return buffer;
+    }
+
+    public void setBuffer(boolean buffer) {
+        this.buffer = buffer;
     }
 }

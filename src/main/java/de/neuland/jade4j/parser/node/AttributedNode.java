@@ -1,24 +1,24 @@
 package de.neuland.jade4j.parser.node;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
+import de.neuland.jade4j.exceptions.JadeParserException;
 import de.neuland.jade4j.model.JadeModel;
 
 public abstract class AttributedNode extends Node {
 
 	protected Map<String, Object> attributes = new LinkedHashMap<String, Object>();
+	protected List<String> attributeBlocks = new LinkedList<String>();
+	protected List attributeNames = new LinkedList<String>();
 	protected Map<String, List<Object>> preparedAttributeValues = new HashMap<String, List<Object>>();
 	protected boolean inheritsAttributes = false;
 
-	public void addAttribute(String key, Object value) {
+	public void setAttribute(String key, Object value) {
 		if ("attributes".equals(key)) {
 			inheritsAttributes = true;
 		} else {
-			addAttribute(attributes, key, value);
+			setAttribute(attributes, key, value);
 		}
 	}
 
@@ -28,7 +28,7 @@ public abstract class AttributedNode extends Node {
 
 	public void addAttributes(Map<String, Object> attributeMap) {
 		for (String key : attributeMap.keySet()) {
-			addAttribute(key, attributeMap.get(key));
+			setAttribute(key, attributeMap.get(key));
 		}
 	}
 
@@ -46,7 +46,7 @@ public abstract class AttributedNode extends Node {
 				Map<String, Object> inheritedAttributes = (Map<String, Object>) o;
 
 				for (Entry<String, Object> entry : inheritedAttributes.entrySet()) {
-					addAttribute(mergedAttributes, (String) entry.getKey(), entry.getValue());
+					setAttribute(mergedAttributes, (String) entry.getKey(), entry.getValue());
 				}
 			}
 		}
@@ -57,7 +57,7 @@ public abstract class AttributedNode extends Node {
 	 * Puts the specified key-value pair in the specified map. Provides special
 	 * processing in the case of the "class" attribute.
 	 */
-	private void addAttribute(Map<String, Object> map, String key, Object newValue) {
+	private void setAttribute(Map<String, Object> map, String key, Object newValue) {
 		if ("class".equals(key) && attributes.containsKey(key)) {
 			String value1 = attributeValueToString(attributes.get(key));
 			String value2 = attributeValueToString(newValue);
@@ -67,7 +67,6 @@ public abstract class AttributedNode extends Node {
 			attributes.put(key, newValue);
 		}
 	}
-
 	private String attributeValueToString(Object value) {
 		if (value instanceof ExpressionString) {
 			String expression = ((ExpressionString) value).getValue();
@@ -90,5 +89,7 @@ public abstract class AttributedNode extends Node {
 
 		return clone;
 	}
-
+	public void addAttribute(String src){
+		this.attributeBlocks.add(src);
+	}
 }
