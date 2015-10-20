@@ -2,16 +2,17 @@ package de.neuland.jade4j.lexer;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.neuland.jade4j.exceptions.ExpressionException;
+import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.lexer.token.*;
 import de.neuland.jade4j.util.CharacterParser;
 import de.neuland.jade4j.util.Options;
+import de.neuland.jade4j.util.StringReplacer;
+import de.neuland.jade4j.util.StringReplacerCallback;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -19,6 +20,9 @@ import de.neuland.jade4j.exceptions.JadeLexerException;
 import de.neuland.jade4j.template.TemplateLoader;
 
 public class Lexer {
+    private static final Pattern cleanRe = Pattern.compile("^['\"]|['\"]$");
+    private static final Pattern doubleQuotedRe = Pattern.compile("^\"[^\"]*\"$");
+    private static final Pattern quotedRe = Pattern.compile("^'[^']*'$");
     @SuppressWarnings("unused")
     private LinkedList<String> options;
     Scanner scanner;
@@ -240,6 +244,9 @@ public class Lexer {
 //      if (this.input[range.end] !== end) throw new Error('start character ' + start + ' does not match end character ' + this.input[range.end]);
 //      return range;
 //    },
+    private CharacterParser.Match bracketExpression(){
+        return bracketExpression(0);
+    }
     private CharacterParser.Match bracketExpression(int skip){
         char start = scanner.getInput().charAt(skip);
         if(start != '(' && start != '{' && start != '[') {
@@ -688,27 +695,189 @@ public class Lexer {
         return null;
     }
 
-    private Token attrs() {
-        if ('(' != scanner.charAt(0)) {
-            return null;
+    public boolean isEndOfAttribute(int i, String str, String key, String val, Loc loc, CharacterParser.State state) {
+        if (key.trim().isEmpty()) return false;
+        if (i == str.length()) return true;
+        if (Loc.KEY.equals(loc)) {
+            if (str.charAt(i) == ' ' || str.charAt(i) == '\n') {
+                for (int x = i; x < str.length(); x++) {
+                    if (str.charAt(x) != ' ' && str.charAt(x) != '\n') {
+                        if (str.charAt(x) == '=' || str.charAt(x) == '!' || str.charAt(x) == ',') return false;
+                        else return true;
+                    }
+                }
+            }
+            return str.charAt(i) == ',';
+        } else if (Loc.VALUE.equals(loc) && !state.isNesting()) {
+            try {
+                ExpressionHandler.assertExpression(val);
+                if (str.charAt(i) == ' ' || str.charAt(i) == '\n') {
+                    for (int x = i; x < str.length(); x++) {
+                        if (str.charAt(x) != ' ' && str.charAt(x) != '\n') {
+                            if (characterParser.isPunctuator(str.charAt(x)) && str.charAt(x) != '"' && str.charAt(x) != '\'')
+                                return false;
+                            else return true;
+                        }
+                    }
+                }
+                return str.charAt(i) == ',';
+            } catch (Exception ex) {
+                return false;
+            }
         }
-
-        int index = indexOfDelimiters('(', ')');
-        if (index == 0) {
-            throw new JadeLexerException("invalid attribute definition; missing )", filename, getLineno(), templateLoader);
-        }
-        String string = scanner.getInput().substring(1, index);
-        consume(index + 1);
-
-        Attribute attribute = new AttributeLexer().getToken(string, lineno);
-
-        if (scanner.getInput().charAt(0) == '/') {
-            consume(1);
-            attribute.setSelfClosing(true);
-        }
-
-        return attribute;
+        return false;
     }
+
+    private String interpolate(String attr, final String quote) {
+        Pattern regex = Pattern.compile("(\\\\)?#\\{(.+)");
+
+        return StringReplacer.replace(attr, regex, new StringReplacerCallback() {
+            @Override
+            public String replace(Matcher m) {
+                String match = m.group(0);
+                boolean escape = m.find(1);
+                String expr = m.group(2);
+                if (escape) return match;
+                try {
+                    CharacterParser.Match range = characterParser.parseMax(expr);
+                    if (expr.charAt(range.getEnd()) != '}')
+                        return substr(match, 0, 2) + interpolate(match.substring(2), quote);
+                    ExpressionHandler.assertExpression(range.getSrc());
+                    return quote + " + (" + range.getSrc() + ") + " + quote + interpolate(expr.substring(range.getEnd() + 1), quote);
+                } catch (Exception ex) {
+                    return substr(match, 0, 2) + interpolate(match.substring(2), quote);
+                }
+            }
+        });
+    }
+
+
+    private String substr(String str, int start, int length) {
+        return str.substring(start, start + length);
+    }
+
+    private boolean assertNestingCorrect(String exp) {
+        //this verifies that code is properly nested, but allows
+        //invalid JavaScript such as the contents of `attributes`
+        try {
+            CharacterParser.State res = characterParser.parse(exp);
+            if (res.isNesting()) {
+                throw new JadeLexerException("Nesting must match on expression `" + exp + "`", filename, getLineno(), templateLoader);
+            }
+        } catch (CharacterParser.SyntaxError syntaxError) {
+            throw new JadeLexerException("Nesting must match on expression `" + exp + "`", filename, getLineno(), templateLoader);
+        }
+        return true;
+    }
+    private enum Loc {
+    	KEY, KEY_CHAR, VALUE, STRING
+    }
+    /**
+     * Attributes.
+     */
+
+    private Token attrs() {
+        if ('(' == scanner.getInput().charAt(0)) {
+            int index = this.bracketExpression().getEnd();
+            String str = scanner.getInput().substring(1, index);
+            Attribute tok = new Attribute("attrs", getLineno());
+
+            assertNestingCorrect(str);
+
+            String quote = "";
+            scanner.consume(index + 1);
+
+            boolean escapedAttr = true;
+            String key = "";
+            String val = "";
+            String interpolatable = "";
+            CharacterParser.State state = characterParser.defaultState();
+            Loc loc = Loc.KEY;
+
+            this.lineno += str.split("\n").length - 1;
+
+            for (int i = 0; i <= str.length(); i++) {
+                if (isEndOfAttribute(i, str, key, val, loc, state)) {
+                    val = val.trim();
+                    if (!val.isEmpty())
+                    try {
+                        ExpressionHandler.assertExpression(val);
+                    } catch (ExpressionException e) {
+                        throw new JadeLexerException(e.getMessage(), filename, lineno, templateLoader);
+                    }
+
+                    key = key.trim();
+                    key = key.replaceAll("^['\"]|['\"]$", "");
+                    if ("".equals(val)) {
+                        tok.addBooleanAttribute(key, Boolean.TRUE);
+                    } else if (doubleQuotedRe.matcher(val).matches()
+                            || quotedRe.matcher(val).matches()) {
+                        tok.addAttribute(key, cleanRe.matcher(val).replaceAll(""));
+                    } else {
+                        tok.addExpressionAttribute(key, val);
+                    }
+                    key = val = "";
+                    loc = Loc.KEY;
+                    escapedAttr = false;
+                } else {
+                    switch (loc) {
+                        case KEY_CHAR:
+                            if (String.valueOf(str.charAt(i)).equals(quote)) {
+                                loc = Loc.KEY;
+                                List<Character> expectedCharacter = Arrays.asList(' ', ',', '!', '=', '\n');
+                                if (i + 1 < str.length() && expectedCharacter.indexOf(str.charAt(i + 1)) == -1)
+                                    throw new JadeLexerException("Unexpected character " + str.charAt(i + 1) + " expected ` `, `\\n`, `,`, `!` or `=`", filename, getLineno(), templateLoader);
+                            } else {
+                                key += str.charAt(i);
+                            }
+                            break;
+                        case KEY:
+                            if (key.isEmpty() && (str.charAt(i) == '"' || str.charAt(i) == '\'')) {
+                                loc = Loc.KEY_CHAR;
+                                quote = String.valueOf(str.charAt(i));
+                            } else if (str.charAt(i) == '!' || str.charAt(i) == '=') {
+                                escapedAttr = str.charAt(i) != '!';
+                                if (str.charAt(i) == '!') i++;
+                                if (str.charAt(i) != '=')
+                                    throw new JadeLexerException("Unexpected character " + str.charAt(i) + " expected `=`", filename, getLineno(), templateLoader);
+                                loc = Loc.VALUE;
+                                state = characterParser.defaultState();
+                            } else {
+                                key += str.charAt(i);
+                            }
+                            break;
+                        case VALUE:
+                            state = characterParser.parseChar(str.charAt(i), state);
+                            if (state.isString()) {
+                                loc = Loc.VALUE;
+                                quote = String.valueOf(str.charAt(i));
+                                interpolatable = String.valueOf(str.charAt(i));
+                            } else {
+                                val += str.charAt(i);
+                            }
+                            break;
+                        case STRING:
+                            state = characterParser.parseChar(str.charAt(i), state);
+                            interpolatable += str.charAt(i);
+                            if (!state.isString()) {
+                                loc = Loc.VALUE;
+                                val += interpolate(interpolatable, quote);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            if ('/' == scanner.getInput().charAt(0)) {
+                this.consume(1);
+                tok.setSelfClosing(true);
+            }
+
+            return tok;
+        }
+        return null;
+    }
+
 
     private int indexOfDelimiters(char start, char end) {
         String str = scanner.getInput();
@@ -872,20 +1041,6 @@ public class Lexer {
                 pipelessText.setValues(tokens);
                 return pipelessText;
             }
-        }
-        return null;
-    }
-
-    private Token pipelessText2() {
-        if (this.pipeless) {
-            if ('\n' == scanner.getInput().charAt(0))
-                return null;
-            int i = scanner.getInput().indexOf('\n');
-            if (-1 == i)
-                i = scanner.getInput().length();
-            String str = scanner.getInput().substring(0, i);
-            consume(str.length());
-            return new PipelessText(str, lineno);
         }
         return null;
     }

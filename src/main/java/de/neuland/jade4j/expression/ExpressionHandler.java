@@ -31,6 +31,13 @@ public class ExpressionHandler {
 			throw new ExpressionException(expression, e);
 		}
 	}
+	public static void assertExpression(String expression) throws ExpressionException {
+		try {
+			jexl.createExpression(expression);
+		} catch (Exception e) {
+			throw new ExpressionException(expression, e);
+		}
+	}
 
 	public static String evaluateStringExpression(String expression, JadeModel model) throws ExpressionException {
 		Object result = evaluateExpression(expression, model);

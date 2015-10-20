@@ -21,7 +21,7 @@ public class CharacterParser {
 //      }
 //      return state;
 //    }
-    private class SyntaxError extends Exception{
+    public static class SyntaxError extends Exception{
         /**
          * Constructs a new exception with the specified detail message.  The
          * cause is not initialized, and may subsequently be initialized by
@@ -354,7 +354,7 @@ public class CharacterParser {
         return new State();
     }
 
-    class State{
+    public static class State{
         private boolean lineComment = false;
         private boolean blockComment = false;
 

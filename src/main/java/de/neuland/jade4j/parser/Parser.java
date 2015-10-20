@@ -2,15 +2,12 @@ package de.neuland.jade4j.parser;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
+import de.neuland.jade4j.lexer.token.*;
+import de.neuland.jade4j.parser.node.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -19,52 +16,6 @@ import de.neuland.jade4j.exceptions.JadeParserException;
 import de.neuland.jade4j.lexer.Assignment;
 import de.neuland.jade4j.lexer.Each;
 import de.neuland.jade4j.lexer.Lexer;
-import de.neuland.jade4j.lexer.token.Attribute;
-import de.neuland.jade4j.lexer.token.Block;
-import de.neuland.jade4j.lexer.token.CaseToken;
-import de.neuland.jade4j.lexer.token.Colon;
-import de.neuland.jade4j.lexer.token.Comment;
-import de.neuland.jade4j.lexer.token.CssClass;
-import de.neuland.jade4j.lexer.token.CssId;
-import de.neuland.jade4j.lexer.token.Default;
-import de.neuland.jade4j.lexer.token.Doctype;
-import de.neuland.jade4j.lexer.token.Dot;
-import de.neuland.jade4j.lexer.token.Else;
-import de.neuland.jade4j.lexer.token.ElseIf;
-import de.neuland.jade4j.lexer.token.Eos;
-import de.neuland.jade4j.lexer.token.Expression;
-import de.neuland.jade4j.lexer.token.ExtendsToken;
-import de.neuland.jade4j.lexer.token.Filter;
-import de.neuland.jade4j.lexer.token.If;
-import de.neuland.jade4j.lexer.token.Include;
-import de.neuland.jade4j.lexer.token.Indent;
-import de.neuland.jade4j.lexer.token.Mixin;
-import de.neuland.jade4j.lexer.token.MixinInject;
-import de.neuland.jade4j.lexer.token.Newline;
-import de.neuland.jade4j.lexer.token.Outdent;
-import de.neuland.jade4j.lexer.token.Tag;
-import de.neuland.jade4j.lexer.token.Text;
-import de.neuland.jade4j.lexer.token.Token;
-import de.neuland.jade4j.lexer.token.When;
-import de.neuland.jade4j.lexer.token.While;
-import de.neuland.jade4j.lexer.token.Yield;
-import de.neuland.jade4j.parser.node.AssigmentNode;
-import de.neuland.jade4j.parser.node.BlockNode;
-import de.neuland.jade4j.parser.node.CaseConditionNode;
-import de.neuland.jade4j.parser.node.CaseNode;
-import de.neuland.jade4j.parser.node.ConditionalNode;
-import de.neuland.jade4j.parser.node.DoctypeNode;
-import de.neuland.jade4j.parser.node.EachNode;
-import de.neuland.jade4j.parser.node.ExpressionNode;
-import de.neuland.jade4j.parser.node.FilterNode;
-import de.neuland.jade4j.parser.node.IfConditionNode;
-import de.neuland.jade4j.parser.node.LiteralNode;
-import de.neuland.jade4j.parser.node.MixinInjectNode;
-import de.neuland.jade4j.parser.node.MixinNode;
-import de.neuland.jade4j.parser.node.Node;
-import de.neuland.jade4j.parser.node.TagNode;
-import de.neuland.jade4j.parser.node.TextNode;
-import de.neuland.jade4j.parser.node.WhileNode;
 import de.neuland.jade4j.template.TemplateLoader;
 
 public class Parser {
@@ -92,7 +43,7 @@ public class Parser {
         block.setFileName(filename);
         while (!(peek() instanceof Eos)) {
             if (peek() instanceof Newline) {
-                nextToken();
+                advance();
             } else {
                 Node expr = parseExpr();
                 if (expr != null) {
@@ -118,17 +69,23 @@ public class Parser {
         if (token instanceof Mixin) {
             return parseMixin();
         }
-        if (token instanceof MixinInject) {
-            return parseMixinInject();
-        }
         if (token instanceof Block) {
             return parseBlock();
+        }
+//        if (token instanceof MixinBlock) {
+//            return parseMixinBlock();
+//        }
+        if (token instanceof CaseToken) {
+            return parseCase();
         }
         if (token instanceof ExtendsToken) {
             return parseExtends();
         }
         if (token instanceof Include) {
             return parseInclude();
+        }
+        if (token instanceof Doctype) {
+            return parseDoctype();
         }
         if (token instanceof Filter) {
             return parseFilter();
@@ -142,30 +99,37 @@ public class Parser {
         if (token instanceof Each) {
             return parseEach();
         }
-        if (token instanceof While) {
-            return parseWhile();
+//        if (token instanceof Code) {
+//            return parseCode();
+//        }
+//        if (token instanceof BlockCode) {
+//            return parseBlockCode();
+//        }
+        if (token instanceof Call) {
+            return parseMixinInject();
         }
-        if (token instanceof CssClass || token instanceof CssId) {
-            return parseCssClassOrId();
-        }
-        if (token instanceof If) {
-            return parseConditional();
-        }
-        if (token instanceof CaseToken) {
-            return parseCase();
-        }
-        if (token instanceof Assignment) {
-            return parseAssignment();
-        }
-        if (token instanceof Doctype) {
-            return parseDoctype();
-        }
-        if (token instanceof Expression) {
-            return parseCode();
+        if (token instanceof Interpolation) {
+            return parseInterpolation();
         }
         if (token instanceof Yield) {
             return parseYield();
         }
+        if (token instanceof CssClass || token instanceof CssId) {
+            return parseCssClassOrId();
+        }
+        if (token instanceof While) {
+            return parseWhile();
+        }
+        if (token instanceof If) {
+            return parseConditional();
+        }
+        if (token instanceof Assignment) {
+            return parseAssignment();
+        }
+        if (token instanceof Expression) {
+            return parseCode();
+        }
+
         throw new JadeParserException(filename, lexer.getLineno(), templateLoader, token);
     }
 
@@ -173,9 +137,10 @@ public class Parser {
         Token token = expect(Comment.class);
 
         CommentNode node;
-        if (peek() instanceof Indent) {
+        Node block = this.parseTextBlock();
+        if (block != null ) {
             node = new BlockCommentNode();
-            node.setBlock(block());
+            node.setBlock(block);
         } else {
             node = new CommentNode();
         }
@@ -203,27 +168,27 @@ public class Parser {
     }
 
     private Node parseMixinInject() {
-        Token token = expect(MixinInject.class);
-        MixinInject mixinInjectToken = (MixinInject) token;
+        Token token = expect(Call.class);
+        Call callToken = (Call) token;
         MixinInjectNode node = new MixinInjectNode();
-        node.setName(mixinInjectToken.getValue());
-        node.setLineNumber(mixinInjectToken.getLineNumber());
+        node.setName(callToken.getValue());
+        node.setLineNumber(callToken.getLineNumber());
         node.setFileName(filename);
 
-        if (StringUtils.isNotBlank(mixinInjectToken.getArguments())) {
-            node.setArguments(mixinInjectToken.getArguments());
+        if (StringUtils.isNotBlank(callToken.getArguments())) {
+            node.setArguments(callToken.getArguments());
         }
 
         while (true) {
             Token incomingToken = peek();
             if (incomingToken instanceof CssId) {
-                Token tok = nextToken();
+                Token tok = advance();
                 node.addAttribute("id", tok.getValue());
             } else if (incomingToken instanceof CssClass) {
-                Token tok = nextToken();
+                Token tok = advance();
                 node.addAttribute("class", tok.getValue());
             } else if (incomingToken instanceof Attribute) {
-                Attribute tok = (Attribute) nextToken();
+                Attribute tok = (Attribute) advance();
                 node.addAttributes(tok.getAttributes());
             } else {
                 break;
@@ -239,7 +204,7 @@ public class Parser {
     }
 
     private Node parseCssClassOrId() {
-        Token tok = nextToken();
+        Token tok = advance();
         Tag div = new Tag("div", line());
         lexer.defer(div);
         lexer.defer(tok);
@@ -279,7 +244,11 @@ public class Parser {
         blocks.put(name, blockNode);
         return blockNode;
     }
-
+//    private Node parseMixinBlock(){
+//        Token token = expect(MixinBlock.class);
+////        if()
+//        return new Mixin
+//    }
     private Node parseInclude() {
         Token token = expect(Include.class);
         Include includeToken = (Include) token;
@@ -357,11 +326,18 @@ public class Parser {
     }
 
     private BlockNode parseYield() {
-        nextToken();
+        advance();
         BlockNode block = (BlockNode) new BlockNode();
         block.setLineNumber(lexer.getLineno());
         block.setFileName(filename);
         block.setYield(true);
+        return block;
+    }
+    private InterpolationNode parseInterpolation() {
+        advance();
+        InterpolationNode block = (InterpolationNode) new InterpolationNode();
+        block.setLineNumber(lexer.getLineno());
+        block.setFileName(filename);
         return block;
     }
 
@@ -385,7 +361,7 @@ public class Parser {
         expect(Indent.class);
         while (!(peek() instanceof Outdent) && !(peek() instanceof Eos)) {
             if (peek() instanceof Newline) {
-                nextToken();
+                advance();
             } else {
                 Node parseExpr = this.parseExpr();
                 if (parseExpr != null) {
@@ -404,7 +380,7 @@ public class Parser {
         List<CaseConditionNode> caseConditionalNodes = new LinkedList<CaseConditionNode>();
         while (!(peek() instanceof Outdent) && !(peek() instanceof Eos)) {
             if (peek() instanceof Newline) {
-                nextToken();
+                advance();
             } else {
                 caseConditionalNodes.add(this.parseCaseCondition());
             }
@@ -435,7 +411,7 @@ public class Parser {
         node.setFileName(filename);
         node.setBlock(block());
         if (peek() instanceof Else) {
-            nextToken();
+            advance();
             node.setElseNode(block());
         }
         return node;
@@ -475,7 +451,7 @@ public class Parser {
                 return this.parseASTFilter();
             }
         }
-        Token token = nextToken();
+        Token token = advance();
         String name = token.getValue();
         TagNode tagNode = new TagNode();
         tagNode.setLineNumber(lexer.getLineno());
@@ -487,15 +463,15 @@ public class Parser {
         while (true) {
             Token incomingToken = peek();
             if (incomingToken instanceof CssId) {
-                Token tok = nextToken();
+                Token tok = advance();
                 tagNode.addAttribute("id", tok.getValue());
                 continue;
             } else if (incomingToken instanceof CssClass) {
-                Token tok = nextToken();
+                Token tok = advance();
                 tagNode.addAttribute("class", tok.getValue());
                 continue;
             } else if (incomingToken instanceof Attribute) {
-                Attribute tok = (Attribute) nextToken();
+                Attribute tok = (Attribute) advance();
                 tagNode.addAttributes(tok.getAttributes());
                 tagNode.setSelfClosing(tok.isSelfClosing());
                 continue;
@@ -509,7 +485,7 @@ public class Parser {
         if (peek() instanceof Dot) {
             dot = true;
             tagNode.setTextOnly(true);
-            nextToken();
+            advance();
         }
 
         // (text | code | ':')?
@@ -518,7 +494,7 @@ public class Parser {
         } else if (peek() instanceof Expression) {
             tagNode.setCodeNode(parseCode());
         } else if (peek() instanceof Colon) {
-            Token next = nextToken();
+            Token next = advance();
             BlockNode block = new BlockNode();
             block.setLineNumber(next.getLineNumber());
             block.setFileName(filename);
@@ -528,7 +504,7 @@ public class Parser {
 
         // newline*
         while (peek() instanceof Newline) {
-            nextToken();
+            advance();
         }
 
         if (!tagNode.isTextOnly()) {
@@ -570,6 +546,17 @@ public class Parser {
         TextNode textNode = new TextNode();
         textNode.setLineNumber(line());
         textNode.setFileName(filename);
+        Token body  = peek();
+        if(!(body instanceof PipelessText)){
+            return null;
+        }
+        this.advance();
+        ArrayList<String> values = body.getValues();
+        for (String value : values) {
+            TextNode node = new TextNode();
+            node.appendText(value);
+            textNode.addNode(node);
+        }
         Token token = expect(Indent.class);
         Indent indentToken = (Indent) token;
         int spaces = indentToken.getIndents();
@@ -579,13 +566,13 @@ public class Parser {
         while (!(peek() instanceof Outdent)) {
             if (peek() instanceof Newline) {
                 textNode.appendText("\n");
-                this.nextToken();
+                this.advance();
             } else if (peek() instanceof Indent) {
                 textNode.appendText("\n");
                 textNode.appendText(this.parseTextBlock().getValue());
                 textNode.appendText("\n");
             } else {
-                textNode.appendText(indentStr + this.nextToken().getValue());
+                textNode.appendText(indentStr + this.advance().getValue());
             }
         }
 
@@ -746,7 +733,7 @@ public class Parser {
         }
     }
 
-    private Token nextToken() {
+    private Token advance() {
         return lexer.advance();
     }
 
@@ -766,7 +753,7 @@ public class Parser {
     private Token expect(Class expectedTokenClass) {
         Token t = this.peek();
         if (t.getClass().equals(expectedTokenClass)) {
-            return nextToken();
+            return advance();
         } else {
             throw new JadeParserException(filename, lexer.getLineno(), templateLoader, expectedTokenClass, t.getClass());
         }
