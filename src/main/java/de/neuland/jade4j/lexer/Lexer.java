@@ -35,7 +35,6 @@ public class Lexer {
     private boolean pipeless = false;
     @SuppressWarnings("unused")
     private boolean attributeMode;
-    private Reader reader;
     private final String filename;
     private final TemplateLoader templateLoader;
     private String indentType;
@@ -44,9 +43,22 @@ public class Lexer {
     public Lexer(String filename, TemplateLoader templateLoader) throws IOException {
         this.filename = ensureJadeExtension(filename);
         this.templateLoader = templateLoader;
-        reader = templateLoader.getReader(this.filename);
+        Reader reader = templateLoader.getReader(this.filename);
         options = new LinkedList<String>();
         scanner = new Scanner(reader);
+        deferredTokens = new LinkedList<Token>();
+        stash = new LinkedList<Token>();
+        indentStack = new LinkedList<Integer>();
+        lastIndents = 0;
+        lineno = 1;
+        characterParser = new CharacterParser();
+    }
+    public Lexer(String input,String filename, TemplateLoader templateLoader) throws IOException {
+        this.filename = ensureJadeExtension(filename);
+        this.templateLoader = templateLoader;
+        Reader reader = templateLoader.getReader(this.filename);
+        options = new LinkedList<String>();
+        scanner = new Scanner(input);
         deferredTokens = new LinkedList<Token>();
         stash = new LinkedList<Token>();
         indentStack = new LinkedList<Integer>();

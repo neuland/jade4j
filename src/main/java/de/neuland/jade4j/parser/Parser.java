@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.io.Reader;
 import java.net.URI;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.neuland.jade4j.lexer.token.*;
 import de.neuland.jade4j.parser.node.*;
+import de.neuland.jade4j.util.CharacterParser;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.neuland.jade4j.exceptions.JadeParserException;
@@ -29,11 +32,20 @@ public class Parser {
     private Parser extending;
     private final String filename;
     private LinkedList<Parser> contexts = new LinkedList<Parser>();
+    private CharacterParser characterParser;
 
     public Parser(String filename, TemplateLoader templateLoader) throws IOException {
         this.filename = filename;
         this.templateLoader = templateLoader;
         lexer = new Lexer(filename, templateLoader);
+        characterParser = new CharacterParser();
+        getContexts().push(this);
+    }
+    public Parser(String src, String filename, TemplateLoader templateLoader) throws IOException {
+        this.filename = filename;
+        this.templateLoader = templateLoader;
+        lexer = new Lexer(src,filename, templateLoader);
+        characterParser = new CharacterParser();
         getContexts().push(this);
     }
 
@@ -542,45 +554,63 @@ public class Parser {
         return tagNode;
     }
 
+    private Node[] parseInlineTagsInText(String str) {
+        int line = this.line();
+        Matcher matcher = Pattern.compile("(\\\\)?#\\[((?:.|\\n)*)$").matcher(str);
+        if (matcher.matches()) {
+            if (matcher.group(1) != null) { // escape
+                TextNode text = new TextNode();
+                text.setValue(str.substring(0, matcher.end()) + "#[");//Not sure if Matcher.end() is correct
+                text.setLineNumber(line);
+                Node[] rest = this.parseInlineTagsInText(matcher.group(2));
+                if (rest[0] instanceof TextNode) {
+                    text.setValue(text.getValue() + rest[0].getValue());
+                    rest = ArrayUtils.remove(rest,0);
+                }
+                Node[] textNodes = {text};
+                return ArrayUtils.addAll(textNodes, rest);
+            } else {
+                TextNode text = new TextNode();
+                text.setValue(str.substring(0, matcher.end()));//Not sure if Matcher.end() is correct
+                text.setLineNumber(line);
+                Node[] textNodes = {text};
+                Node[] buffer = textNodes;
+                String rest = matcher.group(2);
+                CharacterParser.Match range = characterParser.parseMax(rest);
+                Parser inner = null;
+                try {
+                    inner = new Parser(range.getSrc(), this.filename, this.templateLoader); //Need to be reviewed
+                } catch (IOException e) {
+                    throw new JadeParserException(this.filename,line,templateLoader,"Could not parse text");
+                }
+                buffer = ArrayUtils.add(buffer,inner.parse());
+                return ArrayUtils.addAll(buffer, this.parseInlineTagsInText(rest.substring(range.getEnd() + 1)));
+            }
+        } else {
+            TextNode text = new TextNode();
+            text.setValue(str);
+            text.setLineNumber(line);
+            Node[] textNodes = {text};
+            return textNodes;
+        }
+    }
+
     private Node parseTextBlock() {
-        TextNode textNode = new TextNode();
-        textNode.setLineNumber(line());
-        textNode.setFileName(filename);
+        BlockNode blockNode = new BlockNode();
+        blockNode.setLineNumber(line());
+        blockNode.setFileName(filename);
         Token body  = peek();
         if(!(body instanceof PipelessText)){
             return null;
         }
         this.advance();
         ArrayList<String> values = body.getValues();
+        Node[] textNodes = {};
         for (String value : values) {
-            TextNode node = new TextNode();
-            node.appendText(value);
-            textNode.addNode(node);
+            textNodes = ArrayUtils.addAll(textNodes,parseInlineTagsInText(value));
         }
-        Token token = expect(Indent.class);
-        Indent indentToken = (Indent) token;
-        int spaces = indentToken.getIndents();
-        if (null == this._spaces)
-            this._spaces = spaces;
-        String indentStr = StringUtils.repeat(" ", spaces - this._spaces);
-        while (!(peek() instanceof Outdent)) {
-            if (peek() instanceof Newline) {
-                textNode.appendText("\n");
-                this.advance();
-            } else if (peek() instanceof Indent) {
-                textNode.appendText("\n");
-                textNode.appendText(this.parseTextBlock().getValue());
-                textNode.appendText("\n");
-            } else {
-                textNode.appendText(indentStr + this.advance().getValue());
-            }
-        }
-
-        if (spaces == this._spaces)
-            this._spaces = null;
-
-        token = expect(Outdent.class);
-        return textNode;
+        blockNode.setNodes(new LinkedList<Node>(Arrays.asList(textNodes)));
+        return blockNode;
     }
 
     private Node parseConditional() {

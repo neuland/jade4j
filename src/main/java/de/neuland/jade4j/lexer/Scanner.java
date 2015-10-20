@@ -14,7 +14,10 @@ public class Scanner {
     public Scanner(Reader reader) {
     	initFromReader(reader);
     }
-    
+    public Scanner(String input) {
+    	this.input = input;
+    }
+
     public void consume(int length) {
         input = input.substring(length);
     }
