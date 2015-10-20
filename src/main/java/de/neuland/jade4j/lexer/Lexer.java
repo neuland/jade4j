@@ -788,9 +788,9 @@ public class Lexer {
             @Override
             public String replace(Matcher m) {
                 String match = m.group(0);
-                boolean escape = m.find(1);
+                String escape = m.group(1);
                 String expr = m.group(2);
-                if (escape) return match;
+                if (escape != null) return match;
                 try {
                     CharacterParser.Match range = characterParser.parseMax(expr);
                     if (expr.charAt(range.getEnd()) != '}')
@@ -867,7 +867,7 @@ public class Lexer {
                             || quotedRe.matcher(val).matches()) {
                         tok.addAttribute(key, cleanRe.matcher(val).replaceAll(""));
                     } else {
-                        tok.addExpressionAttribute(key, val);
+                        tok.addExpressionAttribute(key, val,escapedAttr);
                     }
                     key = val = "";
                     loc = Loc.KEY;
@@ -902,7 +902,7 @@ public class Lexer {
                         case VALUE:
                             state = characterParser.parseChar(str.charAt(i), state);
                             if (state.isString()) {
-                                loc = Loc.VALUE;
+                                loc = Loc.STRING;
                                 quote = String.valueOf(str.charAt(i));
                                 interpolatable = String.valueOf(str.charAt(i));
                             } else {

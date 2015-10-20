@@ -20,8 +20,10 @@ public class Attribute extends Token {
 		attributes.put(name, value);
 	}
 
-	public void addExpressionAttribute(String name, String expression) {
-		attributes.put(name, new ExpressionString(expression));
+	public void addExpressionAttribute(String name, String expression, boolean escapedAttr) {
+		ExpressionString value = new ExpressionString(expression);
+		value.setEscape(escapedAttr);
+		attributes.put(name, value);
 	}
 
 	public void addBooleanAttribute(String name, Boolean value) {

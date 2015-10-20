@@ -15,6 +15,7 @@ public class AttributeTest extends TokenTest {
 	@Test
     public void shouldScanTagsWithAttributes() throws Exception {
 	    lexer = initLexer("attribute_2.jade");
+	    assertToken(2, Newline.class,    "newline");
 	    assertToken(3, Newline.class,    "newline");
         assertToken(3, Tag.class,        "p");
         assertToken(3, CssId.class,      "red");
@@ -62,5 +63,19 @@ public class AttributeTest extends TokenTest {
         assertToken(29, Text.class,       "Hello Tokyo");
         assertToken(30, Outdent.class,    "outdent");
         assertToken(30, Eos.class,        "eos");
+    }
+
+    @Test
+    public void testattrinterpolation() throws Exception {
+        lexer = initLexer("../originalTests20150515/cases/attrs.interpolation.jade");
+        assertToken(1,Expression.class,"var id = 5");
+        assertToken(2,Newline.class,"newline");
+        assertToken(2,Tag.class,"a");
+        assertToken(2,Attribute.class,"attrs");
+        assertToken(3,Newline.class,"newline");
+        assertToken(3,Tag.class,"foo");
+        assertToken(3,Attribute.class,"attrs");
+        assertToken(3, Eos.class,        "eos");
+
     }
 }
