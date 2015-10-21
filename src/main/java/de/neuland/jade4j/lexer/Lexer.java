@@ -125,6 +125,10 @@ public class Lexer {
             return token;
         }
         
+        if ((token = mixinBlock()) != null) {
+            return token;
+        }
+
         if ((token = include()) != null) {
             return token;
         }
@@ -153,18 +157,17 @@ public class Lexer {
             return token;
         }
         
-        if ((token = assignment()) != null) {
-            return token;
-        }
-        
         if ((token = tag()) != null) {
             return token;
         }
-        
+
         if ((token = filter()) != null) {
             return token;
         }
-        
+        if ((token = blockCode()) != null) {
+            return token;
+        }
+
         if ((token = code()) != null) {
             return token;
         }
@@ -205,6 +208,10 @@ public class Lexer {
             return token;
         }
         
+        if ((token = assignment()) != null) {
+            return token;
+        }
+
         if ((token = textFail()) != null) {
             return token;
         }
@@ -389,12 +396,17 @@ public class Lexer {
     private Token code() {
         Matcher matcher = scanner.getMatcherForPattern("^(!?=|-)[ \\t]*([^\\n]+)");
         if (matcher.find(0) && matcher.groupCount() > 1) {
-            Expression code = new Expression(matcher.group(2), lineno);
-            String type = matcher.group(1);
-            code.setEscape(type.equals("="));
-            code.setBuffer(type.equals("=") || type.equals("!="));
-
             consume(matcher.end());
+            String flags = matcher.group(1);
+            Expression code = new Expression(matcher.group(2), lineno);
+            code.setEscape(flags.charAt(0) == '=');
+            code.setBuffer(flags.charAt(0) == '=' || flags.length()>1 && flags.charAt(1) == '=');
+            if(code.isBuffer())
+                try {
+                    ExpressionHandler.assertExpression(matcher.group(2));
+                } catch (ExpressionException e) {
+                    throw new JadeLexerException(e.getMessage(), filename, lineno, templateLoader);
+                }
             return code;
         }
         return null;
@@ -655,6 +667,26 @@ public class Lexer {
             tok.setMode(mode);
             consume(matcher.end());
             return tok;
+        }
+        return null;
+    }
+
+    private Token mixinBlock() {
+        Matcher matcher = scanner.getMatcherForPattern("^block[ \\t]*(\\n|$)");
+        if (matcher.find(0) && matcher.groupCount() > 1) {
+            consume(matcher.end()-matcher.group(1).length());
+            return new MixinBlock("mixin", lineno);
+        }
+        return null;
+    }
+
+    private Token blockCode() {
+        Matcher matcher = scanner.getMatcherForPattern("^-\\n");
+        if (matcher.find(0)) {
+            consume(matcher.end()-1);
+            BlockCode blockCode = new BlockCode("blockCode", lineno);
+            this.pipeless = true;
+            return blockCode;
         }
         return null;
     }

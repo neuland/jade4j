@@ -114,9 +114,12 @@ public class Parser {
 //        if (token instanceof Code) {
 //            return parseCode();
 //        }
-//        if (token instanceof BlockCode) {
-//            return parseBlockCode();
-//        }
+        if (token instanceof Expression) {
+            return parseCode();
+        }
+        if (token instanceof BlockCode) {
+            return parseBlockCode();
+        }
         if (token instanceof Call) {
             return parseCall();
         }
@@ -138,11 +141,28 @@ public class Parser {
         if (token instanceof Assignment) {
             return parseAssignment();
         }
-        if (token instanceof Expression) {
-            return parseCode();
-        }
 
         throw new JadeParserException(filename, lexer.getLineno(), templateLoader, token);
+    }
+    /**
+     * block code
+     */
+
+    private Node parseBlockCode(){
+      Token tok = this.expect(BlockCode.class);
+      CodeNode node;
+      Token body = this.peek();
+      String text;
+      if (body instanceof PipelessText) {
+        this.advance();
+        text = String.join("\n",body.getValues());
+      } else {
+        text = "";
+      }
+        node = new CodeNode();
+        node.setValue(text);
+        node.setLineNumber(tok.getLineNumber());
+        return node;
     }
 
     private Node parseComment() {
@@ -367,6 +387,7 @@ public class Parser {
                 advance();
             } else {
                 Node parseExpr = this.parseExpr();
+                parseExpr.setFileName(filename);
                 if (parseExpr != null) {
                     block.push(parseExpr);
                 }
@@ -416,7 +437,7 @@ public class Parser {
         node.setLineNumber(eachToken.getLineNumber());
         node.setFileName(filename);
         node.setBlock(block());
-        if (peek() instanceof Else) {
+        if (peek() instanceof Else || peek() instanceof Expression) {
             advance();
             node.setElseNode(block());
         }

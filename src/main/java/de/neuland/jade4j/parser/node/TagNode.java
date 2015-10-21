@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import java.util.List;
 import java.util.Map;
 
-public class TagNode extends AttributedNode {
+public class TagNode extends AttrsNode {
     private boolean textOnly;
     private Node textNode;
     private Node codeNode;

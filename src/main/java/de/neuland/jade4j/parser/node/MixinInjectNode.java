@@ -10,7 +10,7 @@ import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.util.ArgumentSplitter;
 
-public class MixinInjectNode extends AttributedNode {
+public class MixinInjectNode extends AttrsNode {
 
 	protected List<String> arguments = new ArrayList<String>();
 

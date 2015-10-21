@@ -3,10 +3,9 @@ package de.neuland.jade4j.parser.node;
 import java.util.*;
 import java.util.Map.Entry;
 
-import de.neuland.jade4j.exceptions.JadeParserException;
 import de.neuland.jade4j.model.JadeModel;
 
-public abstract class AttributedNode extends Node {
+public abstract class AttrsNode extends Node {
 
 	protected Map<String, Object> attributes = new LinkedHashMap<String, Object>();
 	protected List<String> attributeBlocks = new LinkedList<String>();
@@ -76,8 +75,8 @@ public abstract class AttributedNode extends Node {
 	}
 
 	@Override
-	public AttributedNode clone() throws CloneNotSupportedException {
-		AttributedNode clone = (AttributedNode) super.clone();
+	public AttrsNode clone() throws CloneNotSupportedException {
+		AttrsNode clone = (AttrsNode) super.clone();
 
         // shallow copy
 		if (this.attributes != null) {
