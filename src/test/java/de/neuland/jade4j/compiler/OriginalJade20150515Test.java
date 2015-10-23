@@ -546,7 +546,9 @@ public class OriginalJade20150515Test {
 		jade.setPrettyPrint(true);
 		JadeTemplate template = jade.getTemplate(file.getPath());
 		Writer writer = new StringWriter();
-		jade.renderTemplate(template, new HashMap<String, Object>(), writer);
+		HashMap<String, Object> model = new HashMap<String, Object>();
+		model.put("title","Jade");
+		jade.renderTemplate(template, model, writer);
 		String html = writer.toString();
 
 		String expected = readFile(file.getPath().replace(".jade", ".html"));

@@ -370,7 +370,7 @@ public class Lexer {
 //    },
     private Token blank(){
         Matcher matcher = scanner.getMatcherForPattern("^\\n *\\n");
-        if (matcher.find(0) && matcher.groupCount() > 1) {
+        if (matcher.find(0)) {
             consume(matcher.end()-1);
             ++this.lineno;
 
@@ -442,7 +442,7 @@ public class Lexer {
 //    }
     private Token interpolation(){
         Matcher matcher = scanner.getMatcherForPattern("^#\\{/");
-        if (matcher.find(0) && matcher.groupCount() > 1) {
+        if (matcher.find(0)) {
             try {
                 CharacterParser.Match match = this.bracketExpression(1);
                 this.scanner.consume(match.getEnd());
@@ -468,7 +468,7 @@ public class Lexer {
 
     private Token tag() {
         Matcher matcher = scanner.getMatcherForPattern("^(\\w[-:\\w]*)(\\/?)");
-        if (matcher.find(0) && matcher.groupCount() > 0) {
+        if (matcher.find(0) && matcher.groupCount() > 1) {
             consume(matcher.end());
             Tag tok;
             String name = matcher.group(1);
@@ -511,7 +511,7 @@ public class Lexer {
 
     private Token each() {
         Matcher matcher = scanner.getMatcherForPattern("^(?:- *)?(?:each|for) +([a-zA-Z_$][\\w$]*)(?: *, *([a-zA-Z_$][\\w$]*))? * in *([^\\n]+)");
-        if (matcher.find(0) && matcher.groupCount() > 1) {
+        if (matcher.find(0) && matcher.groupCount() > 2) {
             consume(matcher.end());
             String value = matcher.group(1);
             String key = matcher.group(2);
@@ -633,7 +633,7 @@ public class Lexer {
     }
 
     private Token fail() {
-        if (Pattern.compile("^ ($|\\n)").matcher(scanner.getInput()).matches()) {
+        if (Pattern.compile("^ ($|\\n)").matcher(scanner.getInput()).find(0)) {
           this.consume(1);
           return this.next();
         }
@@ -684,9 +684,9 @@ public class Lexer {
 
     private Token mixinBlock() {
         Matcher matcher = scanner.getMatcherForPattern("^block[ \\t]*(\\n|$)");
-        if (matcher.find(0) && matcher.groupCount() > 1) {
+        if (matcher.find(0) && matcher.groupCount() > 0) {
             consume(matcher.end()-matcher.group(1).length());
-            return new MixinBlock("mixin", lineno);
+            return new MixinBlock("mixin-block", lineno);
         }
         return null;
     }
