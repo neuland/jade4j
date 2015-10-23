@@ -209,7 +209,7 @@ public class TagNode extends AttrsNode {
 //        }
 
         String value = null;
-        if("class".equals(key)){
+        if("class".equals(key)) {
             if (attribute instanceof ValueString) {
                 ValueString valueString = ((ValueString) attribute);
                 escaped = valueString.isEscape();
@@ -237,13 +237,15 @@ public class TagNode extends AttrsNode {
                     }
                     value = s.toString();
                 }
-            }else if(attribute instanceof String){
+            } else if (attribute instanceof String) {
                 value = (String) attribute;
-            }else{
-                return "";
+//            } else {
+//                return "";
             }
             classes.add(value);
             return "";
+//        }else if("id".equals(key)){
+//            value = (String) attribute;
         }else if (attribute instanceof ValueString) {
             ValueString valueString = ((ValueString) attribute);
             escaped = valueString.isEscape();
@@ -277,10 +279,10 @@ public class TagNode extends AttrsNode {
                 value = expressionValue.toString();
                 value = StringEscapeUtils.escapeHtml4(value);
             }
-        } else {
-            return "";
-        }
-        if ("class".equals(key)) {
+        } else if (attribute instanceof String) {
+            value = (String) attribute;
+//        } else {
+//            return "";
         }
         StringBuilder sb = new StringBuilder();
         if (name != null) {
