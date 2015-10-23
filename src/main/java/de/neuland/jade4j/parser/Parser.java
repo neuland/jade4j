@@ -336,7 +336,7 @@ public class Parser {
     }
 
     private String ensureJadeExtension(String templateName) {
-        if ( StringUtils.isBlank(FilenameUtils.getExtension(templateName))) {
+        if (!"jade".equals(FilenameUtils.getExtension(templateName))) {
             return templateName + ".jade";
         }
         return templateName;

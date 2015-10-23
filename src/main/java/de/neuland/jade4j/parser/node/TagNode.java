@@ -129,7 +129,7 @@ public class TagNode extends AttrsNode {
                 block.execute(writer, model, template);
             }
             // pretty print
-            if (writer.isPp() && !isInline() && "pre" != name && !canInline()){
+            if (writer.isPp() && !isInline() && !"pre".equals(name) && !canInline()){
                 writer.prettyIndent(0, true);
             }
             writer.append("</");
@@ -209,7 +209,42 @@ public class TagNode extends AttrsNode {
 //        }
 
         String value = null;
-        if (attribute instanceof ValueString) {
+        if("class".equals(key)){
+            if (attribute instanceof ValueString) {
+                ValueString valueString = ((ValueString) attribute);
+                escaped = valueString.isEscape();
+                value = getInterpolatedAttributeValue(name, valueString.getValue(), model, template);
+            } else if (attribute instanceof ExpressionString) {
+                escaped = ((ExpressionString) attribute).isEscape();
+                Object expressionValue = evaluateExpression((ExpressionString) attribute, model);
+                if (expressionValue != null && expressionValue.getClass().isArray()) {
+                    StringBuffer s = new StringBuffer("");
+                    boolean first = true;
+                    if (expressionValue instanceof int[]) {
+                        for (int o : (int[]) expressionValue) {
+                            if (!first)
+                                s.append(" ");
+                            s.append(o);
+                            first = false;
+                        }
+                    } else {
+                        for (Object o : (Object[]) expressionValue) {
+                            if (!first)
+                                s.append(" ");
+                            s.append(o.toString());
+                            first = false;
+                        }
+                    }
+                    value = s.toString();
+                }
+            }else if(attribute instanceof String){
+                value = (String) attribute;
+            }else{
+                return "";
+            }
+            classes.add(value);
+            return "";
+        }else if (attribute instanceof ValueString) {
             ValueString valueString = ((ValueString) attribute);
             escaped = valueString.isEscape();
             value = getInterpolatedAttributeValue(name, valueString.getValue(), model, template);
@@ -238,11 +273,6 @@ public class TagNode extends AttrsNode {
                 if (template.isTerse()) {
                     value = null;
                 }
-            } else if(expressionValue!=null && expressionValue.getClass().isArray()) {
-                for (Object o : (int[])expressionValue) {
-
-                }
-                String.join(", ",new ArrayList<CharSequence>());
             }else{
                 value = expressionValue.toString();
                 value = StringEscapeUtils.escapeHtml4(value);
@@ -251,8 +281,6 @@ public class TagNode extends AttrsNode {
             return "";
         }
         if ("class".equals(key)) {
-            classes.add(value);
-            return "";
         }
         StringBuilder sb = new StringBuilder();
         if (name != null) {

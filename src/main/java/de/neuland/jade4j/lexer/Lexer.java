@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.neuland.jade4j.compiler.Utils;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.lexer.token.*;
@@ -304,7 +305,17 @@ public class Lexer {
     private String scan(String regexp) {
         String result = null;
         Matcher matcher = scanner.getMatcherForPattern(regexp);
-        if (matcher.find(0) && matcher.groupCount() > 0) {
+        if (matcher.find(0) && matcher.group(0)!=null) {
+            int end = matcher.end();
+            consume(end);
+            return matcher.group(0);
+        }
+        return result;
+    }
+    private String scan1(String regexp) {
+        String result = null;
+        Matcher matcher = scanner.getMatcherForPattern(regexp);
+        if (matcher.find(0) && matcher.groupCount()>0) {
             int end = matcher.end();
             consume(end);
             return matcher.group(1);
@@ -490,7 +501,7 @@ public class Lexer {
     }
 
     private Token filter() {
-        String val = scan("^:([\\w\\-]+)");
+        String val = scan1("^:([\\w\\-]+)");
         if (StringUtils.isNotBlank(val)) {
             this.pipeless = true;
             return new Filter(val, lineno);
@@ -520,7 +531,7 @@ public class Lexer {
     }
 
     private Token whileToken() {
-        String val = scan("^while +([^\\n]+)");
+        String val = scan1("^while +([^\\n]+)");
         if (StringUtils.isNotBlank(val)) {
             return new While(val, lineno);
         }
@@ -567,11 +578,11 @@ public class Lexer {
 //    },
 
     private Token doctype() {
-        String val = scan("^!!! *([^\\n]+)?");
+        String val = scan1("^!!! *([^\\n]+)?");
         if (StringUtils.isNotBlank(val)) {
             throw new JadeLexerException("`!!!` is deprecated, you must now use `doctype`", filename, getLineno(), templateLoader);
         }
-        val = scan("^(?:doctype) *([^\\n]+)?");
+        val = scan1("^(?:doctype) *([^\\n]+)?");
         if (StringUtils.isNotBlank(val)) {
             if(val.trim() == "5")
                 throw new JadeLexerException("`doctype 5` is deprecated, you must now use `doctype html`", filename, getLineno(), templateLoader);
@@ -581,7 +592,7 @@ public class Lexer {
     }
 
     private Token id() {
-        String val = scan("^#([\\w-]+)");
+        String val = scan1("^#([\\w-]+)");
         if (StringUtils.isNotBlank(val)) {
             return new CssId(val, lineno);
         }
@@ -589,7 +600,7 @@ public class Lexer {
     }
 
     private Token className() {
-        String val = scan("^\\.([\\w-]+)");
+        String val = scan1("^\\.([\\w-]+)");
         if (StringUtils.isNotBlank(val)) {
             return new CssClass(val, lineno);
         }
@@ -601,11 +612,11 @@ public class Lexer {
 //          this.scan(/^(<[^\n]*)/, 'text');
 //      },
     private Token text() {
-        String val = scan("^(?:\\| ?| )([^\\n]+)");
+        String val = scan1("^(?:\\| ?| )([^\\n]+)");
         if (StringUtils.isEmpty(val)) {
-            val = scan("^\\|?( )");
+            val = scan1("^\\|?( )");
             if (StringUtils.isEmpty(val)) {
-                val = scan("^(<[^\\n]*)");
+                val = scan1("^(<[^\\n]*)");
             }
         }
         if (StringUtils.isNotEmpty(val)) {
@@ -614,7 +625,7 @@ public class Lexer {
         return null;
     }
     private Token textFail() {
-        String val = scan("^([^\\.\\n][^\\n]+)");
+        String val = scan1("^([^\\.\\n][^\\n]+)");
         if (StringUtils.isNotEmpty(val)) {
             return new Text(val, lineno);
         }
@@ -630,7 +641,7 @@ public class Lexer {
     }
 
     private Token extendsToken() {
-        String val = scan("^extends? +([^\\n]+)");
+        String val = scan1("^extends? +([^\\n]+)");
         if (StringUtils.isNotBlank(val)) {
             return new ExtendsToken(val, lineno);
         }
@@ -638,7 +649,7 @@ public class Lexer {
     }
 
     private Token prepend() {
-        String name = scan("^prepend +([^\\n]+)");
+        String name = scan1("^prepend +([^\\n]+)");
         if (StringUtils.isNotBlank(name)) {
             Block tok = new Block(name, lineno);
             tok.setMode("prepend");
@@ -648,7 +659,7 @@ public class Lexer {
     }
 
     private Token append() {
-        String name = scan("^append +([^\\n]+)");
+        String name = scan1("^append +([^\\n]+)");
         if (StringUtils.isNotBlank(name)) {
             Block tok = new Block(name, lineno);
             tok.setMode("append");
@@ -692,7 +703,7 @@ public class Lexer {
     }
 
     private Token include() {
-        String val = scan("^include +([^\\n]+)");
+        String val = scan1("^include +([^\\n]+)");
         if (StringUtils.isNotBlank(val)) {
             return new Include(val, lineno);
         }
@@ -700,20 +711,31 @@ public class Lexer {
     }
 
     private Token includeFiltered() {
-        Matcher matcher = Pattern.compile("^include:([\\w\\-]+) +([^\\n]+)").matcher(scanner.getInput());
-        if(matcher.matches()){
-            this.consume(matcher.end());
+        Matcher matcher = Pattern.compile("^include:([\\w\\-]+)([\\( ])").matcher(scanner.getInput());
+        if(matcher.find(0) && matcher.groupCount()>1){
+            this.consume(matcher.end()-1);
             String filter = matcher.group(1);
-            String path = matcher.group(2);
+            Token attrs = matcher.group(2).equals("(") ? this.attrs():null;
+            if(!(matcher.group(2).equals(" ") || scanner.getInput().charAt(0) == ' ')){
+                throw new JadeLexerException("expected space after include:filter but got " + String.valueOf(scanner.getInput().charAt(0)), filename, getLineno(), templateLoader);
+            }
+            matcher = Pattern.compile("^ *([^\n]+)").matcher(scanner.getInput());
+            if(!(matcher.find(0)&&matcher.groupCount()>0) || matcher.group(1).trim().equals("")){
+                throw new JadeLexerException("missing path for include:filter", filename, getLineno(), templateLoader);
+            }
+            this.consume(matcher.end());
+            String path = matcher.group(1);
             Include tok = new Include(path, lineno);
             tok.setFilter(filter);
+            tok.setAttrs(attrs);
             return tok;
+
         }
         return null;
     }
 
     private Token caseToken() {
-        String val = scan("^case +([^\\n]+)");
+        String val = scan1("^case +([^\\n]+)");
         if (StringUtils.isNotBlank(val)) {
             return new CaseToken(val, lineno);
         }
@@ -721,7 +743,7 @@ public class Lexer {
     }
 
     private Token when() {
-        String val = scan("^when +([^:\\n]+)");
+        String val = scan1("^when +([^:\\n]+)");
         if (StringUtils.isNotBlank(val)) {
             return new When(val, lineno);
         }
@@ -729,7 +751,7 @@ public class Lexer {
     }
 
     private Token defaultToken() {
-        String val = scan("^(default *)");
+        String val = scan1("^(default *)");
         if (StringUtils.isNotBlank(val)) {
             return new Default(val, lineno);
         }
@@ -1138,11 +1160,7 @@ public class Lexer {
                     if (-1 == i)
                         i = scanner.getInput().length() - 1;
                     String str;
-                    if(i < 1) {
-                        str = scanner.getInput().substring(1);
-                    }else{
-                        str = scanner.getInput().substring(1,i+1);
-                    }
+                    str = scanner.getInput().substring(1,i+1);
                     int indentLength = indent.length();
                     if(str.length()<=indentLength)
                         indentLength = str.length();
