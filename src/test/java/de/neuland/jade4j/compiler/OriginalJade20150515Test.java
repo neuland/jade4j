@@ -35,6 +35,10 @@ public class OriginalJade20150515Test {
 	public void testCasesAttrs() throws IOException, JadeCompilerException {
 		testJade("cases/attrs");
 	}
+	@Test
+	public void testCasesAttrs2() throws IOException, JadeCompilerException {
+		testJade("../lexer/attrs2");
+	}
 
 	@Test
 	public void testCasesAttrsUnescaped() throws IOException, JadeCompilerException {

@@ -25,7 +25,7 @@ public class ExpressionNode extends Node {
 	@Override
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
 		try {
-			Object result = ExpressionHandler.evaluateStringExpression(getValue(), model);
+			Object result = ExpressionHandler.evaluateExpression(getValue(), model);
 			if (result == null || !buffer) {
 				return;
 			}

@@ -7,9 +7,12 @@ import org.apache.commons.lang3.StringUtils;
 
 public class IndentWriter {
     private int indent = 0;
+    private int parentIndents = 0;
     private boolean useIndent = false;
     private boolean empty = true;
     private Writer writer;
+    private String pp = "  ";
+    private boolean escape;
 
     public IndentWriter(Writer writer) {
         this.writer = writer;
@@ -46,12 +49,30 @@ public class IndentWriter {
     }
 
 	public void newline() {
-		if (useIndent && !empty) {
+		if (isPp() && !empty) {
 			write("\n" + StringUtils.repeat("  ", indent));
 		}
 	}
+    public void prettyIndent(int offset,boolean newline){
+        if (isPp() && !empty) {
+            String newlineChar = newline ? "\n" : "";
+            write(newlineChar + StringUtils.repeat(this.pp, indent + offset-1));
+        }
+    }
 
 	public void setUseIndent(boolean useIndent) {
 		this.useIndent = useIndent;
 	}
+
+    public void setEscape(boolean escape) {
+        this.escape = escape;
+    }
+
+    public boolean isEscape() {
+        return escape;
+    }
+
+    public boolean isPp(){
+        return this.pp.length()!=0 && useIndent;
+    }
 }

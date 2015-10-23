@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import de.neuland.jade4j.lexer.token.*;
 import de.neuland.jade4j.parser.node.*;
+import de.neuland.jade4j.parser.node.BlockCommentNode;
 import de.neuland.jade4j.util.CharacterParser;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -168,20 +169,23 @@ public class Parser {
     private Node parseComment() {
         Token token = expect(Comment.class);
 
-        CommentNode node;
         Node block = this.parseTextBlock();
         if (block != null ) {
-            node = new BlockCommentNode();
+            BlockCommentNode node = new BlockCommentNode();
             node.setBlock(block);
+            node.setBuffered(token.isBuffer());
+            node.setLineNumber(token.getLineNumber());
+            node.setFileName(filename);
+            node.setValue(token.getValue());
+            return node;
         } else {
-            node = new CommentNode();
+            CommentNode node = new CommentNode();
+            node.setBuffered(token.isBuffer());
+            node.setLineNumber(token.getLineNumber());
+            node.setFileName(filename);
+            node.setValue(token.getValue());
+            return node;
         }
-        node.setBuffered(token.isBuffer());
-        node.setLineNumber(token.getLineNumber());
-        node.setFileName(filename);
-        node.setValue(token.getValue());
-
-        return node;
     }
 
     private Node parseMixin() {
@@ -524,7 +528,7 @@ public class Parser {
 
         // (text | code | ':')?
         if (peek() instanceof Text) {
-            tagNode.setTextNode(parseText());
+            tagNode.setBlock(parseText());
         } else if (peek() instanceof Expression) {
             tagNode.setCodeNode(parseCode());
         } else if (peek() instanceof Colon) {

@@ -813,7 +813,8 @@ public class Lexer {
                         if (str.charAt(x) != ' ' && str.charAt(x) != '\n') {
                             if (characterParser.isPunctuator(str.charAt(x)) && str.charAt(x) != '"' && str.charAt(x) != '\'')
                                 return false;
-                            else return true;
+                            else
+                                return true;
                         }
                     }
                 }
@@ -909,7 +910,7 @@ public class Lexer {
                         tok.addBooleanAttribute(key, Boolean.TRUE);
                     } else if (doubleQuotedRe.matcher(val).matches()
                             || quotedRe.matcher(val).matches()) {
-                        tok.addAttribute(key, cleanRe.matcher(val).replaceAll(""));
+                        tok.addAttribute(key, cleanRe.matcher(val).replaceAll(""),escapedAttr);
                     } else {
                         tok.addExpressionAttribute(key, val,escapedAttr);
                     }
@@ -989,7 +990,7 @@ public class Lexer {
      */
     private Token attributesBlock() {
         Matcher matcher = scanner.getMatcherForPattern("^&attributes\\b");
-        if (matcher.find(0) && matcher.groupCount() > 1) {
+        if (matcher.find(0) && matcher.group(0) != null) {
             this.scanner.consume(11);
             CharacterParser.Match match = this.bracketExpression();
             this.scanner.consume(match.getEnd()+1);

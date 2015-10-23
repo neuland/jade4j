@@ -526,7 +526,7 @@ public class CharacterParser {
 //    }
 
     public boolean isPunctuator(Character character){
-        Integer code = Character.getNumericValue(character);
+        Integer code = Character.codePointAt(character.toString(),0);
           switch (code) {
             case 46:   // . dot
             case 40:   // ( open bracket

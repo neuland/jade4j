@@ -85,7 +85,6 @@ public abstract class Node implements Cloneable {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
-
 	@Override
 	public Node clone() throws CloneNotSupportedException {
 		Node clone = (Node) super.clone();

@@ -1,6 +1,8 @@
 package de.neuland.jade4j.parser.node;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import de.neuland.jade4j.compiler.IndentWriter;
@@ -31,7 +33,13 @@ public class FilterNode extends Node {
 	@Override
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
 		Filter filter = model.getFilter(getValue());
-        String result = textBlock.getValue();
+		ArrayList<String> values = new ArrayList<String>();
+		LinkedList<Node> nodes = textBlock.getNodes();
+		for (Node node : nodes) {
+				values.add(node.getValue());
+		}
+
+		String result = String.join("\n",values);
 		if (filter != null) {
             result = filter.convert(result, attributes, model);
 		}

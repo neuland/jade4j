@@ -12,9 +12,25 @@ public class BlockNode extends Node {
 	private String mode;
 
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
-		for (Node node : getNodes()) {
-			node.execute(writer, model, template);
+
+		// Pretty print multi-line text
+		if (writer.isPp() && getNodes().size() > 1 && !writer.isEscape() && getNodes().get(0) instanceof TextNode && getNodes().get(1) instanceof TextNode)
+			writer.prettyIndent(1, true);
+
+		for (int i = 0; i < getNodes().size(); ++i) {
+			// Pretty print text
+			if (writer.isPp() && i > 0 && !writer.isEscape() && getNodes().get(i) instanceof TextNode && getNodes().get(i - 1) instanceof TextNode)
+				writer.prettyIndent(1, false);
+
+			getNodes().get(i).execute(writer, model, template);
+			// Multiple text nodes are separated by newlines
+			Node nextNode = null;
+			if(i+1 < getNodes().size())
+				nextNode = getNodes().get(i + 1);
+			if (nextNode !=null && getNodes().get(i) instanceof TextNode && nextNode instanceof TextNode)
+				writer.append("\n");
 		}
+
 	}
 
 	public void setYield(boolean yield) {

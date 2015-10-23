@@ -25,15 +25,23 @@ public class ExpressionHandler {
 
 	public static Object evaluateExpression(String expression, JadeModel model) throws ExpressionException {
 		try {
-			Expression e = jexl.createExpression(expression);
-			return e.evaluate(new MapContext(model));
+//			if(expression.startsWith("{")) {
+//				return expression;
+//			}else{
+			if(expression.startsWith("var")){
+				expression = expression.substring(3);
+			}
+				Expression e = jexl.createExpression(expression);
+				return e.evaluate(new MapContext(model));
+//			}
+
 		} catch (Exception e) {
 			throw new ExpressionException(expression, e);
 		}
 	}
 	public static void assertExpression(String expression) throws ExpressionException {
 		try {
-			jexl.createExpression(expression);
+			jexl.createExpression("return (" + expression + ")");
 		} catch (Exception e) {
 			throw new ExpressionException(expression, e);
 		}

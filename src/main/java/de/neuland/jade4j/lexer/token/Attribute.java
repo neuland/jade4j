@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.neuland.jade4j.parser.node.ExpressionString;
+import de.neuland.jade4j.parser.node.ValueString;
 
 public class Attribute extends Token {
 	private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
@@ -16,8 +17,10 @@ public class Attribute extends Token {
 		return attributes;
 	}
 
-	public void addAttribute(String name, String value) {
-		attributes.put(name, value);
+	public void addAttribute(String name, String value, boolean escapedAttr) {
+		ValueString valueString = new ValueString(value);
+		valueString.setEscape(escapedAttr);
+		attributes.put(name, valueString);
 	}
 
 	public void addExpressionAttribute(String name, String expression, boolean escapedAttr) {

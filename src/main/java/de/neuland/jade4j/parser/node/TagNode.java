@@ -5,11 +5,15 @@ import de.neuland.jade4j.compiler.Utils;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.expression.ExpressionHandler;
+import de.neuland.jade4j.lexer.token.Text;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,9 +21,11 @@ public class TagNode extends AttrsNode {
     private boolean textOnly;
     private Node textNode;
     private Node codeNode;
-    private static final String[] selfClosingTags = {"meta", "img", "link", "input", "area", "base", "col", "br", "hr", "source"};
+    private static final String[] selfClosingTags = {"area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"};
+    private static final String[] inlineTags = { "a", "abbr", "acronym", "b", "br", "code", "em", "font", "i", "img", "ins", "kbd", "map", "samp", "small", "span", "strong", "sub", "sup"};
     private boolean selfClosing = false;
     private boolean buffer = false;
+    private ArrayList<String> classes = new ArrayList<String>();
 
 
     public void setTextOnly(boolean textOnly) {
@@ -50,37 +56,89 @@ public class TagNode extends AttrsNode {
     public boolean hasCodeNode() {
         return codeNode != null;
     }
+    public boolean isInline(){
+        return ArrayUtils.indexOf(inlineTags,this.name) > -1;
+    }
+    private boolean isInline(Node node){
+      // Recurse if the node is a block
+      if (node instanceof BlockNode) return everyIsInline(node.getNodes());
+      return node instanceof TextNode || (ArrayUtils.indexOf(inlineTags,node.getName()) > -1);
+    }
+    private boolean everyIsInline(LinkedList<Node> nodes){
+        boolean multilineInlineOnlyTag = true;
+          for (Node node : nodes) {
+              if(!isInline(node))
+                  multilineInlineOnlyTag = false;
+          }
+        return multilineInlineOnlyTag;
+    }
+    public boolean canInline (){
+        Node block = this.getBlock();
+        if(block==null)
+            return true;
+        LinkedList<Node> nodes = block.getNodes();
 
+
+      // Empty tag
+      if (nodes.size()==0) return true;
+
+      // Text-only or inline-only tag
+      if (1 == nodes.size()) return isInline(nodes.get(0));
+
+      // Multi-line inline-only tag
+      if (everyIsInline(nodes)) {
+        for (int i = 1, len = nodes.size(); i < len; ++i) {
+          if (nodes.get(i-1) instanceof TextNode && nodes.get(i) instanceof TextNode)
+            return false;
+        }
+        return true;
+      }
+
+      // Mixed tag
+      return false;
+    };
     @Override
     public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
-        writer.newline();
-        writer.append("<");
-        writer.append(name);
-        writer.append(attributes(model, template));
-        if (isTerse(template)) {
+        writer.increment();
+        if ("pre".equals(this.name)) writer.setEscape(true);
+        if(writer.isPp() && !isInline()){
+            writer.prettyIndent(0,true);
+        }
+        if (selfClosing || isSelfClosing(template)) {
+            writer.append("<");
+            writer.append(name);
+            writer.append(attributes(model, template));
+            if (isTerse(template)) {
+                writer.append(">");
+            }else {
+                writer.append("/>");
+            }
+            if (hasBlock()) {
+                //Fehlerbehandlung
+            }
+
+        }else {
+            writer.append("<");
+            writer.append(name);
+            writer.append(attributes(model, template));
             writer.append(">");
-            return;
+            if (hasCodeNode()) {
+                codeNode.execute(writer, model, template);
+            }
+            if (hasBlock()) {
+                block.execute(writer, model, template);
+            }
+            // pretty print
+            if (writer.isPp() && !isInline() && "pre" != name && !canInline()){
+                writer.prettyIndent(0, true);
+            }
+            writer.append("</");
+            writer.append(name);
+            writer.append(">");
+
         }
-        if (isSelfClosing(template) || (selfClosing && isEmpty())) {
-            writer.append("/>");
-            return;
-        }
-        writer.append(">");
-        if (hasTextNode()) {
-            textNode.execute(writer, model, template);
-        }
-        if (hasBlock()) {
-            writer.increment();
-            block.execute(writer, model, template);
-            writer.decrement();
-            writer.newline();
-        }
-        if (hasCodeNode()) {
-            codeNode.execute(writer, model, template);
-        }
-        writer.append("</");
-        writer.append(name);
-        writer.append(">");
+        if ("pre".equals(this.name)) writer.setEscape(false);
+        writer.decrement();
     }
 
     private boolean isEmpty() {
@@ -107,14 +165,54 @@ public class TagNode extends AttrsNode {
                 throw new JadeCompilerException(this, template.getTemplateLoader(), e);
             }
         }
-
+        if(!classes.isEmpty()){
+            sb.append(" ").append("class");
+            sb.append("=").append('"');
+            sb.append(String.join(", ",classes));
+            sb.append('"');
+        }
         return sb.toString();
     }
 
     private String getAttributeString(String name, Object attribute, JadeModel model, JadeTemplate template) throws ExpressionException {
+        String key = name;
+        boolean escaped = false;
+//        if ("class".equals(key)) {
+//          classes.push(attr.val);
+//          classEscaping.push(attr.escaped);
+//        } else if (isConstant(attr.val)) {
+//          if (buffer) {
+//            this.buffer(runtime.attr(key, toConstant(attr.val), escaped, this.terse));
+//          } else {
+//            var val = toConstant(attr.val);
+//            if (key === 'style') val = runtime.style(val);
+//            if (escaped && !(key.indexOf('data') === 0 && typeof val !== 'string')) {
+//              val = runtime.escape(val);
+//            }
+//            buf.push(utils.stringify(key) + ': ' + utils.stringify(val));
+//          }
+//        } else {
+//          if (buffer) {
+//            this.bufferExpression('jade.attr("' + key + '", ' + attr.val + ', ' + utils.stringify(escaped) + ', ' + utils.stringify(this.terse) + ')');
+//          } else {
+//            var val = attr.val;
+//            if (key === 'style') {
+//              val = 'jade.style(' + val + ')';
+//            }
+//            if (escaped && !(key.indexOf('data') === 0)) {
+//              val = 'jade.escape(' + val + ')';
+//            } else if (escaped) {
+//              val = '(typeof (jade_interp = ' + val + ') == "string" ? jade.escape(jade_interp) : jade_interp)';
+//            }
+//            buf.push(utils.stringify(key) + ': ' + val);
+//          }
+//        }
+
         String value = null;
-        if (attribute instanceof String) {
-            value = getInterpolatedAttributeValue(name, attribute, model, template);
+        if (attribute instanceof ValueString) {
+            ValueString valueString = ((ValueString) attribute);
+            escaped = valueString.isEscape();
+            value = getInterpolatedAttributeValue(name, valueString.getValue(), model, template);
         } else if (attribute instanceof Boolean) {
             if ((Boolean) attribute) {
                 value = name;
@@ -125,6 +223,7 @@ public class TagNode extends AttrsNode {
                 value = null;
             }
         } else if (attribute instanceof ExpressionString) {
+            escaped = ((ExpressionString) attribute).isEscape();
             Object expressionValue = evaluateExpression((ExpressionString) attribute, model);
             if (expressionValue == null) {
                 return "";
@@ -139,14 +238,22 @@ public class TagNode extends AttrsNode {
                 if (template.isTerse()) {
                     value = null;
                 }
-            } else {
+            } else if(expressionValue!=null && expressionValue.getClass().isArray()) {
+                for (Object o : (int[])expressionValue) {
+
+                }
+                String.join(", ",new ArrayList<CharSequence>());
+            }else{
                 value = expressionValue.toString();
                 value = StringEscapeUtils.escapeHtml4(value);
             }
         } else {
             return "";
         }
-
+        if ("class".equals(key)) {
+            classes.add(value);
+            return "";
+        }
         StringBuilder sb = new StringBuilder();
         if (name != null) {
             sb.append(" ").append(name);

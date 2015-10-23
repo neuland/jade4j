@@ -64,7 +64,7 @@ public class AttributeLexer {
                         if ("".equals(cleanValue) && quote == ' ') {
                             token.addBooleanAttribute(name, Boolean.TRUE);
                         } else if (value.matches("^\"[^\"]*\"$") || value.matches("^'[^']*'$")) {
-                            token.addAttribute(name, cleanValue);
+                            token.addAttribute(name, cleanValue, false);
                         } else {
                             token.addExpressionAttribute(name, value, false);
                         }
