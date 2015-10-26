@@ -1,4 +1,5 @@
-extend auxiliary/inheritance.extend.mixin.block
-
-block content
-  p Hello World!
+html
+  body
+    include yield-head
+      script(src='/caustic.js')
+      script(src='/app.js')
