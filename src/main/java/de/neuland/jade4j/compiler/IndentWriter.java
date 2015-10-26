@@ -49,12 +49,12 @@ public class IndentWriter {
     }
 
 	public void newline() {
-		if (isPp() && !empty) {
+		if (isPp()) {
 			write("\n" + StringUtils.repeat("  ", indent));
 		}
 	}
     public void prettyIndent(int offset,boolean newline){
-        if (isPp() && !empty) {
+        if (isPp()) {
             String newlineChar = newline ? "\n" : "";
             write(newlineChar + StringUtils.repeat(this.pp, indent + offset-1));
         }

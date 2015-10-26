@@ -396,7 +396,7 @@ public class Lexer {
         Matcher matcher = scanner.getMatcherForPattern("^\\/\\/(-)?([^\\n]*)");
         if (matcher.find(0) && matcher.groupCount() > 1) {
             boolean buffer = !"-".equals(matcher.group(1));
-            Comment comment = new Comment(matcher.group(2).trim(), lineno, buffer);
+            Comment comment = new Comment(matcher.group(2), lineno, buffer);
             consume(matcher.end());
             this.pipeless = true;
             return comment;

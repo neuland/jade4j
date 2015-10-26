@@ -34,6 +34,8 @@ public class Parser {
     private final String filename;
     private LinkedList<Parser> contexts = new LinkedList<Parser>();
     private CharacterParser characterParser;
+    private int inMixin = 0;
+    private HashMap mixins = new HashMap<String,MixinNode>();
 
     public Parser(String filename, TemplateLoader templateLoader) throws IOException {
         this.filename = filename;
@@ -85,9 +87,9 @@ public class Parser {
         if (token instanceof Block) {
             return parseBlock();
         }
-//        if (token instanceof MixinBlock) {
-//            return parseMixinBlock();
-//        }
+        if (token instanceof MixinBlock) {
+            return parseMixinBlock();
+        }
         if (token instanceof CaseToken) {
             return parseCase();
         }
@@ -200,9 +202,14 @@ public class Parser {
         }
 
         if (peek() instanceof Indent) {
+            this.inMixin++;
             node.setBlock(block());
+            node.setCall(false);
+            this.mixins.put(mixinToken.getValue(),node);
+            this.inMixin--;
             return node;
         }else{
+            node.setCall(true);
             return node;
         }
     }
@@ -267,11 +274,15 @@ public class Parser {
         blocks.put(name, blockNode);
         return blockNode;
     }
-//    private Node parseMixinBlock(){
-//        Token token = expect(MixinBlock.class);
-////        if()
-//        return new Mixin
-//    }
+
+    private Node parseMixinBlock(){
+        Token tok = expect(MixinBlock.class);
+        if(this.inMixin != 0){
+            throw new JadeParserException(filename, lexer.getLineno(), templateLoader, "Anonymous blocks are not allowed unless they are part of a mixin.");
+        }
+        return new MixinBlockNode();
+    }
+
     private Node parseInclude() {
         Token token = expect(Include.class);
         Include includeToken = (Include) token;

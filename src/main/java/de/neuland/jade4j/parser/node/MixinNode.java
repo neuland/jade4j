@@ -6,7 +6,7 @@ import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 
 public class MixinNode extends MixinInjectNode {
-
+	boolean call = false;
     @Override
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
 		if (hasBlock()) {
@@ -15,5 +15,12 @@ public class MixinNode extends MixinInjectNode {
 			super.execute(writer, model, template);
 		}
 	}
-	
+
+	public boolean isCall() {
+		return call;
+	}
+
+	public void setCall(boolean call) {
+		this.call = call;
+	}
 }
