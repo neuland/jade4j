@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.neuland.jade4j.expression.JexlExpressionHandler;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
@@ -45,7 +46,7 @@ public class CompilerIndentationErrorTest {
         try {
             FileTemplateLoader loader = new FileTemplateLoader(TestFileHelper.getCompilerErrorsResourcePath(""),
                     "UTF-8");
-            parser = new Parser(testName, loader);
+            parser = new Parser(testName, loader,new JexlExpressionHandler());
         } catch (IOException e) {
             e.printStackTrace();
         }

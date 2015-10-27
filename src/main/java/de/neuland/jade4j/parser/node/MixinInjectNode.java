@@ -6,6 +6,7 @@ import java.util.List;
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.expression.ExpressionHandler;
+import de.neuland.jade4j.expression.JexlExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.util.ArgumentSplitter;
@@ -15,7 +16,7 @@ public class MixinInjectNode extends AttrsNode {
 	protected List<String> arguments = new ArrayList<String>();
 
 	@Override
-	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
+	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template, ExpressionHandler expressionHandler) throws JadeCompilerException {
 		MixinNode mixin = model.getMixin(getName());
 		if (mixin == null) {
 			throw new JadeCompilerException(this, template.getTemplateLoader(), "mixin " + getName() + " is not defined");
@@ -38,9 +39,9 @@ public class MixinInjectNode extends AttrsNode {
 
 		model.pushScope();
 		model.put("block", hasBlock());
-		writeVariables(model, mixin, template);
+		writeVariables(model, mixin, template,expressionHandler);
 		writeAttributes(model, mixin, template);
-		mixin.getBlock().execute(writer, model, template);
+		mixin.getBlock().execute(writer, model, template, expressionHandler);
 		model.popScope();
 
 	}
@@ -65,7 +66,7 @@ public class MixinInjectNode extends AttrsNode {
 		return result;
 	}
 
-	private void writeVariables(JadeModel model, MixinNode mixin, JadeTemplate template) {
+	private void writeVariables(JadeModel model, MixinNode mixin, JadeTemplate template, ExpressionHandler expressionHandler) {
 		List<String> names = mixin.getArguments();
 		List<String> values = arguments;
 		if (names == null) {
@@ -79,7 +80,7 @@ public class MixinInjectNode extends AttrsNode {
 			}
 			if (value != null) {
 				try {
-					value = ExpressionHandler.evaluateExpression(values.get(i), model);
+					value = expressionHandler.evaluateExpression(values.get(i), model);
 				} catch (Throwable e) {
 					throw new JadeCompilerException(this, template.getTemplateLoader(), e);
 				}

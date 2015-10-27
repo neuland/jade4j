@@ -2,13 +2,14 @@ package de.neuland.jade4j.parser.node;
 
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
+import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 
 public class BlockCommentNode extends Node {
     private boolean buffered;
     @Override
-    public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
+    public void execute(IndentWriter writer, JadeModel model, JadeTemplate template, ExpressionHandler expressionHandler) throws JadeCompilerException {
         if (!isBuffered()) {
       			return;
       		}
@@ -16,7 +17,7 @@ public class BlockCommentNode extends Node {
             writer.prettyIndent(1, true);
         }
         writer.append("<!--" + value);
-        block.execute(writer, model, template);
+        block.execute(writer, model, template, expressionHandler);
         if(writer.isPp()) {
             writer.prettyIndent(1, true);
         }

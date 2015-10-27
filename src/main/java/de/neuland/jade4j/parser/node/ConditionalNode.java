@@ -7,6 +7,7 @@ import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.expression.ExpressionHandler;
+import de.neuland.jade4j.expression.JexlExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 
@@ -15,11 +16,11 @@ public class ConditionalNode extends Node {
 	private List<IfConditionNode> conditions = new LinkedList<IfConditionNode>();
 
 	@Override
-	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
+	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template, ExpressionHandler expressionHandler) throws JadeCompilerException {
 		for (IfConditionNode conditionNode : this.conditions) {
 			try {
-				if (conditionNode.isDefault() || checkCondition(model, conditionNode.getValue()) ^ conditionNode.isInverse()) {
-					conditionNode.getBlock().execute(writer, model, template);
+				if (conditionNode.isDefault() || checkCondition(model, conditionNode.getValue(),expressionHandler) ^ conditionNode.isInverse()) {
+					conditionNode.getBlock().execute(writer, model, template, expressionHandler);
 					return;
 				}
 			} catch (ExpressionException e) {
@@ -28,8 +29,8 @@ public class ConditionalNode extends Node {
 		}
 	}
 
-	private boolean checkCondition(JadeModel model, String condition) throws ExpressionException {
-		Boolean value = ExpressionHandler.evaluateBooleanExpression(condition, model);
+	private boolean checkCondition(JadeModel model, String condition, ExpressionHandler expressionHandler) throws ExpressionException {
+		Boolean value = expressionHandler.evaluateBooleanExpression(condition, model);
 		return (value == null) ? false : value;
 	}
 

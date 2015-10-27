@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.neuland.jade4j.exceptions.JadeLexerException;
+import de.neuland.jade4j.expression.JexlExpressionHandler;
 import de.neuland.jade4j.filter.CssFilter;
 import de.neuland.jade4j.filter.JsFilter;
 import org.apache.commons.io.FileUtils;
@@ -420,7 +421,7 @@ public class CompilerTest {
         try {
             FileTemplateLoader loader = new FileTemplateLoader(
                     TestFileHelper.getCompilerResourcePath(""), "UTF-8");
-            parser = new Parser(testName, loader);
+            parser = new Parser(testName, loader,new JexlExpressionHandler());
         } catch (IOException e) {
             e.printStackTrace();
         }

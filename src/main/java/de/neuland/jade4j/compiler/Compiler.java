@@ -4,6 +4,8 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import de.neuland.jade4j.exceptions.JadeCompilerException;
+import de.neuland.jade4j.expression.ExpressionHandler;
+import de.neuland.jade4j.expression.JexlExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.parser.node.Node;
 import de.neuland.jade4j.template.JadeTemplate;
@@ -27,7 +29,8 @@ public class Compiler {
 	public void compile(JadeModel model, Writer w) throws JadeCompilerException {
 		IndentWriter writer = new IndentWriter(w);
 		writer.setUseIndent(prettyPrint);
-		rootNode.execute(writer, model, template);
+		ExpressionHandler expressionHandler = new JexlExpressionHandler();
+		rootNode.execute(writer, model, template,  expressionHandler);
 	}
 
 	public void setPrettyPrint(boolean prettyPrint) {

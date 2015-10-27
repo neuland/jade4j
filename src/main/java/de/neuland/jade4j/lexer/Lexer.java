@@ -6,9 +6,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.neuland.jade4j.compiler.Utils;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.expression.ExpressionHandler;
+import de.neuland.jade4j.expression.JexlExpressionHandler;
 import de.neuland.jade4j.lexer.token.*;
 import de.neuland.jade4j.util.CharacterParser;
 import de.neuland.jade4j.util.Options;
@@ -40,8 +40,10 @@ public class Lexer {
     private final TemplateLoader templateLoader;
     private String indentType;
     private CharacterParser characterParser;
+    private ExpressionHandler expressionHandler;
 
-    public Lexer(String filename, TemplateLoader templateLoader) throws IOException {
+    public Lexer(String filename, TemplateLoader templateLoader,ExpressionHandler expressionHandler) throws IOException {
+        this.expressionHandler = expressionHandler;
         this.filename = ensureJadeExtension(filename);
         this.templateLoader = templateLoader;
         Reader reader = templateLoader.getReader(this.filename);
@@ -54,7 +56,8 @@ public class Lexer {
         lineno = 1;
         characterParser = new CharacterParser();
     }
-    public Lexer(String input,String filename, TemplateLoader templateLoader) throws IOException {
+    public Lexer(String input,String filename, TemplateLoader templateLoader,ExpressionHandler expressionHandler) throws IOException {
+        this.expressionHandler = expressionHandler;
         this.filename = ensureJadeExtension(filename);
         this.templateLoader = templateLoader;
         Reader reader = templateLoader.getReader(this.filename);
@@ -414,7 +417,7 @@ public class Lexer {
             code.setBuffer(flags.charAt(0) == '=' || flags.length()>1 && flags.charAt(1) == '=');
             if(code.isBuffer())
                 try {
-                    ExpressionHandler.assertExpression(matcher.group(2));
+                    expressionHandler.assertExpression(matcher.group(2));
                 } catch (ExpressionException e) {
                     throw new JadeLexerException(e.getMessage(), filename, lineno, templateLoader);
                 }
@@ -829,7 +832,7 @@ public class Lexer {
             return str.charAt(i) == ',';
         } else if (Loc.VALUE.equals(loc) && !state.isNesting()) {
             try {
-                ExpressionHandler.assertExpression(val);
+                expressionHandler.assertExpression(val);
                 if (str.charAt(i) == ' ' || str.charAt(i) == '\n') {
                     for (int x = i; x < str.length(); x++) {
                         if (str.charAt(x) != ' ' && str.charAt(x) != '\n') {
@@ -862,7 +865,7 @@ public class Lexer {
                     CharacterParser.Match range = characterParser.parseMax(expr);
                     if (expr.charAt(range.getEnd()) != '}')
                         return substr(match, 0, 2) + interpolate(match.substring(2), quote);
-                    ExpressionHandler.assertExpression(range.getSrc());
+                    expressionHandler.assertExpression(range.getSrc());
                     return quote + " + (" + range.getSrc() + ") + " + quote + interpolate(expr.substring(range.getEnd() + 1), quote);
                 } catch (Exception ex) {
                     return substr(match, 0, 2) + interpolate(match.substring(2), quote);
@@ -921,7 +924,7 @@ public class Lexer {
                     val = val.trim();
                     if (!val.isEmpty())
                     try {
-                        ExpressionHandler.assertExpression(val);
+                        expressionHandler.assertExpression(val);
                     } catch (ExpressionException e) {
                         throw new JadeLexerException(e.getMessage(), filename, lineno, templateLoader);
                     }

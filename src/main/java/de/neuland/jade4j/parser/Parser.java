@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.lexer.token.*;
 import de.neuland.jade4j.parser.node.*;
 import de.neuland.jade4j.parser.node.BlockCommentNode;
@@ -30,6 +31,7 @@ public class Parser {
     private String[] textOnlyTags = {"script", "style"};
     private Integer _spaces = null;
     private final TemplateLoader templateLoader;
+    private ExpressionHandler expressionHandler;
     private Parser extending;
     private final String filename;
     private LinkedList<Parser> contexts = new LinkedList<Parser>();
@@ -37,17 +39,19 @@ public class Parser {
     private int inMixin = 0;
     private HashMap mixins = new HashMap<String,MixinNode>();
 
-    public Parser(String filename, TemplateLoader templateLoader) throws IOException {
+    public Parser(String filename, TemplateLoader templateLoader,ExpressionHandler expressionHandler) throws IOException {
         this.filename = filename;
         this.templateLoader = templateLoader;
-        lexer = new Lexer(filename, templateLoader);
+        this.expressionHandler = expressionHandler;
+        lexer = new Lexer(filename, templateLoader,expressionHandler);
         characterParser = new CharacterParser();
         getContexts().push(this);
     }
-    public Parser(String src, String filename, TemplateLoader templateLoader) throws IOException {
+    public Parser(String src, String filename, TemplateLoader templateLoader,ExpressionHandler expressionHandler) throws IOException {
         this.filename = filename;
         this.templateLoader = templateLoader;
-        lexer = new Lexer(src,filename, templateLoader);
+        this.expressionHandler = expressionHandler;
+        lexer = new Lexer(src,filename, templateLoader,expressionHandler);
         characterParser = new CharacterParser();
         getContexts().push(this);
     }
@@ -339,7 +343,7 @@ public class Parser {
     private Parser createParser(String templateName) {
         templateName = ensureJadeExtension(templateName);
         try {
-            return new Parser(resolvePath(templateName), templateLoader);
+            return new Parser(resolvePath(templateName), templateLoader,expressionHandler);
         } catch (IOException e) {
             throw new JadeParserException(filename, lexer.getLineno(), templateLoader, "the template [" + templateName
                     + "] could not be opened\n" + e.getMessage());
@@ -466,7 +470,11 @@ public class Parser {
         node.setValue(whileToken.getValue());
         node.setLineNumber(whileToken.getLineNumber());
         node.setFileName(filename);
-        node.setBlock(block());
+        BlockNode block = block();
+        if(block!=null)
+            node.setBlock(block);
+        else
+            node.setBlock(new BlockNode());
         return node;
     }
 
@@ -628,7 +636,7 @@ public class Parser {
                 CharacterParser.Match range = characterParser.parseMax(rest);
                 Parser inner = null;
                 try {
-                    inner = new Parser(range.getSrc(), this.filename, this.templateLoader); //Need to be reviewed
+                    inner = new Parser(range.getSrc(), this.filename, this.templateLoader,this.expressionHandler); //Need to be reviewed
                 } catch (IOException e) {
                     throw new JadeParserException(this.filename,line,templateLoader,"Could not parse text");
                 }

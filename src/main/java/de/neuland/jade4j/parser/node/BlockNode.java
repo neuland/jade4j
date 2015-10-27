@@ -2,6 +2,7 @@ package de.neuland.jade4j.parser.node;
 
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
+import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 
@@ -11,7 +12,7 @@ public class BlockNode extends Node {
 	private BlockNode yieldBlock;
 	private String mode;
 
-	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
+	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template, ExpressionHandler expressionHandler) throws JadeCompilerException {
 
 		// Pretty print multi-line text
 		if (writer.isPp() && getNodes().size() > 1 && !writer.isEscape() && getNodes().get(0) instanceof TextNode && getNodes().get(1) instanceof TextNode)
@@ -22,7 +23,7 @@ public class BlockNode extends Node {
 			if (writer.isPp() && i > 0 && !writer.isEscape() && getNodes().get(i) instanceof TextNode && getNodes().get(i - 1) instanceof TextNode)
 				writer.prettyIndent(1, false);
 
-			getNodes().get(i).execute(writer, model, template);
+			getNodes().get(i).execute(writer, model, template, expressionHandler);
 			// Multiple text nodes are separated by newlines
 			Node nextNode = null;
 			if(i+1 < getNodes().size())

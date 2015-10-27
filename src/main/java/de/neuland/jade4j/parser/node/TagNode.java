@@ -96,7 +96,7 @@ public class TagNode extends AttrsNode {
       return false;
     };
     @Override
-    public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
+    public void execute(IndentWriter writer, JadeModel model, JadeTemplate template, ExpressionHandler expressionHandler) throws JadeCompilerException {
         writer.increment();
         if ("pre".equals(this.name)) writer.setEscape(true);
         if(writer.isPp() && !isInline()){
@@ -105,7 +105,7 @@ public class TagNode extends AttrsNode {
         if (selfClosing || isSelfClosing(template)) {
             writer.append("<");
             writer.append(name);
-            writer.append(attributes(model, template));
+            writer.append(attributes(model, template,expressionHandler));
             if (isTerse(template)) {
                 writer.append(">");
             }else {
@@ -118,13 +118,13 @@ public class TagNode extends AttrsNode {
         }else {
             writer.append("<");
             writer.append(name);
-            writer.append(attributes(model, template));
+            writer.append(attributes(model, template, expressionHandler));
             writer.append(">");
             if (hasCodeNode()) {
-                codeNode.execute(writer, model, template);
+                codeNode.execute(writer, model, template, expressionHandler);
             }
             if (hasBlock()) {
-                block.execute(writer, model, template);
+                block.execute(writer, model, template, expressionHandler);
             }
             // pretty print
             if (writer.isPp() && !isInline() && !"pre".equals(name) && !canInline()){
@@ -151,14 +151,14 @@ public class TagNode extends AttrsNode {
         return !template.isXml() && ArrayUtils.contains(selfClosingTags, name);
     }
 
-    private String attributes(JadeModel model, JadeTemplate template) {
+    private String attributes(JadeModel model, JadeTemplate template, ExpressionHandler expressionHandler) {
         StringBuilder sb = new StringBuilder();
 
         Map<String, Object> mergedAttributes = mergeInheritedAttributes(model);
 
         for (Map.Entry<String, Object> entry : mergedAttributes.entrySet()) {
             try {
-                sb.append(getAttributeString(entry.getKey(), entry.getValue(), model, template));
+                sb.append(getAttributeString(entry.getKey(), entry.getValue(), model, template,expressionHandler));
             } catch (ExpressionException e) {
                 throw new JadeCompilerException(this, template.getTemplateLoader(), e);
             }
@@ -172,7 +172,7 @@ public class TagNode extends AttrsNode {
         return sb.toString();
     }
 
-    private String getAttributeString(String name, Object attribute, JadeModel model, JadeTemplate template) throws ExpressionException {
+    private String getAttributeString(String name, Object attribute, JadeModel model, JadeTemplate template, ExpressionHandler expressionHandler) throws ExpressionException {
         String key = name;
         boolean escaped = false;
 //        if ("class".equals(key)) {
@@ -211,10 +211,10 @@ public class TagNode extends AttrsNode {
             if (attribute instanceof ValueString) {
                 ValueString valueString = ((ValueString) attribute);
                 escaped = valueString.isEscape();
-                value = getInterpolatedAttributeValue(name, valueString.getValue(),escaped, model, template);
+                value = getInterpolatedAttributeValue(name, valueString.getValue(),escaped, model, template,expressionHandler);
             } else if (attribute instanceof ExpressionString) {
                 escaped = ((ExpressionString) attribute).isEscape();
-                Object expressionValue = evaluateExpression((ExpressionString) attribute, model);
+                Object expressionValue = evaluateExpression((ExpressionString) attribute, model,expressionHandler);
                 if (expressionValue != null && expressionValue.getClass().isArray()) {
                     StringBuffer s = new StringBuffer("");
                     boolean first = true;
@@ -247,7 +247,7 @@ public class TagNode extends AttrsNode {
         }else if (attribute instanceof ValueString) {
             ValueString valueString = ((ValueString) attribute);
             escaped = valueString.isEscape();
-            value = getInterpolatedAttributeValue(name, valueString.getValue(), escaped, model, template);
+            value = getInterpolatedAttributeValue(name, valueString.getValue(), escaped, model, template, expressionHandler);
         } else if (attribute instanceof Boolean) {
             if ((Boolean) attribute) {
                 value = name;
@@ -259,7 +259,7 @@ public class TagNode extends AttrsNode {
             }
         } else if (attribute instanceof ExpressionString) {
             escaped = ((ExpressionString) attribute).isEscape();
-            Object expressionValue = evaluateExpression((ExpressionString) attribute, model);
+            Object expressionValue = evaluateExpression((ExpressionString) attribute, model, expressionHandler);
             if (expressionValue == null) {
                 return "";
             }
@@ -294,23 +294,23 @@ public class TagNode extends AttrsNode {
         return sb.toString();
     }
 
-    private Object evaluateExpression(ExpressionString attribute, JadeModel model) throws ExpressionException {
+    private Object evaluateExpression(ExpressionString attribute, JadeModel model, ExpressionHandler expressionHandler) throws ExpressionException {
         String expression = ((ExpressionString) attribute).getValue();
-        Object result = ExpressionHandler.evaluateExpression(expression, model);
+        Object result = expressionHandler.evaluateExpression(expression, model);
         if (result instanceof ExpressionString) {
-            return evaluateExpression((ExpressionString) result, model);
+            return evaluateExpression((ExpressionString) result, model, expressionHandler);
         }
         return result;
     }
 
-    private String getInterpolatedAttributeValue(String name, Object attribute, boolean escaped, JadeModel model, JadeTemplate template)
+    private String getInterpolatedAttributeValue(String name, Object attribute, boolean escaped, JadeModel model, JadeTemplate template, ExpressionHandler expressionHandler)
             throws JadeCompilerException {
         if (!preparedAttributeValues.containsKey(name)) {
             preparedAttributeValues.put(name, Utils.prepareInterpolate((String) attribute, escaped));
         }
         List<Object> prepared = preparedAttributeValues.get(name);
         try {
-            return Utils.interpolate(prepared, model);
+            return Utils.interpolate(prepared, model,expressionHandler);
         } catch (ExpressionException e) {
             throw new JadeCompilerException(this, template.getTemplateLoader(), e);
         }

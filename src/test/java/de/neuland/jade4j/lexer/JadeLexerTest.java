@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import de.neuland.jade4j.expression.JexlExpressionHandler;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,10 +26,10 @@ public class JadeLexerTest {
 	@Before
 	public void setUp() throws Exception {
         FileTemplateLoader loader1 = new FileTemplateLoader(TestFileHelper.getLexerResourcePath(""), "UTF-8");
-        lexer1 = new Lexer("test_file1.jade", loader1);
+        lexer1 = new Lexer("test_file1.jade", loader1,new JexlExpressionHandler());
 
         FileTemplateLoader loader2 = new FileTemplateLoader(TestFileHelper.getLexerResourcePath(""), "UTF-8");
-        lexer2 = new Lexer("empty_file.jade", loader2);
+        lexer2 = new Lexer("empty_file.jade", loader2,new JexlExpressionHandler());
 	
 	}
 	

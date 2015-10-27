@@ -2,17 +2,18 @@ package de.neuland.jade4j.parser.node;
 
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
+import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 
 public class MixinNode extends MixinInjectNode {
 	boolean call = false;
     @Override
-	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
+	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template, ExpressionHandler expressionHandler) throws JadeCompilerException {
 		if (hasBlock()) {
 			model.setMixin(getName(), this);
 		} else {
-			super.execute(writer, model, template);
+			super.execute(writer, model, template, expressionHandler);
 		}
 	}
 
