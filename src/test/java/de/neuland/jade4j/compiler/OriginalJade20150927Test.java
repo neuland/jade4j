@@ -572,8 +572,8 @@ public class OriginalJade20150927Test {
 		jade.renderTemplate(template, new HashMap<String, Object>(), writer);
 		String html = writer.toString();
 
-		String expected = readFile(file.getPath().replace(".jade", ".html"));
-		assertEquals(file.getName(), expected, html);
+		String expected = readFile(file.getPath().replace(".jade", ".html")).trim().replaceAll("\r", "");
+		assertEquals(file.getName(), expected, html.trim());
 	}
 
 	private String readFile(String fileName) {

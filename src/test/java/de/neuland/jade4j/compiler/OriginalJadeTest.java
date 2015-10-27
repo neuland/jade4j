@@ -47,9 +47,9 @@ public class OriginalJadeTest {
         jade.renderTemplate(template, new HashMap<String, Object>(), writer);
         String html = writer.toString();
 
-        String expected = readFile(file.getPath().replace(".jade", ".html"));
+        String expected = readFile(file.getPath().replace(".jade", ".html")).trim().replaceAll("\r", "");
 
-        assertEquals(file.getName(), expected, html);
+        assertEquals(file.getName(), expected, html.trim());
     }
 
     private String readFile(String fileName) throws IOException {
