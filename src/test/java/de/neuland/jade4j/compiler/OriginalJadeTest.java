@@ -31,8 +31,8 @@ public class OriginalJadeTest {
 
     private File file;
 
-    public OriginalJadeTest(File file) {
-        this.file = file;
+    public OriginalJadeTest(String file) {
+        this.file = new File(TestFileHelper.getOriginalResourcePath(file));
     }
 
     @Test
@@ -56,15 +56,15 @@ public class OriginalJadeTest {
         return FileUtils.readFileToString(new File(fileName));
     }
 
-    @Parameterized.Parameters
-    public static Collection<File[]> data() {
+    @Parameterized.Parameters(name="{0}")
+    public static Collection<String[]> data() {
         File folder = new File(TestFileHelper.getOriginalResourcePath(""));
         Collection<File> files = FileUtils.listFiles(folder, new String[]{"jade"}, false);
 
-        Collection<File[]> data = new ArrayList<File[]>();
+        Collection<String[]> data = new ArrayList<String[]>();
         for (File file : files) {
             if (!ArrayUtils.contains(ignoredCases, file.getName().replace(".jade", ""))) {
-                data.add(new File[]{file});
+                data.add(new String[]{file.getName()});
             }
 
         }
