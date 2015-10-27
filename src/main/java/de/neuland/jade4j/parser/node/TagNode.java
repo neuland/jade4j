@@ -5,13 +5,11 @@ import de.neuland.jade4j.compiler.Utils;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.expression.ExpressionHandler;
-import de.neuland.jade4j.lexer.token.Text;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -213,7 +211,7 @@ public class TagNode extends AttrsNode {
             if (attribute instanceof ValueString) {
                 ValueString valueString = ((ValueString) attribute);
                 escaped = valueString.isEscape();
-                value = getInterpolatedAttributeValue(name, valueString.getValue(), model, template);
+                value = getInterpolatedAttributeValue(name, valueString.getValue(),escaped, model, template);
             } else if (attribute instanceof ExpressionString) {
                 escaped = ((ExpressionString) attribute).isEscape();
                 Object expressionValue = evaluateExpression((ExpressionString) attribute, model);
@@ -249,7 +247,7 @@ public class TagNode extends AttrsNode {
         }else if (attribute instanceof ValueString) {
             ValueString valueString = ((ValueString) attribute);
             escaped = valueString.isEscape();
-            value = getInterpolatedAttributeValue(name, valueString.getValue(), model, template);
+            value = getInterpolatedAttributeValue(name, valueString.getValue(), escaped, model, template);
         } else if (attribute instanceof Boolean) {
             if ((Boolean) attribute) {
                 value = name;
@@ -305,10 +303,10 @@ public class TagNode extends AttrsNode {
         return result;
     }
 
-    private String getInterpolatedAttributeValue(String name, Object attribute, JadeModel model, JadeTemplate template)
+    private String getInterpolatedAttributeValue(String name, Object attribute, boolean escaped, JadeModel model, JadeTemplate template)
             throws JadeCompilerException {
         if (!preparedAttributeValues.containsKey(name)) {
-            preparedAttributeValues.put(name, Utils.prepareInterpolate((String) attribute, true));
+            preparedAttributeValues.put(name, Utils.prepareInterpolate((String) attribute, escaped));
         }
         List<Object> prepared = preparedAttributeValues.get(name);
         try {

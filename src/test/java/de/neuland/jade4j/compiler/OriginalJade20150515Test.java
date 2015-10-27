@@ -6,6 +6,7 @@ import de.neuland.jade4j.TestFileHelper;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.filter.CDATAFilter;
 import de.neuland.jade4j.filter.PlainFilter;
+import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -540,11 +541,12 @@ public class OriginalJade20150515Test {
 		File file = new File(TestFileHelper.getOriginal20150515ResourcePath(path+".jade"));
 
 		JadeConfiguration jade = new JadeConfiguration();
+		jade.setTemplateLoader(new FileTemplateLoader(TestFileHelper.getOriginal20150515ResourcePath("cases/"),"UTF-8"));
 		jade.setMode(Jade4J.Mode.XHTML); // original jade uses xhtml by default
 		jade.setFilter("plain", new PlainFilter());
 		jade.setFilter("cdata", new CDATAFilter());
 		jade.setPrettyPrint(true);
-		JadeTemplate template = jade.getTemplate(file.getPath());
+		JadeTemplate template = jade.getTemplate(file.getName());
 		Writer writer = new StringWriter();
 		HashMap<String, Object> model = new HashMap<String, Object>();
 		model.put("title","Jade");
