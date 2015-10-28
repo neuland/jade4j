@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 public class OriginalJade20150515Test {
     private static String[] ignoredCases = new String[]{"attrs", "attrs.js", "code.conditionals", "code.iteration",
              "filters.coffeescript", "filters.less", "filters.markdown", "filters.stylus",
-             "mixin.blocks", "mixin.merge",  "styles", "text-block", "doctype.default"};
+             "mixin.blocks", "mixin.merge",  "styles", "text-block"};
 
     private String file;
 

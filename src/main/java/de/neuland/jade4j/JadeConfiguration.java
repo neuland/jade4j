@@ -128,6 +128,10 @@ public class JadeConfiguration {
         this.expressionHandler = expressionHandler;
     }
 
+    public ExpressionHandler getExpressionHandler() {
+        return expressionHandler;
+    }
+
     public Mode getMode() {
         return mode;
     }

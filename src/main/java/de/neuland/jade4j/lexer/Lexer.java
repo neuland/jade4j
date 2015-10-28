@@ -585,8 +585,18 @@ public class Lexer {
         if (StringUtils.isNotBlank(val)) {
             throw new JadeLexerException("`!!!` is deprecated, you must now use `doctype`", filename, getLineno(), templateLoader);
         }
-        val = scan1("^(?:doctype) *([^\\n]+)?");
-        if (StringUtils.isNotBlank(val)) {
+        Matcher matcher = scanner.getMatcherForPattern("^(?:doctype) *([^\\n]+)?");
+        if (matcher.find(0) && matcher.groupCount()>0) {
+            int end = matcher.end();
+            consume(end);
+            String match = matcher.group(1);
+            if(match== null)
+                val = "default";
+            else
+                val = match;
+        }
+
+        if (val != null) {
             if(val.trim() == "5")
                 throw new JadeLexerException("`doctype 5` is deprecated, you must now use `doctype html`", filename, getLineno(), templateLoader);
             return new Doctype(val, lineno);

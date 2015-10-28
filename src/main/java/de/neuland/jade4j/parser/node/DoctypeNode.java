@@ -7,8 +7,10 @@ import de.neuland.jade4j.lexer.token.Doctypes;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 
-public class DoctypeNode extends Node {
+import java.util.HashMap;
+import java.util.Map;
 
+public class DoctypeNode extends Node {
 	@Override
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
 		String name = getValue();
