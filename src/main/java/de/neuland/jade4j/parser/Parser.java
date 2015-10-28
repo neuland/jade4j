@@ -294,21 +294,36 @@ public class Parser {
 
         String extension = FilenameUtils.getExtension(templateName);
         if (!"".equals(extension) && !"jade".equals(extension)) {
-            FilterNode node = new FilterNode();
-            node.setLineNumber(lexer.getLineno());
-            node.setFileName(filename);
-            node.setValue(extension);
             try {
-                Reader reader = templateLoader.getReader(resolvePath(templateName));
-                Node textNode = new TextNode();
-                textNode.setFileName(filename);
-                textNode.setLineNumber(lexer.getLineno());
-                textNode.setValue(IOUtils.toString(reader));
-                node.setTextBlock(textNode);
+                if(includeToken.getFilter()!=null) {
+                    Reader reader = templateLoader.getReader(resolvePath(templateName));
+                    FilterNode node = new FilterNode();
+                    node.setValue(includeToken.getFilter());
+                    node.setLineNumber(line());
+                    node.setFileName(filename);
+                    TextNode text = new TextNode();
+                    text.setValue(IOUtils.toString(reader));
+                    BlockNode block = new BlockNode();
+                    LinkedList<Node> nodes = new LinkedList<Node>();
+                    nodes.add(text);
+                    block.setNodes(nodes);
+                    if(block!=null)
+                        node.setTextBlock(block);
+                    else{
+                        node.setTextBlock(new BlockNode());
+                    }
+                    return node;
+                }else{
+                    Reader reader = templateLoader.getReader(resolvePath(templateName));
+                    LiteralNode node = new LiteralNode();
+                    node.setLineNumber(lexer.getLineno());
+                    node.setFileName(filename);
+                    node.setValue(IOUtils.toString(reader));
+                    return node;
+                }
             } catch (IOException e) {
                 throw new JadeParserException(filename, lexer.getLineno(), templateLoader, "the included file [" + templateName + "] could not be opened\n" + e.getMessage());
             }
-            return node;
         }
 
         Parser parser = createParser(templateName);
@@ -782,7 +797,11 @@ public class Parser {
         node.setValue(filterToken.getValue());
         node.setLineNumber(line());
         node.setFileName(filename);
-        node.setTextBlock(tNode);
+        if(tNode!=null)
+            node.setTextBlock(tNode);
+        else{
+            node.setTextBlock(new BlockNode());
+        }
         if (attr != null) {
             node.setAttributes(attr.getAttributes());
         }

@@ -6,6 +6,8 @@ import de.neuland.jade4j.TestFileHelper;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.filter.CDATAFilter;
+import de.neuland.jade4j.filter.CustomTestFilter;
+import de.neuland.jade4j.filter.MarkdownFilter;
 import de.neuland.jade4j.filter.PlainFilter;
 import de.neuland.jade4j.lexer.Lexer;
 import de.neuland.jade4j.lexer.token.Token;
@@ -26,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 
 
 public class OriginalJade20150515SingleTest {
-	String templateName = "doctype.default";
+	String templateName = "include-filter";
 
 	@Test
 	public void testCase() throws IOException, JadeCompilerException {
@@ -72,6 +74,8 @@ public class OriginalJade20150515SingleTest {
 		jade.setMode(Jade4J.Mode.XHTML); // original jade uses xhtml by default
 		jade.setFilter("plain", new PlainFilter());
 		jade.setFilter("cdata", new CDATAFilter());
+		jade.setFilter("marked", new MarkdownFilter());
+		jade.setFilter("custom-filter", new CustomTestFilter());
 		jade.setPrettyPrint(true);
 		return jade;
 	}

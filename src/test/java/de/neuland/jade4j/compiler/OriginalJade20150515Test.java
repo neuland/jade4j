@@ -5,6 +5,7 @@ import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.TestFileHelper;
 import de.neuland.jade4j.filter.CDATAFilter;
 import de.neuland.jade4j.filter.CustomTestFilter;
+import de.neuland.jade4j.filter.MarkdownFilter;
 import de.neuland.jade4j.filter.PlainFilter;
 import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
@@ -45,6 +46,7 @@ public class OriginalJade20150515Test {
         jade.setFilter("plain", new PlainFilter());
         jade.setFilter("cdata", new CDATAFilter());
         jade.setFilter("custom-filter", new CustomTestFilter());
+        jade.setFilter("marked", new MarkdownFilter());
         jade.setPrettyPrint(true);
         JadeTemplate template = jade.getTemplate(file);
         Writer writer = new StringWriter();
