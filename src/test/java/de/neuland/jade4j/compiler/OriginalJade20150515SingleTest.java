@@ -5,10 +5,7 @@ import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.TestFileHelper;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.expression.ExpressionHandler;
-import de.neuland.jade4j.filter.CDATAFilter;
-import de.neuland.jade4j.filter.CustomTestFilter;
-import de.neuland.jade4j.filter.MarkdownFilter;
-import de.neuland.jade4j.filter.PlainFilter;
+import de.neuland.jade4j.filter.*;
 import de.neuland.jade4j.lexer.Lexer;
 import de.neuland.jade4j.lexer.token.Token;
 import de.neuland.jade4j.template.FileTemplateLoader;
@@ -76,6 +73,7 @@ public class OriginalJade20150515SingleTest {
 		jade.setFilter("cdata", new CDATAFilter());
 		jade.setFilter("marked", new MarkdownFilter());
 		jade.setFilter("custom-filter", new CustomTestFilter());
+		jade.setFilter("verbatim", new VerbatimFilter());
 		jade.setPrettyPrint(true);
 		return jade;
 	}
