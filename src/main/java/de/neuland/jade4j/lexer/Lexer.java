@@ -589,18 +589,12 @@ public class Lexer {
         if (matcher.find(0) && matcher.groupCount()>0) {
             int end = matcher.end();
             consume(end);
-            String match = matcher.group(1);
-            if(match== null)
-                val = "default";
-            else
-                val = match;
+            String name = matcher.group(1);
+            if(name != null && name.trim() == "5")
+                throw new JadeLexerException("`doctype 5` is deprecated, you must now use `doctype html`", filename, getLineno(), templateLoader);
+            return new Doctype(name, lineno);
         }
 
-        if (val != null) {
-            if(val.trim() == "5")
-                throw new JadeLexerException("`doctype 5` is deprecated, you must now use `doctype html`", filename, getLineno(), templateLoader);
-            return new Doctype(val, lineno);
-        }
         return null;
     }
 
@@ -732,7 +726,7 @@ public class Lexer {
             if(!(matcher.group(2).equals(" ") || scanner.getInput().charAt(0) == ' ')){
                 throw new JadeLexerException("expected space after include:filter but got " + String.valueOf(scanner.getInput().charAt(0)), filename, getLineno(), templateLoader);
             }
-            matcher = Pattern.compile("^ *([^\n]+)").matcher(scanner.getInput());
+            matcher = Pattern.compile("^ *([^\\n]+)").matcher(scanner.getInput());
             if(!(matcher.find(0)&&matcher.groupCount()>0) || matcher.group(1).trim().equals("")){
                 throw new JadeLexerException("missing path for include:filter", filename, getLineno(), templateLoader);
             }

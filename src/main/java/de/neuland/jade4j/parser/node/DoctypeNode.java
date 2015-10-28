@@ -15,7 +15,7 @@ public class DoctypeNode extends Node {
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
 		String name = getValue();
 		if (name == null) {
-			name = "5";
+			name = "default";
 		}
 		String doctypeLine = Doctypes.get(name);
 		if (doctypeLine == null) {
