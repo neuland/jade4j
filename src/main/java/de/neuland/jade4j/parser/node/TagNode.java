@@ -9,6 +9,7 @@ import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -240,7 +241,8 @@ public class TagNode extends AttrsNode {
 //            } else {
 //                return "";
             }
-            classes.add(value);
+            if(!StringUtils.isBlank(value))
+                classes.add(value);
             return "";
 //        }else if("id".equals(key)){
 //            value = (String) attribute;
