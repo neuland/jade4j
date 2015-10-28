@@ -2,10 +2,9 @@ package de.neuland.jade4j.expression;
 
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.model.JadeModel;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import javax.script.*;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,18 +20,19 @@ public class JsExpressionHandler implements ExpressionHandler {
     @Override
     public Object evaluateExpression(String expression, JadeModel model) throws ExpressionException {
         ScriptEngineManager mgr = new ScriptEngineManager();
-        ScriptEngine jsEngine = mgr.getEngineByName("Jexl");
+        ScriptEngine jsEngine = mgr.getEngineByName("JavaScript");
 
-        Set<Map.Entry<String, Object>> entries = model.entrySet();
-        for (Map.Entry<String, Object> entry : entries) {
-            jsEngine.put(entry.getKey(),entry.getValue());
-        }
-
-        System.out.println("Executing in script environment...");
         try{
-          return jsEngine.eval(expression);
+            Bindings bindings = jsEngine.createBindings();
+            bindings.putAll(model);
+            Object eval = jsEngine.eval(expression, bindings);
+            for (Map.Entry<String, Object> stringObjectEntry : bindings.entrySet()) {
+                model.put(stringObjectEntry.getKey(),stringObjectEntry.getValue());
+            }
+            return eval;
         }
         catch (ScriptException ex){
+//            return expression;
             throw new ExpressionException(expression, ex);
         }
     }
