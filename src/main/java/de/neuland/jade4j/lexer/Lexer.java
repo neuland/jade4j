@@ -1203,4 +1203,15 @@ public class Lexer {
     public boolean getPipeless() {
         return pipeless;
     }
+
+    public LinkedList<Token> getTokens(){
+        Token t = null;
+        LinkedList<Token> list = new LinkedList<Token>();
+        while((t = this.advance()) != null){
+            list.add(t);
+            if(t instanceof Eos)
+                break;
+        }
+        return list;
+    }
 }
