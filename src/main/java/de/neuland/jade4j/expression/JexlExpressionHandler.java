@@ -26,15 +26,15 @@ public class JexlExpressionHandler implements ExpressionHandler {
 
 	public Object evaluateExpression(String expression, JadeModel model) throws ExpressionException {
 		try {
-//			if(expression.startsWith("{")) {
-//				return expression;
-//			}else{
+			if(expression.startsWith("{")) {
+				return expression;
+			}else{
 			if(expression.startsWith("var")){
 				expression = expression.substring(3);
 			}
 				Expression e = jexl.createExpression(expression);
 				return e.evaluate(new MapContext(model));
-//			}
+			}
 
 		} catch (Exception e) {
 			throw new ExpressionException(expression, e);

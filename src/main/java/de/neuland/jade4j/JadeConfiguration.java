@@ -85,6 +85,7 @@ public class JadeConfiguration {
         Parser parser = new Parser(name, templateLoader,expressionHandler);
         Node root = parser.parse();
         template.setTemplateLoader(templateLoader);
+        template.setExpressionHandler(expressionHandler);
         template.setRootNode(root);
         template.setPrettyPrint(prettyPrint);
         template.setMode(getMode());
@@ -121,6 +122,10 @@ public class JadeConfiguration {
 
     public void setTemplateLoader(TemplateLoader templateLoader) {
         this.templateLoader = templateLoader;
+    }
+
+    public void setExpressionHandler(ExpressionHandler expressionHandler) {
+        this.expressionHandler = expressionHandler;
     }
 
     public Mode getMode() {

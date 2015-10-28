@@ -18,7 +18,7 @@ public abstract class Node implements Cloneable {
     protected Node block;
     protected String fileName;
 
-    public abstract void execute(IndentWriter writer, JadeModel model, JadeTemplate template, ExpressionHandler expressionHandler) throws JadeCompilerException;
+    public abstract void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException;
     
     public void setLineNumber(int lineNumber) {
         this.lineNumber = lineNumber;

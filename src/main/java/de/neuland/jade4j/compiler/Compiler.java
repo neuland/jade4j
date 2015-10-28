@@ -15,6 +15,7 @@ public class Compiler {
 	private final Node rootNode;
 	private boolean prettyPrint;
 	private JadeTemplate template = new JadeTemplate();
+	private ExpressionHandler expressionHandler;
 
 	public Compiler(Node rootNode) {
 		this.rootNode = rootNode;
@@ -29,8 +30,7 @@ public class Compiler {
 	public void compile(JadeModel model, Writer w) throws JadeCompilerException {
 		IndentWriter writer = new IndentWriter(w);
 		writer.setUseIndent(prettyPrint);
-		ExpressionHandler expressionHandler = new JexlExpressionHandler();
-		rootNode.execute(writer, model, template,  expressionHandler);
+		rootNode.execute(writer, model, template);
 	}
 
 	public void setPrettyPrint(boolean prettyPrint) {
@@ -40,4 +40,9 @@ public class Compiler {
 	public void setTemplate(JadeTemplate jadeTemplate) {
 		this.template = jadeTemplate;
 	}
+
+	public void setExpressionHandler(ExpressionHandler expressionHandler) {
+		this.expressionHandler = expressionHandler;
+	}
+
 }

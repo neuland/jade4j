@@ -4,6 +4,7 @@ import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.TestFileHelper;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
+import de.neuland.jade4j.expression.JsExpressionHandler;
 import de.neuland.jade4j.filter.CDATAFilter;
 import de.neuland.jade4j.filter.PlainFilter;
 import de.neuland.jade4j.template.FileTemplateLoader;
@@ -542,6 +543,7 @@ public class OriginalJade20150515Test {
 
 		JadeConfiguration jade = new JadeConfiguration();
 		jade.setTemplateLoader(new FileTemplateLoader(TestFileHelper.getOriginal20150515ResourcePath("cases/"),"UTF-8"));
+//		jade.setExpressionHandler(new JsExpressionHandler());
 		jade.setMode(Jade4J.Mode.XHTML); // original jade uses xhtml by default
 		jade.setFilter("plain", new PlainFilter());
 		jade.setFilter("cdata", new CDATAFilter());

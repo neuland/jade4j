@@ -7,7 +7,6 @@ import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.expression.ExpressionHandler;
-import de.neuland.jade4j.expression.JexlExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 
@@ -16,11 +15,11 @@ public class CaseNode extends Node {
     private List<CaseConditionNode> caseConditionNodes = new LinkedList<CaseConditionNode>();
 
 	@Override
-	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template, ExpressionHandler expressionHandler) throws JadeCompilerException {
+	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
 		try {
 			for (CaseConditionNode caseConditionNode : caseConditionNodes) {
-				if (caseConditionNode.isDefault() || checkCondition(model, caseConditionNode,expressionHandler)) {
-					caseConditionNode.execute(writer, model, template, expressionHandler);
+				if (caseConditionNode.isDefault() || checkCondition(model, caseConditionNode,template.getExpressionHandler())) {
+					caseConditionNode.execute(writer, model, template);
 					break;
 				}
 			}

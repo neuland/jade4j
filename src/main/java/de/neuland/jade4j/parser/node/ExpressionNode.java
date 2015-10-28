@@ -1,7 +1,5 @@
 package de.neuland.jade4j.parser.node;
 
-import de.neuland.jade4j.expression.ExpressionHandler;
-import de.neuland.jade4j.expression.JexlExpressionHandler;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import de.neuland.jade4j.compiler.IndentWriter;
@@ -24,9 +22,9 @@ public class ExpressionNode extends Node {
 	}
 
 	@Override
-	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template, ExpressionHandler expressionHandler) throws JadeCompilerException {
+	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
 		try {
-			Object result = expressionHandler.evaluateExpression(getValue(), model);
+			Object result = template.getExpressionHandler().evaluateExpression(getValue(), model);
 			if (result == null || !buffer) {
 				return;
 			}
@@ -38,7 +36,7 @@ public class ExpressionNode extends Node {
 
             if (hasBlock()) {
                 writer.increment();
-                block.execute(writer, model, template, expressionHandler);
+                block.execute(writer, model, template);
                 writer.decrement();
                 writer.newline();
             }
