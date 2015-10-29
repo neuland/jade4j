@@ -169,7 +169,7 @@ public class TagNode extends AttrsNode {
 //        }
         for (Attr attribute : attributes) {
             try {
-                sb.append(getAttributeString(attribute.getName(), attribute.getValue(), model, template));
+                sb.append(getAttributeString(attribute.getName(), attribute, model, template));
             } catch (ExpressionException e) {
                 throw new JadeCompilerException(this, template.getTemplateLoader(), e);
             }
@@ -183,7 +183,7 @@ public class TagNode extends AttrsNode {
         return sb.toString();
     }
 
-    private String getAttributeString(String name, Object attribute, JadeModel model, JadeTemplate template) throws ExpressionException {
+    private String getAttributeString(String name, Attr attribute, JadeModel model, JadeTemplate template) throws ExpressionException {
         String key = name;
         boolean escaped = false;
 //        if ("class".equals(key)) {
@@ -218,12 +218,11 @@ public class TagNode extends AttrsNode {
 //        }
 
         String value = null;
-        Object attributeValue = attribute;
+        Object attributeValue = attribute.getValue();
         if("class".equals(key)) {
-            if (attributeValue instanceof ValueString) {
-                ValueString valueString = ((ValueString) attributeValue);
-                escaped = valueString.isEscape();
-                value = getInterpolatedAttributeValue(name, valueString.getValue(),escaped, model, template);
+            if (attributeValue instanceof String) {
+                escaped = attribute.isEscaped();
+                value = getInterpolatedAttributeValue(name, attributeValue,escaped, model, template);
             } else if (attributeValue instanceof ExpressionString) {
                 escaped = ((ExpressionString) attributeValue).isEscape();
                 Object expressionValue = evaluateExpression((ExpressionString) attributeValue, model,template.getExpressionHandler());
@@ -247,20 +246,15 @@ public class TagNode extends AttrsNode {
                     }
                     value = s.toString();
                 }
-            } else if (attributeValue instanceof String) {
-                value = (String) attributeValue;
-//            } else {
-//                return "";
             }
             if(!StringUtils.isBlank(value))
                 classes.add(value);
             return "";
 //        }else if("id".equals(key)){
 //            value = (String) attribute;
-        }else if (attributeValue instanceof ValueString) {
-            ValueString valueString = ((ValueString) attributeValue);
-            escaped = valueString.isEscape();
-            value = getInterpolatedAttributeValue(name, valueString.getValue(), escaped, model, template);
+        }else if (attributeValue instanceof String) {
+            escaped = attribute.isEscaped();
+            value = getInterpolatedAttributeValue(name, attributeValue, escaped, model, template);
         } else if (attributeValue instanceof Boolean) {
             if ((Boolean) attributeValue) {
                 value = name;
