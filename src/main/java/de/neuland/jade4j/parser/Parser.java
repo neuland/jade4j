@@ -629,10 +629,10 @@ public class Parser {
     private Node[] parseInlineTagsInText(String str) {
         int line = this.line();
         Matcher matcher = Pattern.compile("(\\\\)?#\\[((?:.|\\n)*)$").matcher(str);
-        if (matcher.matches()) {
+        if (matcher.find(0) && matcher.groupCount()>1) {
             if (matcher.group(1) != null) { // escape
                 TextNode text = new TextNode();
-                text.setValue(str.substring(0, matcher.end()) + "#[");//Not sure if Matcher.end() is correct
+                text.setValue(str.substring(0, matcher.start()) + "#[");//Not sure if Matcher.end() is correct
                 text.setLineNumber(line);
                 Node[] rest = this.parseInlineTagsInText(matcher.group(2));
                 if (rest[0] instanceof TextNode) {
@@ -643,7 +643,7 @@ public class Parser {
                 return ArrayUtils.addAll(textNodes, rest);
             } else {
                 TextNode text = new TextNode();
-                text.setValue(str.substring(0, matcher.end()));//Not sure if Matcher.end() is correct
+                text.setValue(str.substring(0, matcher.start()));//Not sure if Matcher.end() is correct
                 text.setLineNumber(line);
                 Node[] textNodes = {text};
                 Node[] buffer = textNodes;
