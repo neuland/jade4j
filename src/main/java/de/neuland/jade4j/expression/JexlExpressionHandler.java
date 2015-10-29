@@ -8,10 +8,13 @@ import org.apache.commons.jexl2.MapContext;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.model.JadeModel;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class JexlExpressionHandler implements ExpressionHandler {
 
 	private static final int MAX_ENTRIES = 5000;
-
+	public static Pattern xx = Pattern.compile("([a-zA-Z0-9-_]*[a-zA-Z0-9])\\+\\+");
 	private JexlEngine jexl;
 
 	public JexlExpressionHandler() {
@@ -32,8 +35,14 @@ public class JexlExpressionHandler implements ExpressionHandler {
 			if(expression.startsWith("var")){
 				expression = expression.substring(3);
 			}
+				Matcher matcher = xx.matcher(expression);
+				if(matcher.find(0) && matcher.groupCount()==1) {
+					String a = matcher.group(0);
+					expression = a+" = "+a+" + 1";
+				}
 				Expression e = jexl.createExpression(expression);
-				return e.evaluate(new MapContext(model));
+				Object evaluate = e.evaluate(new MapContext(model));
+				return evaluate;
 			}
 
 		} catch (Exception e) {

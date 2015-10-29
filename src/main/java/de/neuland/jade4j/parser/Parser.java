@@ -562,7 +562,7 @@ public class Parser {
 
         // (text | code | ':')?
         if (peek() instanceof Text) {
-            tagNode.setBlock(parseText());
+            tagNode.getBlock().push(parseText());
         } else if (peek() instanceof Expression) {
             tagNode.setCodeNode(parseCode());
         } else if (peek() instanceof Colon) {

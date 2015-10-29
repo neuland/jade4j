@@ -15,6 +15,7 @@ import de.neuland.jade4j.exceptions.JadeLexerException;
 import de.neuland.jade4j.expression.JexlExpressionHandler;
 import de.neuland.jade4j.filter.CssFilter;
 import de.neuland.jade4j.filter.JsFilter;
+import de.neuland.jade4j.template.JadeTemplate;
 import org.apache.commons.io.FileUtils;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -418,16 +419,21 @@ public class CompilerTest {
 
     private void run(String testName, boolean pretty, JadeModel model) {
         Parser parser = null;
+        JexlExpressionHandler expressionHandler = new JexlExpressionHandler();
         try {
             FileTemplateLoader loader = new FileTemplateLoader(
                     TestFileHelper.getCompilerResourcePath(""), "UTF-8");
-            parser = new Parser(testName, loader,new JexlExpressionHandler());
+            parser = new Parser(testName, loader, expressionHandler);
         } catch (IOException e) {
             e.printStackTrace();
         }
         Node root = parser.parse();
         Compiler compiler = new Compiler(root);
+        JadeTemplate jadeTemplate = new JadeTemplate();
+        jadeTemplate.setExpressionHandler(expressionHandler);
+        compiler.setTemplate(jadeTemplate);
         compiler.setPrettyPrint(pretty);
+        compiler.setExpressionHandler(expressionHandler);
         String expected = readFile(testName + expectedFileNameExtension);
         model.addFilter("markdown", new MarkdownFilter());
         model.addFilter("plain", new PlainFilter());

@@ -46,6 +46,9 @@ public class OriginalJade20150515Test {
         jade.setFilter("custom-filter", new CustomTestFilter());
         jade.setFilter("marked", new MarkdownFilter());
         jade.setFilter("verbatim", new VerbatimFilter());
+        jade.setFilter("js", new JsFilter());
+        jade.setFilter("css", new CssFilter());
+
         jade.setPrettyPrint(true);
         JadeTemplate template = jade.getTemplate(file);
         Writer writer = new StringWriter();

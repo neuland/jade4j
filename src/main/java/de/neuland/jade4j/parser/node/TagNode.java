@@ -26,6 +26,9 @@ public class TagNode extends AttrsNode {
     private boolean buffer = false;
     private ArrayList<String> classes = new ArrayList<String>();
 
+    public TagNode() {
+        this.block = new BlockNode();
+    }
 
     public void setTextOnly(boolean textOnly) {
         this.textOnly = textOnly;
