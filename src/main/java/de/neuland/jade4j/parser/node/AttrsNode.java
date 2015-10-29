@@ -57,14 +57,14 @@ public abstract class AttrsNode extends Node {
 	 * processing in the case of the "class" attribute.
 	 */
 	private void setAttribute(Map<String, Object> map, String key, Object newValue) {
-//		if ("class".equals(key) && attributes.containsKey(key)) {
-//			String value1 = attributeValueToString(attributes.get(key));
-//			String value2 = attributeValueToString(newValue);
-//			attributes.put(key, value1 + " " + value2);
-//
-//		} else {
+		if ("class".equals(key) && attributes.containsKey(key)) {
+			String value1 = attributeValueToString(attributes.get(key));
+			String value2 = attributeValueToString(newValue);
+			attributes.put(key, value1 + " " + value2);
+
+		} else {
 			attributes.put(key, newValue);
-//		}
+		}
 	}
 	private String attributeValueToString(Object value) {
 		if (value instanceof ExpressionString) {

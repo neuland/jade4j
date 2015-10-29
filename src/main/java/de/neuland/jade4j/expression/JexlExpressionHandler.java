@@ -14,7 +14,8 @@ import java.util.regex.Pattern;
 public class JexlExpressionHandler implements ExpressionHandler {
 
 	private static final int MAX_ENTRIES = 5000;
-	public static Pattern xx = Pattern.compile("([a-zA-Z0-9-_]*[a-zA-Z0-9])\\+\\+");
+	public static Pattern plusplus = Pattern.compile("([a-zA-Z0-9-_]*[a-zA-Z0-9])\\+\\+");
+	public static Pattern minusminus = Pattern.compile("([a-zA-Z0-9-_]*[a-zA-Z0-9])--");
 	private JexlEngine jexl;
 
 	public JexlExpressionHandler() {
@@ -35,10 +36,15 @@ public class JexlExpressionHandler implements ExpressionHandler {
 			if(expression.startsWith("var")){
 				expression = expression.substring(3);
 			}
-				Matcher matcher = xx.matcher(expression);
+				Matcher matcher = plusplus.matcher(expression);
 				if(matcher.find(0) && matcher.groupCount()==1) {
-					String a = matcher.group(0);
+					String a = matcher.group(1);
 					expression = a+" = "+a+" + 1";
+				}
+				matcher = minusminus.matcher(expression);
+				if(matcher.find(0) && matcher.groupCount()==1) {
+					String a = matcher.group(1);
+					expression = a+" = "+a+" - 1";
 				}
 				Expression e = jexl.createExpression(expression);
 				Object evaluate = e.evaluate(new MapContext(model));
