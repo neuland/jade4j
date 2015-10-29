@@ -523,29 +523,39 @@ public class Parser {
             Token incomingToken = peek();
             if (incomingToken instanceof CssId) {
                 Token tok = advance();
-                tagNode.setAttribute("id", tok.getValue());
+                tagNode.setAttribute("id", tok.getValue(),false);
                 continue;
             } else if (incomingToken instanceof CssClass) {
                 Token tok = advance();
-                tagNode.setAttribute("class", tok.getValue());
+                tagNode.setAttribute("class", tok.getValue(),false);
                 continue;
-            } else if (incomingToken instanceof Attribute) {
+            } else if (incomingToken instanceof AttributeList) {
                 if (seenAttrs) {
                     //console.warn(this.filename + ', line ' + this.peek().line + ':\nYou should not have jade tags with multiple attributes.');
                 }
                 seenAttrs = true;
-                Attribute tok = (Attribute) advance();
+                AttributeList tok = (AttributeList) advance();
                 Map<String, Object> attrs = tok.getAttributes();
-                tagNode.addAttributes(attrs);
                 tagNode.setSelfClosing(tok.isSelfClosing());
-                for (String s : attrs.keySet()) {
-                    Object o = attrs.get(s);
-                    tagNode.setAttribute(s,o);
+                for (String name : attrs.keySet()) {
+                    Object value = attrs.get(name);
+                    if(value instanceof ValueString) {
+                        ValueString valueString = (ValueString) value;
+                        tagNode.setAttribute(name, valueString.getValue(),valueString.isEscape());
+                    }else if(value instanceof ExpressionString) {
+                        ExpressionString expressionString = (ExpressionString) value;
+                        tagNode.setAttribute(name, value, expressionString.isEscape());
+                    }else if(value instanceof Boolean){
+                        tagNode.setAttribute(name, value, false);
+                    }else if(value instanceof String){
+                        tagNode.setAttribute(name, value, false);
+                    }
+
                 }
                 continue;
             } else if (incomingToken instanceof AttributesBlock) {
                 Token tok = this.advance();
-                tagNode.addAttribute(tok.getValue());
+                tagNode.addAttributes(tok.getValue());
                 break;
             } else {
                 break;
@@ -788,7 +798,7 @@ public class Parser {
     private Node parseFilter() {
         Token token = expect(Filter.class);
         Filter filterToken = (Filter) token;
-        Attribute attr = (Attribute) accept(Attribute.class);
+        AttributeList attr = (AttributeList) accept(AttributeList.class);
         lexer.setPipeless(true);
         Node tNode = parseTextBlock();
         lexer.setPipeless(false);
@@ -811,7 +821,7 @@ public class Parser {
     private Node parseASTFilter() {
         Token token = expect(Filter.class);
         Filter filterToken = (Filter) token;
-        Attribute attr = (Attribute) accept(Attribute.class);
+        AttributeList attr = (AttributeList) accept(AttributeList.class);
 
         token = expect(Colon.class);
 

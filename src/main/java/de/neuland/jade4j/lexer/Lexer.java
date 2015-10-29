@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.expression.ExpressionHandler;
-import de.neuland.jade4j.expression.JexlExpressionHandler;
 import de.neuland.jade4j.lexer.token.*;
 import de.neuland.jade4j.util.CharacterParser;
 import de.neuland.jade4j.util.Options;
@@ -907,7 +906,7 @@ public class Lexer {
         if ('(' == scanner.getInput().charAt(0)) {
             int index = this.bracketExpression().getEnd();
             String str = scanner.getInput().substring(1, index);
-            Attribute tok = new Attribute("attrs", getLineno());
+            AttributeList tok = new AttributeList("attrs", getLineno());
 
             assertNestingCorrect(str);
 

@@ -158,11 +158,18 @@ public class TagNode extends AttrsNode {
     private String attributes(JadeModel model, JadeTemplate template) {
         StringBuilder sb = new StringBuilder();
 
-        Map<String, Object> mergedAttributes = mergeInheritedAttributes(model);
-
-        for (Map.Entry<String, Object> entry : mergedAttributes.entrySet()) {
+//        Map<String, Object> mergedAttributes = attmergeInheritedAttributes(model);
+//        for (Map.Entry<String, Attr> entry : attributes.entrySet()) {
+//            try {
+//                sb.append(getAttributeString(entry.getKey(), entry.getValue(), model, template));
+//            } catch (ExpressionException e) {
+//                throw new JadeCompilerException(this, template.getTemplateLoader(), e);
+//            }
+//
+//        }
+        for (Attr attribute : attributes) {
             try {
-                sb.append(getAttributeString(entry.getKey(), entry.getValue(), model, template));
+                sb.append(getAttributeString(attribute.getName(), attribute.getValue(), model, template));
             } catch (ExpressionException e) {
                 throw new JadeCompilerException(this, template.getTemplateLoader(), e);
             }
@@ -170,7 +177,7 @@ public class TagNode extends AttrsNode {
         if(!classes.isEmpty()){
             sb.append(" ").append("class");
             sb.append("=").append('"');
-            sb.append(String.join(", ",classes));
+            sb.append(String.join(" ",classes));
             sb.append('"');
         }
         return sb.toString();
@@ -211,14 +218,15 @@ public class TagNode extends AttrsNode {
 //        }
 
         String value = null;
+        Object attributeValue = attribute;
         if("class".equals(key)) {
-            if (attribute instanceof ValueString) {
-                ValueString valueString = ((ValueString) attribute);
+            if (attributeValue instanceof ValueString) {
+                ValueString valueString = ((ValueString) attributeValue);
                 escaped = valueString.isEscape();
                 value = getInterpolatedAttributeValue(name, valueString.getValue(),escaped, model, template);
-            } else if (attribute instanceof ExpressionString) {
-                escaped = ((ExpressionString) attribute).isEscape();
-                Object expressionValue = evaluateExpression((ExpressionString) attribute, model,template.getExpressionHandler());
+            } else if (attributeValue instanceof ExpressionString) {
+                escaped = ((ExpressionString) attributeValue).isEscape();
+                Object expressionValue = evaluateExpression((ExpressionString) attributeValue, model,template.getExpressionHandler());
                 if (expressionValue != null && expressionValue.getClass().isArray()) {
                     StringBuffer s = new StringBuffer("");
                     boolean first = true;
@@ -239,8 +247,8 @@ public class TagNode extends AttrsNode {
                     }
                     value = s.toString();
                 }
-            } else if (attribute instanceof String) {
-                value = (String) attribute;
+            } else if (attributeValue instanceof String) {
+                value = (String) attributeValue;
 //            } else {
 //                return "";
             }
@@ -249,12 +257,12 @@ public class TagNode extends AttrsNode {
             return "";
 //        }else if("id".equals(key)){
 //            value = (String) attribute;
-        }else if (attribute instanceof ValueString) {
-            ValueString valueString = ((ValueString) attribute);
+        }else if (attributeValue instanceof ValueString) {
+            ValueString valueString = ((ValueString) attributeValue);
             escaped = valueString.isEscape();
             value = getInterpolatedAttributeValue(name, valueString.getValue(), escaped, model, template);
-        } else if (attribute instanceof Boolean) {
-            if ((Boolean) attribute) {
+        } else if (attributeValue instanceof Boolean) {
+            if ((Boolean) attributeValue) {
                 value = name;
             } else {
                 return "";
@@ -262,9 +270,9 @@ public class TagNode extends AttrsNode {
             if (template.isTerse()) {
                 value = null;
             }
-        } else if (attribute instanceof ExpressionString) {
-            escaped = ((ExpressionString) attribute).isEscape();
-            Object expressionValue = evaluateExpression((ExpressionString) attribute, model, template.getExpressionHandler());
+        } else if (attributeValue instanceof ExpressionString) {
+            escaped = ((ExpressionString) attributeValue).isEscape();
+            Object expressionValue = evaluateExpression((ExpressionString) attributeValue, model, template.getExpressionHandler());
             if (expressionValue == null) {
                 return "";
             }
@@ -282,8 +290,8 @@ public class TagNode extends AttrsNode {
                 value = expressionValue.toString();
                 value = StringEscapeUtils.escapeHtml4(value);
             }
-        } else if (attribute instanceof String) {
-            value = (String) attribute;
+        } else if (attributeValue instanceof String) {
+            value = (String) attributeValue;
 //        } else {
 //            return "";
         }
@@ -310,10 +318,10 @@ public class TagNode extends AttrsNode {
 
     private String getInterpolatedAttributeValue(String name, Object attribute, boolean escaped, JadeModel model, JadeTemplate template)
             throws JadeCompilerException {
-        if (!preparedAttributeValues.containsKey(name)) {
-            preparedAttributeValues.put(name, Utils.prepareInterpolate((String) attribute, escaped));
-        }
-        List<Object> prepared = preparedAttributeValues.get(name);
+//        if (!preparedAttributeValues.containsKey(name)) {
+//            preparedAttributeValues.put(name, Utils.prepareInterpolate((String) attribute, escaped));
+//        }
+        List<Object> prepared = Utils.prepareInterpolate((String) attribute, escaped);
         try {
             return Utils.interpolate(prepared, model,template.getExpressionHandler());
         } catch (ExpressionException e) {

@@ -6,10 +6,10 @@ import java.util.Map;
 import de.neuland.jade4j.parser.node.ExpressionString;
 import de.neuland.jade4j.parser.node.ValueString;
 
-public class Attribute extends Token {
+public class AttributeList extends Token {
 	private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
 
-	public Attribute(String value, int lineNumber) {
+	public AttributeList(String value, int lineNumber) {
 		super(value, lineNumber);
 	}
 

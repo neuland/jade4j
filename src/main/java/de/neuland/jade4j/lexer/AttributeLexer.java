@@ -3,7 +3,7 @@ package de.neuland.jade4j.lexer;
 import java.util.Deque;
 import java.util.LinkedList;
 
-import de.neuland.jade4j.lexer.token.Attribute;
+import de.neuland.jade4j.lexer.token.AttributeList;
 
 public class AttributeLexer {
 
@@ -18,7 +18,7 @@ public class AttributeLexer {
 
     private String key = "";
     private String value = "";
-    private Attribute token;
+    private AttributeList token;
     private Deque<State> states = new LinkedList<State>();
     private char quote = ' ';
 
@@ -26,8 +26,8 @@ public class AttributeLexer {
         states.add(State.KEY);
     }
 
-    public Attribute getToken(String input, int lineno) {
-        token = new Attribute(input, lineno);
+    public AttributeList getToken(String input, int lineno) {
+        token = new AttributeList(input, lineno);
         for (int i = 0; i < input.length(); i++) {
             parse(input.charAt(i));
         }

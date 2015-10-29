@@ -3,69 +3,37 @@ package de.neuland.jade4j.parser.node;
 import java.util.*;
 import java.util.Map.Entry;
 
+import de.neuland.jade4j.exceptions.JadeParserException;
 import de.neuland.jade4j.model.JadeModel;
 
 public abstract class AttrsNode extends Node {
 
-	protected Map<String, Object> attributes = new LinkedHashMap<String, Object>();
+	protected List<Attr> attributes = new LinkedList<Attr>();
 	protected List<String> attributeBlocks = new LinkedList<String>();
-	protected List attributeNames = new LinkedList<String>();
-	protected Map<String, List<Object>> preparedAttributeValues = new HashMap<String, List<Object>>();
-	protected boolean inheritsAttributes = false;
+	protected List<String> attributeNames = new LinkedList<String>();
 
-	public void setAttribute(String key, Object value) {
-		if ("attributes".equals(key)) {
-			inheritsAttributes = true;
+	public void setAttribute(String key, Object value, boolean escaped) {
+		if (!"class".equals(key) && this.attributeNames.indexOf(key) != -1) {
+			throw new Error("Duplicate attribute '" + key + "' is not allowed.");
 		} else {
-			setAttribute(attributes, key, value);
+			this.attributeNames.add(key);
+			Attr attr = new Attr();
+			attr.setName(key);
+			attr.setValue(value);
+			attr.setEscaped(escaped);
+			this.attributes.add(attr);
 		}
 	}
 
 	public String getAttribute(String key) {
-		return (String) attributes.get(key);
-	}
-
-	public void addAttributes(Map<String, Object> attributeMap) {
-		for (String key : attributeMap.keySet()) {
-			setAttribute(key, attributeMap.get(key));
-		}
-	}
-
-	public Map<String, Object> getAttributes() {
-		return attributes;
-	}
-
-	protected Map<String, Object> mergeInheritedAttributes(JadeModel model) {
-		Map<String, Object> mergedAttributes = this.attributes;
-
-		if (inheritsAttributes) {
-			Object o = model.get("attributes");
-			if (o != null && o instanceof Map) {
-				@SuppressWarnings("unchecked")
-				Map<String, Object> inheritedAttributes = (Map<String, Object>) o;
-
-				for (Entry<String, Object> entry : inheritedAttributes.entrySet()) {
-					setAttribute(mergedAttributes, (String) entry.getKey(), entry.getValue());
-				}
+		for (int i = 0, len = this.attributes.size(); i < len; ++i) {
+			if (this.attributes.get(i) != null && this.attributes.get(i).getName().equals(name)) {
+				return attributeValueToString(this.attributes.get(i).getValue());
 			}
 		}
-		return mergedAttributes;
+		return null;
 	}
 
-	/**
-	 * Puts the specified key-value pair in the specified map. Provides special
-	 * processing in the case of the "class" attribute.
-	 */
-	private void setAttribute(Map<String, Object> map, String key, Object newValue) {
-		if ("class".equals(key) && attributes.containsKey(key)) {
-			String value1 = attributeValueToString(attributes.get(key));
-			String value2 = attributeValueToString(newValue);
-			attributes.put(key, value1 + " " + value2);
-
-		} else {
-			attributes.put(key, newValue);
-		}
-	}
 	private String attributeValueToString(Object value) {
 		if (value instanceof ExpressionString) {
 			String expression = ((ExpressionString) value).getValue();
@@ -74,21 +42,18 @@ public abstract class AttrsNode extends Node {
 		return value.toString();
 	}
 
-	@Override
-	public AttrsNode clone() throws CloneNotSupportedException {
-		AttrsNode clone = (AttrsNode) super.clone();
-
-        // shallow copy
-		if (this.attributes != null) {
-			clone.attributes = new LinkedHashMap<String, Object>(this.attributes);
-		}
-
-		// clear prepared attribute values, will be rebuilt on execute
-		clone.preparedAttributeValues = new HashMap<String, List<Object>>();
-
-		return clone;
-	}
-	public void addAttribute(String src){
+//	@Override
+//	public AttrsNode clone() throws CloneNotSupportedException {
+//		AttrsNode clone = (AttrsNode) super.clone();
+//
+//        // shallow copy
+//		if (this.attributes != null) {
+//			clone.attributes = new LinkedHashMap<String, Object>(this.attributes);
+//		}
+//
+//		return clone;
+//	}
+	public void addAttributes(String src){
 		this.attributeBlocks.add(src);
 	}
 }
