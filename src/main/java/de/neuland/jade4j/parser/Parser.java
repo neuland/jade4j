@@ -311,36 +311,42 @@ public class Parser {
         Token token = expect(Include.class);
         Include includeToken = (Include) token;
         String templateName = includeToken.getValue().trim();
+        String path = resolvePath(templateName);
 
-        String extension = FilenameUtils.getExtension(templateName);
-        if (!"".equals(extension) && !"jade".equals(extension)) {
-            try {
-                if(includeToken.getFilter()!=null) {
-                    Reader reader = templateLoader.getReader(resolvePath(templateName));
-                    FilterNode node = new FilterNode();
-                    node.setValue(includeToken.getFilter());
-                    node.setLineNumber(line());
-                    node.setFileName(filename);
-                    TextNode text = new TextNode();
-                    text.setValue(IOUtils.toString(reader));
-                    BlockNode block = new BlockNode();
-                    LinkedList<Node> nodes = new LinkedList<Node>();
-                    nodes.add(text);
-                    block.setNodes(nodes);
-                    if(block!=null)
-                        node.setTextBlock(block);
-                    else{
-                        node.setTextBlock(new BlockNode());
-                    }
-                    return node;
-                }else{
-                    Reader reader = templateLoader.getReader(resolvePath(templateName));
-                    LiteralNode node = new LiteralNode();
-                    node.setLineNumber(lexer.getLineno());
-                    node.setFileName(filename);
-                    node.setValue(IOUtils.toString(reader));
-                    return node;
+        try {
+            if(includeToken.getFilter()!=null) {
+                Reader reader = templateLoader.getReader(path);
+                FilterNode node = new FilterNode();
+                node.setValue(includeToken.getFilter());
+                node.setLineNumber(line());
+                node.setFileName(filename);
+                TextNode text = new TextNode();
+                text.setValue(IOUtils.toString(reader));
+                BlockNode block = new BlockNode();
+                LinkedList<Node> nodes = new LinkedList<Node>();
+                nodes.add(text);
+                block.setNodes(nodes);
+                if(block!=null)
+                    node.setTextBlock(block);
+                else{
+                    node.setTextBlock(new BlockNode());
                 }
+                return node;
+            }
+        } catch (IOException e) {
+            throw new JadeParserException(filename, lexer.getLineno(), templateLoader, "the included file [" + templateName + "] could not be opened\n" + e.getMessage());
+        }
+
+        // non-jade
+        String extension = FilenameUtils.getExtension(path);
+        if (!"jade".equals(extension)) {
+            try {
+                Reader reader = templateLoader.getReader(path);
+                LiteralNode node = new LiteralNode();
+                node.setLineNumber(lexer.getLineno());
+                node.setFileName(filename);
+                node.setValue(IOUtils.toString(reader));
+                return node;
             } catch (IOException e) {
                 throw new JadeParserException(filename, lexer.getLineno(), templateLoader, "the included file [" + templateName + "] could not be opened\n" + e.getMessage());
             }
@@ -348,6 +354,7 @@ public class Parser {
 
         Parser parser = createParser(templateName);
         parser.setBlocks(blocks);
+
         contexts.push(parser);
         Node ast = parser.parse();
         contexts.pop();
@@ -395,7 +402,10 @@ public class Parser {
     private String resolvePath(String templateName) {
         URI currentUri = URI.create(filename);
         URI templateUri = currentUri.resolve(templateName);
-        return templateUri.toString();
+        String path = templateUri.toString();
+        if(templateName.indexOf(".") == -1)
+            path += ".jade";
+        return path;
     }
 
     private BlockNode parseYield() {
