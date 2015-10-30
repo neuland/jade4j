@@ -27,7 +27,7 @@ public class Parser {
 
     public static final Pattern FILE_EXTENSION_PATTERN = Pattern.compile(".*\\.\\w+$");
     private Lexer lexer;
-    private Map<String, Node> blocks = new LinkedHashMap<String, Node>();
+    private LinkedHashMap<String, BlockNode> blocks = new LinkedHashMap<String,BlockNode>();
     private String[] textOnlyTags = {"script", "style"};
     private Integer _spaces = null;
     private final TemplateLoader templateLoader;
@@ -38,6 +38,7 @@ public class Parser {
     private CharacterParser characterParser;
     private int inMixin = 0;
     private HashMap mixins = new HashMap<String,MixinNode>();
+    private int inBlock = 0;
 
     public Parser(String filename, TemplateLoader templateLoader,ExpressionHandler expressionHandler) throws IOException {
         this.filename = filename;
@@ -244,26 +245,45 @@ public class Parser {
         lexer.defer(tok);
         return parseExpr();
     }
-
     private Node parseBlock() {
         Token token = expect(Block.class);
         Block block = (Block) token;
         String mode = block.getMode();
         String name = block.getValue().trim();
 
-        Node blockNode;
+        this.inBlock++;
+        BlockNode blockNode;
         if (peek() instanceof Indent) {
             blockNode = block();
         } else {
             blockNode = new BlockNode();
             blockNode.setLineNumber(block.getLineNumber());
             blockNode.setFileName(filename);
+            LiteralNode node = new LiteralNode();
+            node.setValue("");
+            blockNode.push(node);
         }
+        this.inBlock--;
+        blockNode.setName(name);
+        blockNode.setLineNumber(line());
+
+        BlockNode prev;
+        if(this.blocks.get(name)==null)
+            prev = new BlockNode();
+        else
+            prev = this.blocks.get(name);
+
+
+        if ("replace".equals(prev.getMode())) {
+            this.blocks.put(name, prev);
+            return prev;
+        }
+
+
 
         ((BlockNode) blockNode).setMode(mode);
 
         if (blocks.containsKey(name)) {
-            BlockNode prev = (BlockNode) blocks.get(name);
             if ("append".equals(prev.getMode())) {
                 blockNode.getNodes().addAll(prev.getNodes());
             }
@@ -380,7 +400,7 @@ public class Parser {
 
     private BlockNode parseYield() {
         advance();
-        BlockNode block = (BlockNode) new BlockNode();
+        BlockNode block = new BlockNode();
         block.setLineNumber(lexer.getLineno());
         block.setFileName(filename);
         block.setYield(true);
@@ -954,11 +974,11 @@ public class Parser {
         }
     }
 
-    public Map<String, Node> getBlocks() {
+    public Map<String, BlockNode> getBlocks() {
         return blocks;
     }
 
-    public void setBlocks(Map<String, Node> blocks) {
+    public void setBlocks(LinkedHashMap<String, BlockNode> blocks) {
         this.blocks = blocks;
     }
 
