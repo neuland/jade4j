@@ -13,14 +13,25 @@ import de.neuland.jade4j.template.JadeTemplate;
 public class CaseNode extends Node {
 
     private List<CaseConditionNode> caseConditionNodes = new LinkedList<CaseConditionNode>();
-
+	public static class When extends Node {
+		@Override
+		public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
+			block.execute(writer, model, template);
+		}
+	}
 	@Override
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
 		try {
-			for (CaseConditionNode caseConditionNode : caseConditionNodes) {
-				if (caseConditionNode.isDefault() || checkCondition(model, caseConditionNode,template.getExpressionHandler())) {
-					caseConditionNode.execute(writer, model, template);
-					break;
+			boolean skip = false;
+			for (Node when : block.getNodes()) {
+				if (skip || checkCondition(model, when,template.getExpressionHandler()) || "default".equals(when.getValue())) {
+					skip = false;
+					if(when.getBlock()!=null) {
+						when.execute(writer, model, template);
+						break;
+					}else {
+						skip = true;
+					}
 				}
 			}
 		} catch (ExpressionException e) {

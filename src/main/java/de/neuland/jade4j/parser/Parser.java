@@ -725,16 +725,95 @@ public class Parser {
 
         return conditional;
     }
+//    var block = new nodes.Block;
+//    block.line = this.line();
+//    block.filename = this.filename;
+//    this.expect('indent');
+//    while ('outdent' != this.peek().type) {
+//      switch (this.peek().type) {
+//        case 'comment':
+//        case 'newline':
+//          this.advance();
+//          break;
+//        case 'when':
+//          block.push(this.parseWhen());
+//          break;
+//        case 'default':
+//          block.push(this.parseDefault());
+//          break;
+//        default:
+//          throw new Error('Unexpected token "' + this.peek().type
+//                          + '", expected "when", "default" or "newline"');
+//      }
+//    }
+//    this.expect('outdent');
+//
+//    node.block = block;
+//
+//    return node;
+    private Node parseBlockExpansion(){
+      if (this.peek() instanceof Colon) {
+        this.advance();
+          BlockNode blockNode = new BlockNode();
+          blockNode.push(this.parseExpr());
+          return blockNode;
+      } else {
+        return this.block();
+      }
+    }
 
     private Node parseCase() {
-        Token token = expect(CaseToken.class);
-        CaseToken caseToken = (CaseToken) token;
-        CaseNode node = new CaseNode();
-        node.setLineNumber(caseToken.getLineNumber());
-        node.setFileName(filename);
-        node.setValue(caseToken.getValue());
-        node.setConditions(whenBlock());
+        String val = expect(CaseToken.class).getValue();
+        Node node = new CaseNode();
+        node.setValue(val);
+        node.setLineNumber(line());
+
+        Node block = new BlockNode();
+        block.setLineNumber(line());
+        block.setFileName(filename);
+        expect(Indent.class);
+        while (!(peek() instanceof Outdent)) {
+            if (peek() instanceof Comment) {
+                advance();
+            } else if (peek() instanceof Newline) {
+                advance();
+            } else if (peek() instanceof When) {
+                block.push(parseWhen());
+            } else if (peek() instanceof Default) {
+                block.push(parseDefault());
+            } else {
+                throw new JadeParserException(filename,lexer.getLineno(),templateLoader,"Unexpected token \"" + this.peek() + "\", expected \"when\", \"default\" or \"newline\"");
+            }
+        }
+        expect(Outdent.class);
+        node.setBlock(block);
         return node;
+    }
+    /**
+     * when
+     */
+
+    private Node parseWhen(){
+      String val = this.expect(When.class).getValue();
+        CaseNode.When when = new CaseNode.When();
+        when.setValue(val);
+        if (!(this.peek() instanceof Newline)) {
+          when.setBlock(this.parseBlockExpansion());
+        }
+        return when;
+
+    }
+
+    /**
+     * default
+     */
+
+    private Node parseDefault(){
+        expect(Default.class);
+        Node when = new CaseNode.When();
+        when.setValue("default");
+        when.setBlock(this.parseBlockExpansion());
+        return when;
     }
 
     private CaseConditionNode parseCaseCondition() {
