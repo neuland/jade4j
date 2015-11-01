@@ -14,7 +14,7 @@ public class Scanner {
     public Scanner(Reader reader) {
     	initFromReader(reader);
     }
-    
+
     public void consume(int length) {
         input = input.substring(length);
     }
@@ -34,9 +34,14 @@ public class Scanner {
             StringBuilder sb = new StringBuilder();
             BufferedReader in = new BufferedReader(reader);
             String s = in.readLine();
+            // Compile RegEx pattern
+            // Checks to see if "- var" or "-" are found in a given string
+            Pattern pattern = Pattern.compile("(^\\s*)(-\\s*(var)?\\s*)", Pattern.MULTILINE);
             while (s != null) {
                 if (StringUtils.isNotBlank(s)) {
-                    sb.append(s);
+                    // Find "- var" or "-" statements and remove them
+                    String matchedStr = pattern.matcher(s).replaceAll("$1");
+                    sb.append(matchedStr);
                 }
                 sb.append("\n");
                 s = in.readLine();
@@ -52,7 +57,7 @@ public class Scanner {
         }
     }
 
-    
+
     public char charAt(int i) {
         return input.charAt(i);
     }
