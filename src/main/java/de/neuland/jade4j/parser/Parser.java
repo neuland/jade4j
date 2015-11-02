@@ -314,7 +314,7 @@ public class Parser {
         String path = resolvePath(templateName);
 
         try {
-            if(includeToken.getFilter()!=null) {
+            if (includeToken.getFilter() != null) {
                 Reader reader = templateLoader.getReader(path);
                 FilterNode node = new FilterNode();
                 node.setValue(includeToken.getFilter());
@@ -326,9 +326,9 @@ public class Parser {
                 LinkedList<Node> nodes = new LinkedList<Node>();
                 nodes.add(text);
                 block.setNodes(nodes);
-                if(block!=null)
+                if (block != null)
                     node.setTextBlock(block);
-                else{
+                else {
                     node.setTextBlock(new BlockNode());
                 }
                 return node;
@@ -354,12 +354,12 @@ public class Parser {
 
         Parser parser = createParser(templateName);
         parser.setBlocks(blocks);
-
+        parser.setMixins(mixins);
         contexts.push(parser);
         Node ast = parser.parse();
         contexts.pop();
 
-        if (peek() instanceof Indent && ast instanceof BlockNode) {
+        if (peek() instanceof Indent) {
             ((BlockNode) ast).getIncludeBlock().push(block());
         }
 
@@ -998,5 +998,9 @@ public class Parser {
 
     public void setContexts(LinkedList<Parser> contexts) {
         this.contexts = contexts;
+    }
+
+    public void setMixins(HashMap mixins) {
+        this.mixins = mixins;
     }
 }

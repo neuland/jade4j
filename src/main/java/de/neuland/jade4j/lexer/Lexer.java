@@ -284,7 +284,12 @@ public class Lexer {
         char end = closingBrackets.get(start);
         Options options = new Options();
         options.setStart(skip+1);
-        CharacterParser.Match range = characterParser.parseMax(scanner.getInput(),options);
+        CharacterParser.Match range;
+        try {
+            range = characterParser.parseMax(scanner.getInput(), options);
+        }catch(Error error){
+            throw new JadeLexerException(error.getMessage(), filename, getLineno(), templateLoader);
+        }
         if(scanner.getInput().charAt(range.getEnd()) != end)
             throw new JadeLexerException("start character " + start + " does not match end character " + scanner.getInput().charAt(range.getEnd()), filename, getLineno(), templateLoader);
         return range;

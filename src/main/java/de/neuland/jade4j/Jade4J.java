@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.Map;
 
 import de.neuland.jade4j.exceptions.JadeCompilerException;
+import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.expression.JexlExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.parser.Parser;
@@ -91,10 +92,11 @@ public class Jade4J {
 		return createTemplate(name, new ReaderTemplateLoader(reader, name), new JexlExpressionHandler());
 	}
 
-	private static JadeTemplate createTemplate(String filename, TemplateLoader loader, JexlExpressionHandler jexlExpressionHandler) throws IOException {
-		Parser parser = new Parser(filename, loader,jexlExpressionHandler);
+	private static JadeTemplate createTemplate(String filename, TemplateLoader loader, ExpressionHandler expressionHandler) throws IOException {
+		Parser parser = new Parser(filename, loader,expressionHandler);
 		Node root = parser.parse();
 		JadeTemplate template = new JadeTemplate();
+		template.setExpressionHandler(expressionHandler);
 		template.setTemplateLoader(loader);
 		template.setRootNode(root);
 		return template;

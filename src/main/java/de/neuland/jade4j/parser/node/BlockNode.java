@@ -50,21 +50,25 @@ public class BlockNode extends Node {
 	}
 
 	public BlockNode getIncludeBlock() {
+		BlockNode ret = null;
 		for (Node node : getNodes()) {
 			if (node instanceof BlockNode && ((BlockNode) node).isYield()) {
 				return (BlockNode) node;
 			}
-			if (node instanceof TagNode && ((TagNode) node).isTextOnly()) {
+			else if (node instanceof TagNode && ((TagNode) node).isTextOnly()) {
 				continue;
 			}
-			if (node instanceof BlockNode && ((BlockNode) node).getIncludeBlock() != null) {
-				return ((BlockNode) node).getIncludeBlock();
+			else if (node instanceof BlockNode && ((BlockNode) node).getIncludeBlock() != null) {
+				ret =  ((BlockNode) node).getIncludeBlock();
 			}
-			if (node.hasBlock() && node.getBlock() instanceof BlockNode) {
-				return ((BlockNode) node.getBlock()).getIncludeBlock();
+			else if (node.hasBlock() && node.getBlock() instanceof BlockNode) {
+				ret =  ((BlockNode) node.getBlock()).getIncludeBlock();
+			}
+			if(ret instanceof BlockNode && ((BlockNode) ret).isYield()){
+				return ret;
 			}
 		}
-		return this;
+		return ret;
 	}
 
 	public String getMode() {
