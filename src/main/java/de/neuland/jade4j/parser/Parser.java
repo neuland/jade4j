@@ -625,8 +625,8 @@ public class Parser {
             tagNode.setBlock(block);
         }else if(peek() instanceof Indent){
             BlockNode block = block();
-            if(!tagNode.hasBlock())
-                tagNode.setBlock(new BlockNode());
+//            if(!tagNode.hasBlock())
+//                tagNode.setBlock(new BlockNode());
             for (int i = 0, len = block.getNodes().size(); i < len; ++i) {
                 tagNode.getBlock().push(block.getNodes().get(i));
             }

@@ -1094,14 +1094,17 @@ public class Lexer {
         if (matcher.find(0) && matcher.groupCount() > 0) {
             Token tok;
             int indents = matcher.group(1).length();
-            if (lastIndents <= 0 && indents > 0)
-                lastIndents = indents;
             lineno++;
             consume(indents + 1);
 
-            if ((indents > 0 && lastIndents > 0 && indents % lastIndents != 0) || scanner.isIntendantionViolated()) {
-                throw new JadeLexerException("invalid indentation; expecting " + indents + " " + indentType, filename, getLineno(), templateLoader);
+            if(scanner.getInput().length() > 0  && (scanner.getInput().charAt(0) == ' ' || scanner.getInput().charAt(0) == '\t')){
+                throw new JadeLexerException("Invalid indentation, you can use tabs or spaces but not both", filename, getLineno(), templateLoader);
             }
+//            if (lastIndents <= 0 && indents > 0)
+//                lastIndents = indents;
+//            if ((indents > 0 && lastIndents > 0 && indents % lastIndents != 0) || scanner.isIntendantionViolated()) {
+//                throw new JadeLexerException("invalid indentation; expecting " + indents + " " + indentType, filename, getLineno(), templateLoader);
+//            }
 
             // blank line
             if (scanner.isBlankLine()) {
