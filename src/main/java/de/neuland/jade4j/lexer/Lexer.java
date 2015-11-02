@@ -589,7 +589,7 @@ public class Lexer {
             int end = matcher.end();
             consume(end);
             String name = matcher.group(1);
-            if(name != null && name.trim() == "5")
+            if(name != null && "5".equals(name.trim()))
                 throw new JadeLexerException("`doctype 5` is deprecated, you must now use `doctype html`", filename, getLineno(), templateLoader);
             return new Doctype(name, lineno);
         }

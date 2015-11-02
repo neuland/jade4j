@@ -27,7 +27,7 @@ public class OriginalJadeTest {
     private static String[] ignoredCases = new String[]{"attrs", "attrs.js", "code.conditionals", "code.iteration", "comments",
             "escape-chars", "filters.coffeescript", "filters.less", "filters.markdown", "filters.stylus", "html", "include-only-text-body",
             "include-only-text", "include-with-text-head", "include-with-text", "mixin.blocks", "mixin.merge", "quotes", "script.whitespace", "scripts", "scripts.non-js",
-            "source", "styles", "template", "text-block", "text", "vars", "yield-title", "doctype.default"};
+            "source", "styles", "template", "text-block", "text", "vars", "yield-title", "doctype.default","comments.conditional","html5"};
 
     private File file;
 
