@@ -805,19 +805,39 @@ public class Lexer {
     }
 
     private Token call() {
-        Matcher matcher = scanner.getMatcherForPattern("^\\+([-\\w]+)");
-        if (matcher.find(0) && matcher.groupCount() > 0) {
-            Call tok = new Call(matcher.group(1), lineno);
-            consume(matcher.end());
-
-            matcher = scanner.getMatcherForPattern("^ *\\((.*?)\\)");
-
-            if (matcher.find(0) && matcher.groupCount() > 0) {
-                // verify group does not contain attributes
-                Matcher attributeMatcher = Pattern.compile("^ *[-\\w]+ *=").matcher(matcher.group(1));
-                if (!attributeMatcher.find(0)) {
-                    tok.setArguments(matcher.group(1));
-                    consume(matcher.end());
+        Call tok;
+        Matcher matcher = scanner.getMatcherForPattern("^\\+(\\s*)(([-\\w]+)|(#\\{))");
+        if (matcher.find(0) && matcher.groupCount() > 3) {
+            // try to consume simple or interpolated call
+            if(matcher.group(3)!=null) {
+                // simple call
+                consume(matcher.end());
+                tok = new Call(matcher.group(3), lineno);
+            }else{
+                // interpolated call
+                CharacterParser.Match match = this.bracketExpression(2 + matcher.group(1).length());
+                this.consume(match.getEnd() + 1);
+                try {
+                    expressionHandler.assertExpression(match.getSrc());
+                } catch (ExpressionException e) {
+                    e.printStackTrace();
+                }
+                tok = new Call("#{"+match.getSrc()+"}", lineno);
+            }
+            matcher = scanner.getMatcherForPattern("^ *\\(");
+            if (matcher.find(0)) {
+                CharacterParser.Match range = this.bracketExpression(matcher.group(0).length() - 1);
+                matcher = Pattern.compile("^\\s*[-\\w]+ *=").matcher(range.getSrc());
+                if (!matcher.find(0)) { // not attributes
+                    this.consume(range.getEnd() + 1);
+                    tok.setArguments(range.getSrc());
+                }
+                if (tok.getArguments()!=null) {
+                    try {
+                        expressionHandler.assertExpression("[" + tok.getArguments() + "]");
+                    } catch (ExpressionException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             return tok;

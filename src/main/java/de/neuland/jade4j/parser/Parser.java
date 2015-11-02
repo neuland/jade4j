@@ -227,13 +227,14 @@ public class Parser {
         mixin.setName(callToken.getValue());
         mixin.setLineNumber(callToken.getLineNumber());
         mixin.setFileName(filename);
+        mixin.setCall(true);
 
         if (StringUtils.isNotBlank(callToken.getArguments())) {
             mixin.setArguments(callToken.getArguments());
         }
-//        this.tag(mixin);
+        this.tag(mixin);
 //        if(mixin.)
-        if(mixin.hasBlock()&&!mixin.getBlock().hasNodes())
+        if(mixin.hasBlock() && mixin.getBlock().getNodes().isEmpty())
             mixin.setBlock(null);
         return mixin;
     }
@@ -279,8 +280,6 @@ public class Parser {
             return prev;
         }
 
-
-
         ((BlockNode) blockNode).setMode(mode);
 
         if (blocks.containsKey(name)) {
@@ -301,7 +300,7 @@ public class Parser {
 
     private Node parseMixinBlock(){
         Token tok = expect(MixinBlock.class);
-        if(this.inMixin != 0){
+        if(this.inMixin == 0){
             throw new JadeParserException(filename, lexer.getLineno(), templateLoader, "Anonymous blocks are not allowed unless they are part of a mixin.");
         }
         return new MixinBlockNode();
@@ -359,7 +358,7 @@ public class Parser {
         Node ast = parser.parse();
         contexts.pop();
 
-        if (peek() instanceof Indent) {
+        if (peek() instanceof Indent && ast != null) {
             ((BlockNode) ast).getIncludeBlock().push(block());
         }
 
@@ -546,7 +545,7 @@ public class Parser {
         return this.tag(tagNode);
     }
 
-    private Node tag(TagNode tagNode){
+    private Node tag(AttrsNode tagNode){
         // ast-filter look-ahead
         boolean seenAttrs = false;
         while (true) {

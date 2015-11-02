@@ -11,6 +11,9 @@ public abstract class AttrsNode extends Node {
 	protected List<Attr> attributes = new LinkedList<Attr>();
 	protected List<String> attributeBlocks = new LinkedList<String>();
 	protected List<String> attributeNames = new LinkedList<String>();
+	protected boolean selfClosing = false;
+	protected Node codeNode;
+	private boolean textOnly;
 
 	public void setAttribute(String key, Object value, boolean escaped) {
 		if (!"class".equals(key) && this.attributeNames.indexOf(key) != -1) {
@@ -56,4 +59,29 @@ public abstract class AttrsNode extends Node {
 	public void addAttributes(String src){
 		this.attributeBlocks.add(src);
 	}
+
+	public void setSelfClosing(boolean selfClosing) {
+        this.selfClosing = selfClosing;
+    }
+
+	public boolean isSelfClosing() {
+        return selfClosing;
+    }
+
+	public void setTextOnly(boolean textOnly) {
+        this.textOnly = textOnly;
+
+    }
+
+	public boolean isTextOnly() {
+        return this.textOnly;
+    }
+
+	public void setCodeNode(Node codeNode) {
+        this.codeNode = codeNode;
+    }
+
+	public boolean hasCodeNode() {
+        return codeNode != null;
+    }
 }

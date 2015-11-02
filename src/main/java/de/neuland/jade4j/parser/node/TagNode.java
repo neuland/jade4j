@@ -17,12 +17,9 @@ import java.util.List;
 import java.util.Map;
 
 public class TagNode extends AttrsNode {
-    private boolean textOnly;
     private Node textNode;
-    private Node codeNode;
     private static final String[] selfClosingTags = {"area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"};
     private static final String[] inlineTags = { "a", "abbr", "acronym", "b", "br", "code", "em", "font", "i", "img", "ins", "kbd", "map", "samp", "small", "span", "strong", "sub", "sup"};
-    private boolean selfClosing = false;
     private boolean buffer = false;
     private ArrayList<String> classes = new ArrayList<String>();
 
@@ -30,21 +27,8 @@ public class TagNode extends AttrsNode {
         this.block = new BlockNode();
     }
 
-    public void setTextOnly(boolean textOnly) {
-        this.textOnly = textOnly;
-
-    }
-
     public void setTextNode(Node textNode) {
         this.textNode = textNode;
-    }
-
-    public void setCodeNode(Node codeNode) {
-        this.codeNode = codeNode;
-    }
-
-    public boolean isTextOnly() {
-        return this.textOnly;
     }
 
     public Node getTextNode() {
@@ -55,9 +39,6 @@ public class TagNode extends AttrsNode {
         return textNode != null;
     }
 
-    public boolean hasCodeNode() {
-        return codeNode != null;
-    }
     public boolean isInline(){
         return ArrayUtils.indexOf(inlineTags,this.name) > -1;
     }
@@ -106,7 +87,7 @@ public class TagNode extends AttrsNode {
         if(writer.isPp() && !isInline()){
             writer.prettyIndent(0,true);
         }
-        if (selfClosing || isSelfClosing(template)) {
+        if (isSelfClosing() || isSelfClosing(template)) {
             writer.append("<");
             writer.append(name);
             writer.append(attributes(model, template));
@@ -321,14 +302,6 @@ public class TagNode extends AttrsNode {
         } catch (ExpressionException e) {
             throw new JadeCompilerException(this, template.getTemplateLoader(), e);
         }
-    }
-
-    public void setSelfClosing(boolean selfClosing) {
-        this.selfClosing = selfClosing;
-    }
-
-    public boolean isSelfClosing() {
-        return selfClosing;
     }
 
     public boolean isBuffer() {

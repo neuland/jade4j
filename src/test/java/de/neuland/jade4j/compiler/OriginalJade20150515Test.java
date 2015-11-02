@@ -48,6 +48,7 @@ public class OriginalJade20150515Test {
         jade.setFilter("verbatim", new VerbatimFilter());
         jade.setFilter("js", new JsFilter());
         jade.setFilter("css", new CssFilter());
+//        jade.setFilter("coffee-script", new CoffeeScriptFilter());
 
         jade.setPrettyPrint(true);
         JadeTemplate template = jade.getTemplate(file);
