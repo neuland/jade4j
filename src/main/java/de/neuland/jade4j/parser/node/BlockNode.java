@@ -61,7 +61,7 @@ public class BlockNode extends Node {
 			else if (node instanceof BlockNode && ((BlockNode) node).getIncludeBlock() != null) {
 				ret =  ((BlockNode) node).getIncludeBlock();
 			}
-			else if (node.hasBlock() && node.getBlock() instanceof BlockNode) {
+			else if (node.hasBlock()) {
 				ret =  ((BlockNode) node.getBlock()).getIncludeBlock();
 			}
 			if(ret instanceof BlockNode && ((BlockNode) ret).isYield()){

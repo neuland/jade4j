@@ -422,7 +422,6 @@ public class Parser {
         tagNode.setLineNumber(lexer.getLineno());
         tagNode.setFileName(filename);
         tagNode.setName(name);
-        tagNode.setValue(name);
         tagNode.setBuffer(true);
         return this.tag(tagNode);
     }

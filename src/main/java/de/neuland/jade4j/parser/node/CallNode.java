@@ -1,8 +1,10 @@
 package de.neuland.jade4j.parser.node;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
+import com.sun.deploy.util.StringUtils;
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
@@ -11,7 +13,7 @@ import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.util.ArgumentSplitter;
 
-public class MixinInjectNode extends AttrsNode {
+public class CallNode extends AttrsNode {
 
 	protected List<String> arguments = new ArrayList<String>();
 	boolean call = false;
@@ -57,7 +59,7 @@ public class MixinInjectNode extends AttrsNode {
 		if (hasBlock()) {
 			List<BlockNode> injectionPoints = getInjectionPoints(mixin.getBlock());
             for (BlockNode point : injectionPoints) {
-                point.getNodes().add(block);
+				point.getNodes().add(block);
             }
 		}
 
@@ -117,7 +119,19 @@ public class MixinInjectNode extends AttrsNode {
 
 	private void writeAttributes(JadeModel model, MixinNode mixin, JadeTemplate template) {
 //		model.put("attributes", mergeInheritedAttributes(model));
-		model.put("attributes", "Test");
+//		model.put("attributes", getArguments());
+		if (attributeBlocks.size()>0) {
+    		if (attributes.size()>0) {
+				LinkedHashMap<String,String> attrs = attrs(model, template);
+      			String val = this.attributes(model, template);
+      			attributeBlocks.push(val);
+    		}
+			model.put("attributes", StringUtils.join(attributeBlocks, ","));
+  		} else if (attributes.size()>0) {
+			LinkedHashMap<String,String> attrs = attrs(model, template);
+			model.put("attributes", attrs);
+  		}
+
 	}
 
 	public List<String> getArguments() {

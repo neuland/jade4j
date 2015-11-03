@@ -14,14 +14,12 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class TagNode extends AttrsNode {
     private Node textNode;
     private static final String[] selfClosingTags = {"area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"};
     private static final String[] inlineTags = { "a", "abbr", "acronym", "b", "br", "code", "em", "font", "i", "img", "ins", "kbd", "map", "samp", "small", "span", "strong", "sub", "sup"};
     private boolean buffer = false;
-    private ArrayList<String> classes = new ArrayList<String>();
 
     public TagNode() {
         this.block = new BlockNode();
@@ -89,7 +87,7 @@ public class TagNode extends AttrsNode {
         }
         if (isSelfClosing() || isSelfClosing(template)) {
             writer.append("<");
-            writer.append(name);
+            writer.append(bufferName(template, model));
             writer.append(attributes(model, template));
             if (isTerse(template)) {
                 writer.append(">");
@@ -102,7 +100,7 @@ public class TagNode extends AttrsNode {
 
         }else {
             writer.append("<");
-            writer.append(name);
+            writer.append(bufferName(template, model));
             writer.append(attributes(model, template));
             writer.append(">");
             if (hasCodeNode()) {
@@ -116,7 +114,7 @@ public class TagNode extends AttrsNode {
                 writer.prettyIndent(0, true);
             }
             writer.append("</");
-            writer.append(name);
+            writer.append(bufferName(template,model));
             writer.append(">");
 
         }
@@ -136,172 +134,17 @@ public class TagNode extends AttrsNode {
         return !template.isXml() && ArrayUtils.contains(selfClosingTags, name);
     }
 
-    private String attributes(JadeModel model, JadeTemplate template) {
-        StringBuilder sb = new StringBuilder();
-
-//        Map<String, Object> mergedAttributes = attmergeInheritedAttributes(model);
-//        for (Map.Entry<String, Attr> entry : attributes.entrySet()) {
-//            try {
-//                sb.append(getAttributeString(entry.getKey(), entry.getValue(), model, template));
-//            } catch (ExpressionException e) {
-//                throw new JadeCompilerException(this, template.getTemplateLoader(), e);
-//            }
-//
-//        }
-        for (Attr attribute : attributes) {
-            try {
-                sb.append(getAttributeString(attribute.getName(), attribute, model, template));
-            } catch (ExpressionException e) {
-                throw new JadeCompilerException(this, template.getTemplateLoader(), e);
-            }
-        }
-        if(!classes.isEmpty()){
-            sb.append(" ").append("class");
-            sb.append("=").append('"');
-            sb.append(String.join(" ",classes));
-            sb.append('"');
-        }
-        return sb.toString();
-    }
-
-    private String getAttributeString(String name, Attr attribute, JadeModel model, JadeTemplate template) throws ExpressionException {
-        String key = name;
-        boolean escaped = false;
-//        if ("class".equals(key)) {
-//          classes.push(attr.val);
-//          classEscaping.push(attr.escaped);
-//        } else if (isConstant(attr.val)) {
-//          if (buffer) {
-//            this.buffer(runtime.attr(key, toConstant(attr.val), escaped, this.terse));
-//          } else {
-//            var val = toConstant(attr.val);
-//            if (key === 'style') val = runtime.style(val);
-//            if (escaped && !(key.indexOf('data') === 0 && typeof val !== 'string')) {
-//              val = runtime.escape(val);
-//            }
-//            buf.push(utils.stringify(key) + ': ' + utils.stringify(val));
-//          }
-//        } else {
-//          if (buffer) {
-//            this.bufferExpression('jade.attr("' + key + '", ' + attr.val + ', ' + utils.stringify(escaped) + ', ' + utils.stringify(this.terse) + ')');
-//          } else {
-//            var val = attr.val;
-//            if (key === 'style') {
-//              val = 'jade.style(' + val + ')';
-//            }
-//            if (escaped && !(key.indexOf('data') === 0)) {
-//              val = 'jade.escape(' + val + ')';
-//            } else if (escaped) {
-//              val = '(typeof (jade_interp = ' + val + ') == "string" ? jade.escape(jade_interp) : jade_interp)';
-//            }
-//            buf.push(utils.stringify(key) + ': ' + val);
-//          }
-//        }
-
-        String value = null;
-        Object attributeValue = attribute.getValue();
-        if("class".equals(key)) {
-            if (attributeValue instanceof String) {
-                escaped = attribute.isEscaped();
-                value = getInterpolatedAttributeValue(name, attributeValue,escaped, model, template);
-            } else if (attributeValue instanceof ExpressionString) {
-                escaped = ((ExpressionString) attributeValue).isEscape();
-                Object expressionValue = evaluateExpression((ExpressionString) attributeValue, model,template.getExpressionHandler());
-                if (expressionValue != null && expressionValue.getClass().isArray()) {
-                    StringBuffer s = new StringBuffer("");
-                    boolean first = true;
-                    if (expressionValue instanceof int[]) {
-                        for (int o : (int[]) expressionValue) {
-                            if (!first)
-                                s.append(" ");
-                            s.append(o);
-                            first = false;
-                        }
-                    } else {
-                        for (Object o : (Object[]) expressionValue) {
-                            if (!first)
-                                s.append(" ");
-                            s.append(o.toString());
-                            first = false;
-                        }
-                    }
-                    value = s.toString();
-                }
-            }
-            if(!StringUtils.isBlank(value))
-                classes.add(value);
-            return "";
-//        }else if("id".equals(key)){
-//            value = (String) attribute;
-        }else if (attributeValue instanceof String) {
-            escaped = attribute.isEscaped();
-            value = getInterpolatedAttributeValue(name, attributeValue, escaped, model, template);
-        } else if (attributeValue instanceof Boolean) {
-            if ((Boolean) attributeValue) {
-                value = name;
-            } else {
-                return "";
-            }
-            if (template.isTerse()) {
-                value = null;
-            }
-        } else if (attributeValue instanceof ExpressionString) {
-            escaped = ((ExpressionString) attributeValue).isEscape();
-            Object expressionValue = evaluateExpression((ExpressionString) attributeValue, model, template.getExpressionHandler());
-            if (expressionValue == null) {
-                return "";
-            }
-            // TODO: refactor
-            if (expressionValue instanceof Boolean) {
-                if ((Boolean) expressionValue) {
-                    value = name;
-                } else {
-                    return "";
-                }
-                if (template.isTerse()) {
-                    value = null;
-                }
-            }else{
-                value = expressionValue.toString();
-                value = StringEscapeUtils.escapeHtml4(value);
-            }
-        } else if (attributeValue instanceof String) {
-            value = (String) attributeValue;
-//        } else {
-//            return "";
-        }
-        StringBuilder sb = new StringBuilder();
-        if (name != null) {
-            sb.append(" ").append(name);
-            if (value != null) {
-                sb.append("=").append('"');
-                sb.append(value);
-                sb.append('"');
-            }
-        }
-        return sb.toString();
-    }
-
-    private Object evaluateExpression(ExpressionString attribute, JadeModel model, ExpressionHandler expressionHandler) throws ExpressionException {
-        String expression = ((ExpressionString) attribute).getValue();
-        Object result = expressionHandler.evaluateExpression(expression, model);
-        if (result instanceof ExpressionString) {
-            return evaluateExpression((ExpressionString) result, model, expressionHandler);
-        }
-        return result;
-    }
-
-    private String getInterpolatedAttributeValue(String name, Object attribute, boolean escaped, JadeModel model, JadeTemplate template)
-            throws JadeCompilerException {
-//        if (!preparedAttributeValues.containsKey(name)) {
-//            preparedAttributeValues.put(name, Utils.prepareInterpolate((String) attribute, escaped));
-//        }
-        List<Object> prepared = Utils.prepareInterpolate((String) attribute, escaped);
-        try {
-            return Utils.interpolate(prepared, model,template.getExpressionHandler());
-        } catch (ExpressionException e) {
-            throw new JadeCompilerException(this, template.getTemplateLoader(), e);
-        }
+    private String bufferName(JadeTemplate template, JadeModel model) {
+          if (isBuffer()) {
+              try {
+                  return template.getExpressionHandler().evaluateStringExpression(name, model);
+              } catch (ExpressionException e) {
+                  e.printStackTrace();
+                  return null;
+              }
+          }else {
+              return name;
+          }
     }
 
     public boolean isBuffer() {

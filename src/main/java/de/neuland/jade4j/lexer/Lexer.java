@@ -222,10 +222,7 @@ public class Lexer {
         if ((token = fail()) != null) {
             return token;
         }
-
-
-        throw new JadeLexerException("token not recognized " + scanner.getInput().substring(0, 5), filename, getLineno(),
-                    templateLoader);
+        return null;
     }
     
 
@@ -448,11 +445,11 @@ public class Lexer {
 //      }
 //    }
     private Token interpolation(){
-        Matcher matcher = scanner.getMatcherForPattern("^#\\{/");
+        Matcher matcher = scanner.getMatcherForPattern("^#\\{");
         if (matcher.find(0)) {
             try {
                 CharacterParser.Match match = this.bracketExpression(1);
-                this.scanner.consume(match.getEnd());
+                this.scanner.consume(match.getEnd()+1);
                 return new Interpolation(match.getSrc(),lineno);
             } catch(Exception ex){
                 return null; //not an interpolation expression, just an unmatched open interpolation
@@ -644,10 +641,6 @@ public class Lexer {
     }
 
     private Token fail() {
-        if (Pattern.compile("^ ($|\\n)").matcher(scanner.getInput()).find(0)) {
-          this.consume(1);
-          return this.next();
-        }
         throw new JadeLexerException("unexpected text " + scanner.getInput().substring(0, 5), filename, getLineno(), templateLoader);
     }
 

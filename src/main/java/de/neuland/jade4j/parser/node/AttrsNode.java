@@ -1,19 +1,25 @@
 package de.neuland.jade4j.parser.node;
 
 import java.util.*;
-import java.util.Map.Entry;
 
-import de.neuland.jade4j.exceptions.JadeParserException;
+import de.neuland.jade4j.compiler.Utils;
+import de.neuland.jade4j.exceptions.ExpressionException;
+import de.neuland.jade4j.exceptions.JadeCompilerException;
+import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
+import de.neuland.jade4j.template.JadeTemplate;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public abstract class AttrsNode extends Node {
 
 	protected List<Attr> attributes = new LinkedList<Attr>();
-	protected List<String> attributeBlocks = new LinkedList<String>();
+	protected LinkedList<String> attributeBlocks = new LinkedList<String>();
 	protected List<String> attributeNames = new LinkedList<String>();
 	protected boolean selfClosing = false;
 	protected Node codeNode;
 	private boolean textOnly;
+	private ArrayList<String> classes = new ArrayList<String>();
 
 	public void setAttribute(String key, Object value, boolean escaped) {
 		if (!"class".equals(key) && this.attributeNames.indexOf(key) != -1) {
@@ -44,18 +50,34 @@ public abstract class AttrsNode extends Node {
 		}
 		return value.toString();
 	}
-
-//	@Override
-//	public AttrsNode clone() throws CloneNotSupportedException {
-//		AttrsNode clone = (AttrsNode) super.clone();
+//	protected Map<String, Object> mergeInheritedAttributes(JadeModel model) {
+//		List<Attr> mergedAttributes = this.attributes;
 //
-//        // shallow copy
-//		if (this.attributes != null) {
-//			clone.attributes = new LinkedHashMap<String, Object>(this.attributes);
+//		if (inheritsAttributes) {
+//			Object o = model.get("attributes");
+//			if (o != null && o instanceof Map) {
+//				@SuppressWarnings("unchecked")
+//				Map<String, Object> inheritedAttributes = (Map<String, Object>) o;
+//
+//				for (Entry<String, Object> entry : inheritedAttributes.entrySet()) {
+//					setAttribute(mergedAttributes, (String) entry.getKey(), entry.getValue());
+//				}
+//			}
 //		}
-//
-//		return clone;
+//		return mergedAttributes;
 //	}
+
+	@Override
+	public AttrsNode clone() throws CloneNotSupportedException {
+		AttrsNode clone = (AttrsNode) super.clone();
+
+        // shallow copy
+		if (this.attributes != null) {
+			clone.attributes = new ArrayList<Attr>(this.attributes);
+		}
+
+		return clone;
+	}
 	public void addAttributes(String src){
 		this.attributeBlocks.add(src);
 	}
@@ -83,5 +105,181 @@ public abstract class AttrsNode extends Node {
 
 	public boolean hasCodeNode() {
         return codeNode != null;
+    }
+
+	protected String attributes(JadeModel model, JadeTemplate template) {
+        StringBuilder sb = new StringBuilder();
+
+//        Map<String, Object> mergedAttributes = attmergeInheritedAttributes(model);
+//        for (Map.Entry<String, Attr> entry : attributes.entrySet()) {
+//            try {
+//                sb.append(getAttributeString(entry.getKey(), entry.getValue(), model, template));
+//            } catch (ExpressionException e) {
+//                throw new JadeCompilerException(this, template.getTemplateLoader(), e);
+//            }
+//
+//        }
+        LinkedHashMap<String,String> attrs = attrs(model, template);
+        boolean first = true;
+        for (Map.Entry<String, String> entry : attrs.entrySet()) {
+//            if(!first){
+                sb.append(" ");
+//            }
+//            first = false;
+            sb.append(entry.getKey());
+            if (entry.getValue() != null) {
+                sb.append("=").append('"');
+                sb.append(entry.getValue());
+                sb.append('"');
+            }
+        }
+        return sb.toString();
+    }
+
+    protected LinkedHashMap<String,String> attrs(JadeModel model, JadeTemplate template) {
+        LinkedHashMap<String,String> newAttributes = new LinkedHashMap<String,String>();
+        for (Attr attribute : attributes) {
+            try {
+                addAttributesToMap(newAttributes, attribute, model, template);
+            } catch (ExpressionException e) {
+                throw new JadeCompilerException(this, template.getTemplateLoader(), e);
+            }
+        }
+        if(!classes.isEmpty()){
+            newAttributes.put("class",String.join(" ",classes));
+        }
+        return newAttributes;
+    }
+
+    private void addAttributesToMap(HashMap<String, String> newAttributes, Attr attribute, JadeModel model, JadeTemplate template) throws ExpressionException {
+        String name = attribute.getName();
+        String key = name;
+        boolean escaped = false;
+//        if ("class".equals(key)) {
+//          classes.push(attr.val);
+//          classEscaping.push(attr.escaped);
+//        } else if (isConstant(attr.val)) {
+//          if (buffer) {
+//            this.buffer(runtime.attr(key, toConstant(attr.val), escaped, this.terse));
+//          } else {
+//            var val = toConstant(attr.val);
+//            if (key === 'style') val = runtime.style(val);
+//            if (escaped && !(key.indexOf('data') === 0 && typeof val !== 'string')) {
+//              val = runtime.escape(val);
+//            }
+//            buf.push(utils.stringify(key) + ': ' + utils.stringify(val));
+//          }
+//        } else {
+//          if (buffer) {
+//            this.bufferExpression('jade.attr("' + key + '", ' + attr.val + ', ' + utils.stringify(escaped) + ', ' + utils.stringify(this.terse) + ')');
+//          } else {
+//            var val = attr.val;
+//            if (key === 'style') {
+//              val = 'jade.style(' + val + ')';
+//            }
+//            if (escaped && !(key.indexOf('data') === 0)) {
+//              val = 'jade.escape(' + val + ')';
+//            } else if (escaped) {
+//              val = '(typeof (jade_interp = ' + val + ') == "string" ? jade.escape(jade_interp) : jade_interp)';
+//            }
+//            buf.push(utils.stringify(key) + ': ' + val);
+//          }
+//        }
+
+        String value = null;
+        Object attributeValue = attribute.getValue();
+        if("class".equals(key)) {
+            if (attributeValue instanceof String) {
+                escaped = attribute.isEscaped();
+                value = getInterpolatedAttributeValue(name, attributeValue,escaped, model, template);
+            } else if (attributeValue instanceof ExpressionString) {
+                escaped = ((ExpressionString) attributeValue).isEscape();
+                Object expressionValue = evaluateExpression((ExpressionString) attributeValue, model,template.getExpressionHandler());
+                if (expressionValue != null && expressionValue.getClass().isArray()) {
+                    StringBuffer s = new StringBuffer("");
+                    boolean first = true;
+                    if (expressionValue instanceof int[]) {
+                        for (int o : (int[]) expressionValue) {
+                            if (!first)
+                                s.append(" ");
+                            s.append(o);
+                            first = false;
+                        }
+                    } else {
+                        for (Object o : (Object[]) expressionValue) {
+                            if (!first)
+                                s.append(" ");
+                            s.append(o.toString());
+                            first = false;
+                        }
+                    }
+                    value = s.toString();
+                }
+            }
+            if(!StringUtils.isBlank(value))
+                classes.add(value);
+            return;
+//        }else if("id".equals(key)){
+//            value = (String) attribute;
+        }else if (attributeValue instanceof String) {
+            escaped = attribute.isEscaped();
+            value = getInterpolatedAttributeValue(name, attributeValue, escaped, model, template);
+        } else if (attributeValue instanceof Boolean) {
+            if ((Boolean) attributeValue) {
+                value = name;
+            } else {
+                return;
+            }
+            if (template.isTerse()) {
+                value = null;
+            }
+        } else if (attributeValue instanceof ExpressionString) {
+            escaped = ((ExpressionString) attributeValue).isEscape();
+            Object expressionValue = evaluateExpression((ExpressionString) attributeValue, model, template.getExpressionHandler());
+            if (expressionValue == null) {
+                return;
+            }
+            // TODO: refactor
+            if (expressionValue instanceof Boolean) {
+                if ((Boolean) expressionValue) {
+                    value = name;
+                } else {
+                    return;
+                }
+                if (template.isTerse()) {
+                    value = null;
+                }
+            }else{
+                value = expressionValue.toString();
+                value = StringEscapeUtils.escapeHtml4(value);
+            }
+        } else if (attributeValue instanceof String) {
+            value = (String) attributeValue;
+//        } else {
+//            return "";
+        }
+        newAttributes.put(name,value);
+    }
+
+	private Object evaluateExpression(ExpressionString attribute, JadeModel model, ExpressionHandler expressionHandler) throws ExpressionException {
+        String expression = ((ExpressionString) attribute).getValue();
+        Object result = expressionHandler.evaluateExpression(expression, model);
+        if (result instanceof ExpressionString) {
+            return evaluateExpression((ExpressionString) result, model, expressionHandler);
+        }
+        return result;
+    }
+
+	private String getInterpolatedAttributeValue(String name, Object attribute, boolean escaped, JadeModel model, JadeTemplate template)
+            throws JadeCompilerException {
+//        if (!preparedAttributeValues.containsKey(name)) {
+//            preparedAttributeValues.put(name, Utils.prepareInterpolate((String) attribute, escaped));
+//        }
+        List<Object> prepared = Utils.prepareInterpolate((String) attribute, escaped);
+        try {
+            return Utils.interpolate(prepared, model,template.getExpressionHandler());
+        } catch (ExpressionException e) {
+            throw new JadeCompilerException(this, template.getTemplateLoader(), e);
+        }
     }
 }
