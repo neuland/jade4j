@@ -1,19 +1,13 @@
 package de.neuland.jade4j.parser.node;
 
 import de.neuland.jade4j.compiler.IndentWriter;
-import de.neuland.jade4j.compiler.Utils;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
-import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 public class TagNode extends AttrsNode {
     private Node textNode;
@@ -88,7 +82,7 @@ public class TagNode extends AttrsNode {
         if (isSelfClosing() || isSelfClosing(template)) {
             writer.append("<");
             writer.append(bufferName(template, model));
-            writer.append(attributes(model, template));
+            writer.append(visitAttributes(model, template));
             if (isTerse(template)) {
                 writer.append(">");
             }else {
@@ -101,7 +95,7 @@ public class TagNode extends AttrsNode {
         }else {
             writer.append("<");
             writer.append(bufferName(template, model));
-            writer.append(attributes(model, template));
+            writer.append(visitAttributes(model, template));
             writer.append(">");
             if (hasCodeNode()) {
                 codeNode.execute(writer, model, template);

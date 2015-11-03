@@ -107,25 +107,30 @@ public abstract class AttrsNode extends Node {
         return codeNode != null;
     }
 
-	protected String attributes(JadeModel model, JadeTemplate template) {
-        StringBuilder sb = new StringBuilder();
+	protected String visitAttributes(JadeModel model, JadeTemplate template) {
 
-//        Map<String, Object> mergedAttributes = attmergeInheritedAttributes(model);
-//        for (Map.Entry<String, Attr> entry : attributes.entrySet()) {
-//            try {
-//                sb.append(getAttributeString(entry.getKey(), entry.getValue(), model, template));
-//            } catch (ExpressionException e) {
-//                throw new JadeCompilerException(this, template.getTemplateLoader(), e);
+        if(attributeBlocks.size()>0){
+            //Todo: AttributesBlock needs to be evaluated
+//            if(attributes.size()>0){
+//                LinkedHashMap<String,String> attrs = attrs(model, template);
+////                attributeBlocks.push(attrs)
 //            }
 //
-//        }
-        LinkedHashMap<String,String> attrs = attrs(model, template);
-        boolean first = true;
+//            return attrsToString(attrs);
+            LinkedHashMap<String,String> attrs = attrs(model, template);
+            return attrsToString(attrs);
+        }else{
+            LinkedHashMap<String,String> attrs = attrs(model, template);
+            return attrsToString(attrs);
+        }
+
+
+    }
+
+    private String attrsToString(LinkedHashMap<String, String> attrs) {
+        StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : attrs.entrySet()) {
-//            if(!first){
                 sb.append(" ");
-//            }
-//            first = false;
             sb.append(entry.getKey());
             if (entry.getValue() != null) {
                 sb.append("=").append('"');

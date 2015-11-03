@@ -8,7 +8,6 @@ import com.sun.deploy.util.StringUtils;
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
-import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.util.ArgumentSplitter;
@@ -123,7 +122,7 @@ public class CallNode extends AttrsNode {
 		if (attributeBlocks.size()>0) {
     		if (attributes.size()>0) {
 				LinkedHashMap<String,String> attrs = attrs(model, template);
-      			String val = this.attributes(model, template);
+      			String val = this.visitAttributes(model, template);
       			attributeBlocks.push(val);
     		}
 			model.put("attributes", StringUtils.join(attributeBlocks, ","));
