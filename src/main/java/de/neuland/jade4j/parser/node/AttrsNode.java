@@ -19,7 +19,7 @@ public abstract class AttrsNode extends Node {
 	protected boolean selfClosing = false;
 	protected Node codeNode;
 	private boolean textOnly;
-	private ArrayList<String> classes = new ArrayList<String>();
+
 
 	public void setAttribute(String key, Object value, boolean escaped) {
 		if (!"class".equals(key) && this.attributeNames.indexOf(key) != -1) {
@@ -74,8 +74,11 @@ public abstract class AttrsNode extends Node {
         // shallow copy
 		if (this.attributes != null) {
 			clone.attributes = new ArrayList<Attr>(this.attributes);
-		}
 
+		}
+        if (this.attributes != null) {
+            clone.attributeBlocks = new LinkedList<String>(this.attributeBlocks);
+        }
 		return clone;
 	}
 	public void addAttributes(String src){
@@ -152,10 +155,11 @@ public abstract class AttrsNode extends Node {
     }
 
     protected LinkedHashMap<String,String> attrs(JadeModel model, JadeTemplate template) {
+        ArrayList<String> classes = new ArrayList<String>();
         LinkedHashMap<String,String> newAttributes = new LinkedHashMap<String,String>();
         for (Attr attribute : attributes) {
             try {
-                addAttributesToMap(newAttributes, attribute, model, template);
+                addAttributesToMap(newAttributes,classes, attribute, model, template);
             } catch (ExpressionException e) {
                 throw new JadeCompilerException(this, template.getTemplateLoader(), e);
             }
@@ -166,7 +170,7 @@ public abstract class AttrsNode extends Node {
         return newAttributes;
     }
 
-    private void addAttributesToMap(HashMap<String, String> newAttributes, Attr attribute, JadeModel model, JadeTemplate template) throws ExpressionException {
+    private void addAttributesToMap(HashMap<String, String> newAttributes, ArrayList<String> classes, Attr attribute, JadeModel model, JadeTemplate template) throws ExpressionException {
         String name = attribute.getName();
         String key = name;
         boolean escaped = false;
