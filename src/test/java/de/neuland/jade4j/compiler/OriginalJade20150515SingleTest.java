@@ -12,6 +12,7 @@ import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.template.TemplateLoader;
 import org.apache.commons.io.FileUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.*;
@@ -21,6 +22,7 @@ import java.util.LinkedList;
 import static org.junit.Assert.assertEquals;
 
 
+@Ignore
 public class OriginalJade20150515SingleTest {
 	String templateName = "attrs2";
 

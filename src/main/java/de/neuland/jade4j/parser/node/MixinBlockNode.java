@@ -11,6 +11,5 @@ public class MixinBlockNode extends Node {
         BlockNode blockNode = (BlockNode) model.get("block");
         if(blockNode != null)
             blockNode.execute(writer,model,template);
-        model.put("block",null);
     }
 }
