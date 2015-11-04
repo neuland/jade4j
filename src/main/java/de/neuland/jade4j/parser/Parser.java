@@ -400,9 +400,10 @@ public class Parser {
 
     private String resolvePath(String templateName) {
         URI currentUri = URI.create(filename);
+        currentUri.getPath();
         URI templateUri = currentUri.resolve(templateName);
         String path = templateUri.toString();
-        if(templateName.indexOf(".") == -1)
+        if(StringUtils.lastIndexOf(templateUri.toString(),"/") >= StringUtils.lastIndexOf(templateUri.toString(),"."))
             path += ".jade";
         return path;
     }
