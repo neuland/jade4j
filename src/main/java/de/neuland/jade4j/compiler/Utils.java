@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.expression.JexlExpressionHandler;
+import de.neuland.jade4j.util.CharacterParser;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import de.neuland.jade4j.exceptions.ExpressionException;
@@ -15,7 +16,7 @@ import de.neuland.jade4j.parser.node.ExpressionString;
 
 public class Utils {
 	public static Pattern interpolationPattern = Pattern.compile("(\\\\)?([#!])\\{(.*?)\\}");
-
+	public static CharacterParser characterParser = new CharacterParser();
 	public static List<Object> prepareInterpolate(String string, boolean xmlEscape) {
 		List<Object> result = new LinkedList<Object>();
 
@@ -55,8 +56,32 @@ public class Utils {
 
 		return result;
 	}
-
+//	public static String interpolate(String str,boolean interpolate){
+//		StringBuilder sb = new StringBuilder();
+//		if (interpolate) {
+//			Matcher matcher = Pattern.compile("(\\\\)?([#!])\\{((?:.|\\n)*)$").matcher(str);
+//			if(matcher.find(0))
+//      			sb.append(str.substring(0, matcher.start()));
+//    		if (matcher.group(1)!=null) { // escape
+//        		sb.append(matcher.group(2) + "{");
+//        		sb.append(matcher.group(3));
+//				return sb.toString();
+//      		} else {
+//				String rest = matcher.group(3);
+//				CharacterParser.Match range = characterParser.parseMax(rest);
+//				String code = (matcher.group(2).equals("!") ? "" : 'jade.escape') + "((jade_interp = " + range.src + ") == null ? '' : jade_interp)";
+//				this.bufferExpression(code);
+//				sb.append(rest.substring(range.getEnd() + 1));
+//				return sb.toString();
+//		  	}
+//    	}
+//
+//	  str = utils.stringify(str);
+//  		str = str.substr(1, str.length - 2);
+//
+//	}
 	public static String interpolate(List<Object> prepared, JadeModel model, ExpressionHandler expressionHandler) throws ExpressionException {
+
 		StringBuffer result = new StringBuffer();
 
 		for (Object entry : prepared) {

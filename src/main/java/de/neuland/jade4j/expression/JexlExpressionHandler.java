@@ -30,9 +30,9 @@ public class JexlExpressionHandler implements ExpressionHandler {
 
 	public Object evaluateExpression(String expression, JadeModel model) throws ExpressionException {
 		try {
-			if(expression.startsWith("{")) {
-				return expression;
-			}else{
+//			if(expression.startsWith("{")) {
+//				return expression;
+//			}else{
 			if(expression.startsWith("var")){
 				expression = expression.substring(3);
 			}
@@ -49,7 +49,7 @@ public class JexlExpressionHandler implements ExpressionHandler {
 				Expression e = jexl.createExpression(expression);
 				Object evaluate = e.evaluate(new MapContext(model));
 				return evaluate;
-			}
+//			}
 
 		} catch (Exception e) {
 			throw new ExpressionException(expression, e);

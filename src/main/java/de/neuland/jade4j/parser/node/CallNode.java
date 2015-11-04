@@ -122,8 +122,6 @@ public class CallNode extends AttrsNode {
 		if (attributeBlocks.size()>0) {
     		if (attributes.size()>0) {
 				LinkedHashMap<String,String> attrs = attrs(model, template);
-      			String val = this.visitAttributes(model, template);
-      			attributeBlocks.push(val);
     		}
 			model.put("attributes", StringUtils.join(attributeBlocks, ","));
   		} else if (attributes.size()>0) {

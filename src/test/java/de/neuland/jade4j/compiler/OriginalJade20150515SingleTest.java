@@ -14,10 +14,7 @@ import de.neuland.jade4j.template.TemplateLoader;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -25,7 +22,7 @@ import static org.junit.Assert.assertEquals;
 
 
 public class OriginalJade20150515SingleTest {
-	String templateName = "include-filter";
+	String templateName = "attrs2";
 
 	@Test
 	public void testCase() throws IOException, JadeCompilerException {
@@ -47,7 +44,7 @@ public class OriginalJade20150515SingleTest {
  }
 
 	private void testJade(String path, JadeConfiguration jade) throws IOException {
-		File file = new File(TestFileHelper.getOriginal20150515ResourcePath("cases/"+path + ".jade"));
+		File file = new File(getResourcePath(path + ".jade"));
 		JadeTemplate template = jade.getTemplate(path+".jade");
 		Writer writer = new StringWriter();
 		HashMap<String, Object> model = getModel();
@@ -58,6 +55,7 @@ public class OriginalJade20150515SingleTest {
 		assertEquals(file.getName(), expected, html.trim());
 	}
 
+
 	private HashMap<String, Object> getModel() {
 		HashMap<String, Object> model = new HashMap<String, Object>();
 		model.put("title","Jade");
@@ -66,7 +64,7 @@ public class OriginalJade20150515SingleTest {
 
 	private JadeConfiguration getJadeConfiguration() {
 		JadeConfiguration jade = new JadeConfiguration();
-		jade.setTemplateLoader(new FileTemplateLoader(TestFileHelper.getOriginal20150927ResourcePath("cases/"), "UTF-8"));
+		jade.setTemplateLoader(new FileTemplateLoader(getResourcePath(""), "UTF-8"));
 		//		jade.setExpressionHandler(new JsExpressionHandler());
 		jade.setMode(Jade4J.Mode.XHTML); // original jade uses xhtml by default
 		jade.setFilter("plain", new PlainFilter());
@@ -87,4 +85,13 @@ public class OriginalJade20150515SingleTest {
 		}
 		return "";
 	}
+	private String getResourcePath(String filename) {
+		try {
+			return TestFileHelper.getLexerResourcePath(filename);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 }

@@ -111,12 +111,22 @@ public abstract class AttrsNode extends Node {
 
         if(attributeBlocks.size()>0){
             //Todo: AttributesBlock needs to be evaluated
-//            if(attributes.size()>0){
-//                LinkedHashMap<String,String> attrs = attrs(model, template);
-////                attributeBlocks.push(attrs)
-//            }
-//
-//            return attrsToString(attrs);
+            for (String attributeBlock : attributeBlocks) {
+                HashMap<String,String> o = null;
+                try {
+                    o = (HashMap<String,String>)template.getExpressionHandler().evaluateExpression(attributeBlock, model);
+                } catch (ExpressionException e) {
+                    e.printStackTrace();
+                }
+                if(o!=null) {
+                    for (Map.Entry<String, String> entry : o.entrySet()) {
+                        Attr attr = new Attr();
+                        attr.setName(entry.getKey());
+                        attr.setValue(entry.getValue());
+                        attributes.add(attr);
+                    }
+                }
+            }
             LinkedHashMap<String,String> attrs = attrs(model, template);
             return attrsToString(attrs);
         }else{
