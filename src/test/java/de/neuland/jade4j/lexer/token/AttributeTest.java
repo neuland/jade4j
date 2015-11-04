@@ -15,7 +15,6 @@ public class AttributeTest extends TokenTest {
 	@Test
     public void shouldScanTagsWithAttributes() throws Exception {
 	    lexer = initLexer("attribute_2.jade");
-	    assertToken(2, Newline.class,    "newline");
 	    assertToken(3, Newline.class,    "newline");
         assertToken(3, Tag.class,        "p");
         assertToken(3, CssId.class,      "red");

@@ -11,7 +11,6 @@ import java.util.LinkedList;
 
 public class TagNode extends AttrsNode {
     private Node textNode;
-    private static final String[] selfClosingTags = {"area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"};
     private static final String[] inlineTags = { "a", "abbr", "acronym", "b", "br", "code", "em", "font", "i", "img", "ins", "kbd", "map", "samp", "small", "span", "strong", "sub", "sup"};
     private boolean buffer = false;
 
@@ -118,14 +117,6 @@ public class TagNode extends AttrsNode {
 
     private boolean isEmpty() {
         return !hasBlock() && !hasTextNode() && !hasCodeNode();
-    }
-
-    public boolean isTerse(JadeTemplate template) {
-        return isSelfClosing(template) && template.isTerse();
-    }
-
-    public boolean isSelfClosing(JadeTemplate template) {
-        return !template.isXml() && ArrayUtils.contains(selfClosingTags, name);
     }
 
     private String bufferName(JadeTemplate template, JadeModel model) {

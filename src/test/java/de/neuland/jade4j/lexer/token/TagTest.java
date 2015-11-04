@@ -19,6 +19,7 @@ public class TagTest extends TokenTest {
 		assertToken("indent");
 		assertToken("p");
 		assertToken("outdent");
+		assertToken("outdent"); // OriginalJade Has An Outdent here
 		assertToken("eos");
 	}
 }

@@ -372,7 +372,7 @@ public class CompilerTest {
 
     @Test
     public void includeNonJade() {
-        run("include_non_jade");
+        run("include_non_jade",true);
     }
 
     @Test

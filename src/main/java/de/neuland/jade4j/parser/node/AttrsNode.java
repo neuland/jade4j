@@ -8,12 +8,14 @@ import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public abstract class AttrsNode extends Node {
 
-	protected List<Attr> attributes = new LinkedList<Attr>();
+    private static final String[] selfClosingTags = {"area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"};
+    protected LinkedList<Attr> attributes = new LinkedList<Attr>();
 	protected LinkedList<String> attributeBlocks = new LinkedList<String>();
 	protected List<String> attributeNames = new LinkedList<String>();
 	protected boolean selfClosing = false;
@@ -73,7 +75,7 @@ public abstract class AttrsNode extends Node {
 
         // shallow copy
 		if (this.attributes != null) {
-			clone.attributes = new ArrayList<Attr>(this.attributes);
+			clone.attributes = new LinkedList<Attr>(this.attributes);
 
 		}
         if (this.attributes != null) {
@@ -131,16 +133,16 @@ public abstract class AttrsNode extends Node {
                 }
             }
             LinkedHashMap<String,String> attrs = attrs(model, template);
-            return attrsToString(attrs);
+            return attrsToString(attrs, template);
         }else{
             LinkedHashMap<String,String> attrs = attrs(model, template);
-            return attrsToString(attrs);
+            return attrsToString(attrs, template);
         }
 
 
     }
 
-    private String attrsToString(LinkedHashMap<String, String> attrs) {
+    private String attrsToString(LinkedHashMap<String, String> attrs, JadeTemplate template) {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : attrs.entrySet()) {
                 sb.append(" ");
@@ -148,6 +150,10 @@ public abstract class AttrsNode extends Node {
             if (entry.getValue() != null) {
                 sb.append("=").append('"');
                 sb.append(entry.getValue());
+                sb.append('"');
+            }else if(entry.getValue() == null && !isTerse(template)){
+                sb.append("=").append('"');
+                sb.append(entry.getKey());
                 sb.append('"');
             }
         }
@@ -164,10 +170,12 @@ public abstract class AttrsNode extends Node {
                 throw new JadeCompilerException(this, template.getTemplateLoader(), e);
             }
         }
+        LinkedHashMap<String,String> finalAttributes = new LinkedHashMap<String,String>();
+        finalAttributes.putAll(newAttributes);
         if(!classes.isEmpty()){
-            newAttributes.put("class",String.join(" ",classes));
+            finalAttributes.put("class",String.join(" ",classes));
         }
-        return newAttributes;
+        return finalAttributes;
     }
 
     private void addAttributesToMap(HashMap<String, String> newAttributes, ArrayList<String> classes, Attr attribute, JadeModel model, JadeTemplate template) throws ExpressionException {
@@ -233,6 +241,8 @@ public abstract class AttrsNode extends Node {
                         }
                     }
                     value = s.toString();
+                }else if(expressionValue!=null){
+                    value = expressionValue.toString();
                 }
             }
             if(!StringUtils.isBlank(value))
@@ -300,5 +310,13 @@ public abstract class AttrsNode extends Node {
         } catch (ExpressionException e) {
             throw new JadeCompilerException(this, template.getTemplateLoader(), e);
         }
+    }
+
+    public boolean isTerse(JadeTemplate template) {
+        return isSelfClosing(template) && template.isTerse();
+    }
+
+    public boolean isSelfClosing(JadeTemplate template) {
+        return !template.isXml() && ArrayUtils.contains(selfClosingTags, name);
     }
 }
