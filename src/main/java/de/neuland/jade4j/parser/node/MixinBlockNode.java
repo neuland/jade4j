@@ -8,8 +8,8 @@ import de.neuland.jade4j.template.JadeTemplate;
 public class MixinBlockNode extends Node {
     @Override
     public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
-        BlockNode blockNode = (BlockNode) model.get("block");
-        if(blockNode != null)
-            blockNode.execute(writer,model,template);
+        Node node = pollNode();
+        if(node != null)
+            node.execute(writer, model, template);
     }
 }

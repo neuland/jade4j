@@ -48,43 +48,44 @@ public class CallNode extends AttrsNode {
 			throw new IllegalStateException(e);
 		}
 
+		if (hasBlock()) {
+			List<MixinBlockNode> injectionPoints = getInjectionPoints(mixin.getBlock());
+            for (MixinBlockNode point : injectionPoints) {
+				point.getNodes().add(block);
+            }
+		}
+
 		if (this.isCall()) {
+			model.pushScope();
+			model.put("block", block);
+			writeVariables(model, mixin, template);
+			writeAttributes(model, mixin, template);
+			mixin.getBlock().execute(writer, model, template);
+			model.put("block",null);
+			model.popScope();
 
 		}else{
 
 		}
 
 
-		if (hasBlock()) {
-			List<BlockNode> injectionPoints = getInjectionPoints(mixin.getBlock());
-            for (BlockNode point : injectionPoints) {
-				point.getNodes().add(block);
-            }
-		}
 
-		model.pushScope();
-		model.put("block", block);
-		writeVariables(model, mixin, template);
-		writeAttributes(model, mixin, template);
-		mixin.getBlock().execute(writer, model, template);
-		model.put("block",null);
-		model.popScope();
 
 	}
 
-	private List<BlockNode> getInjectionPoints(Node block) {
-        List<BlockNode> result = new ArrayList<BlockNode>();
+	private List<MixinBlockNode> getInjectionPoints(Node block) {
+        List<MixinBlockNode> result = new ArrayList<MixinBlockNode>();
 		for (Node node : block.getNodes()) {
-			if (node instanceof BlockNode && !node.hasNodes()) {
-                result.add((BlockNode) node);
+			if (node instanceof MixinBlockNode && !node.hasNodes()) {
+                result.add((MixinBlockNode) node);
 			} else if(node instanceof ConditionalNode){
                 for (IfConditionNode condition : ((ConditionalNode) node).getConditions()) {
                     result.addAll(getInjectionPoints(condition.getBlock()));
                 }
-            } else if(node instanceof CaseNode){
-                for (CaseConditionNode condition : ((CaseNode) node).getCaseConditionNodes()) {
-                    result.addAll(getInjectionPoints(condition.getBlock()));
-                }
+//            } else if(node instanceof CaseNode.When){
+//                for (CaseConditionNode condition : ((CaseNode) node).getCaseConditionNodes()) {
+//                    result.addAll(getInjectionPoints(condition.getBlock()));
+//                }
             } else if (node.hasBlock()) {
                 result.addAll(getInjectionPoints(node.getBlock()));
             }
