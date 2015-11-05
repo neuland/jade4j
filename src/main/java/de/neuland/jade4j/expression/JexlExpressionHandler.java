@@ -33,8 +33,8 @@ public class JexlExpressionHandler implements ExpressionHandler {
 //			if(expression.startsWith("{")) {
 //				return expression;
 //			}else{
-			if(expression.startsWith("var")){
-				expression = expression.substring(3);
+			if(expression.startsWith("var ")){
+				expression = expression.substring(4);
 			}
 				Matcher matcher = plusplus.matcher(expression);
 				if(matcher.find(0) && matcher.groupCount()==1) {

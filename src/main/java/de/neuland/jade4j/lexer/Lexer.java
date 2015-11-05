@@ -1138,7 +1138,7 @@ public class Lexer {
                 }
                 tok = this.stash.pollLast();
                 // indent
-            } else if (indents > 0 && (indentStack.size() < 1 || indents != indentStack.get(0))) {
+            } else if (indents > 0 && (indentStack.size() == 0 || indents != indentStack.get(0))) {
                 indentStack.push(indents);
                 tok = new Indent("indent", lineno);
                 tok.setIndents(indents);

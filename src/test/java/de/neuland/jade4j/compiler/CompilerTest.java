@@ -201,6 +201,7 @@ public class CompilerTest {
     }
 
     @Test
+    @Ignore("not supported since Jade 1.0 anymore")
     public void conditionalComment() {
         run("conditional_comment");
     }

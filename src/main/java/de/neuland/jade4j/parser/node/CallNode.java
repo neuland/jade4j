@@ -67,6 +67,7 @@ public class CallNode extends AttrsNode {
 		writeVariables(model, mixin, template);
 		writeAttributes(model, mixin, template);
 		mixin.getBlock().execute(writer, model, template);
+		model.put("block",null);
 		model.popScope();
 
 	}

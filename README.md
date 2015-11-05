@@ -302,8 +302,9 @@ If you want to use jade4j with Spring check out our [neuland/spring-jade4j](http
 ## Breaking Changes in 0.5.0
 In Version 0.5.0 we added a lot of features of JadeJs 1.10. There are also some Breaking Changes:
 - Instead of 'id = 5' you must use '- var id = 5'
-- Instead of 'h1(attributes, class = "test")' you must usw 'h1(class= "test")&attributes(attributes)'
+- Instead of 'h1(attributes, class = "test")' you must use 'h1(class= "test")&attributes(attributes)'
 - Instead of '!!! 5' you must use 'doctype html'
+- Jade Syntax for Conditional Comments is not supported anymore
 
 <a name="authors"></a>
 ## Authors
