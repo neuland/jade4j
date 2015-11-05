@@ -14,23 +14,9 @@ public class DoctypeNode extends Node {
 	@Override
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
 		String name = getValue();
-		if (name == null) {
-			name = "default";
-		}
-		String doctypeLine = Doctypes.get(name);
-		if (doctypeLine == null) {
-			doctypeLine = "<!DOCTYPE " + name + ">";
-		}
-
-		if (doctypeLine.startsWith("<?xml")) {
-			template.setMode(Jade4J.Mode.XML);
-		} else if (doctypeLine.equals("<!DOCTYPE html>")) {
-			template.setMode(Jade4J.Mode.HTML);
-		} else {
-			template.setMode(Jade4J.Mode.XHTML);
-		}
-
-		writer.append(doctypeLine);
+		template.setDoctype(name);
+		writer.append(template.getDoctypeLine());
+		writer.setCompiledDoctype(true);
 	}
 
 }

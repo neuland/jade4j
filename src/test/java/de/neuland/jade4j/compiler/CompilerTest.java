@@ -56,7 +56,7 @@ public class CompilerTest {
 
     @Test
     public void complexIndentOutdentFile() {
-        run("complex_indent_outdent_file");
+        run("complex_indent_outdent_file",true);
     }
 
     @Test
@@ -218,7 +218,7 @@ public class CompilerTest {
 
     @Test
     public void attribute() {
-        run("attribute");
+        run("attribute",true);
     }
 
     @Test
@@ -406,7 +406,7 @@ public class CompilerTest {
 
     @Test
     public void reportedIssue90() {
-        run("reportedIssue89");
+        run("reportedIssue89",true);
     }
 
     private void run(String testName) {

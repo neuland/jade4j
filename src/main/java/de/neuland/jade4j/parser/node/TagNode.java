@@ -1,8 +1,10 @@
 package de.neuland.jade4j.parser.node;
 
+import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
+import de.neuland.jade4j.lexer.token.Doctypes;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 import org.apache.commons.lang3.ArrayUtils;
@@ -74,6 +76,14 @@ public class TagNode extends AttrsNode {
     @Override
     public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
         writer.increment();
+
+        if (!writer.isCompiledTag()) {
+          if (!writer.isCompiledDoctype() && "html".equals(name)) {
+              template.setDoctype(null);
+          }
+          writer.setCompiledTag(true);
+        }
+
         if ("pre".equals(this.name)) writer.setEscape(true);
         if(writer.isPp() && !isInline()){
             writer.prettyIndent(0,true);
