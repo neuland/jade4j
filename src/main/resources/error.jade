@@ -145,17 +145,17 @@ html
         var $pretty = document.getElementById('prettyHtml');
         var $rawLink = document.getElementsByClassName('openRaw')[0];
         var $prettyLink = document.getElementsByClassName('openPretty')[0];
-        
+
         $pretty.textContent = style_html($raw.textContent);
-        
+
         if (window.localStorage && localStorage.jadeExceptionOutput == 'raw') {
           $pretty.style.display = 'none';
-          $rawLink.style.textDecoration = 'underline';        
+          $rawLink.style.textDecoration = 'underline';
         } else {
           $raw.style.display = 'none';
-          $prettyLink.style.textDecoration = 'underline';        
+          $prettyLink.style.textDecoration = 'underline';
         }
-        
+
         $prettyLink.addEventListener('click', function() {
           $raw.style.display = 'none';
           $pretty.style.display = 'block';
@@ -163,7 +163,7 @@ html
           $prettyLink.style.textDecoration = 'underline';
           localStorage.jadeExceptionOutput = 'pretty';
         });
-        
+
         $rawLink.addEventListener('click', function() {
           $raw.style.display = 'block';
           $pretty.style.display = 'none';

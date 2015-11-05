@@ -4,12 +4,8 @@ import static org.junit.Assert.*;
 
 import java.util.LinkedList;
 
+import de.neuland.jade4j.parser.node.*;
 import org.junit.Test;
-
-import de.neuland.jade4j.parser.node.AssigmentNode;
-import de.neuland.jade4j.parser.node.BlockNode;
-import de.neuland.jade4j.parser.node.Node;
-import de.neuland.jade4j.parser.node.TagNode;
 
 public class AssignmentParserTest extends ParserTest {
 
@@ -22,9 +18,8 @@ public class AssignmentParserTest extends ParserTest {
 		LinkedList<Node> nodes = block.getNodes();
 		assertEquals(2, nodes.size());
 		
-		AssigmentNode assignment = (AssigmentNode) block.getNodes().get(0);
-		assertEquals("hello", assignment.getName());
-		assertEquals("\"world\"", assignment.getValue());
+		ExpressionNode assignment = (ExpressionNode) block.getNodes().get(0);
+		assertEquals("var hello = \"world\"", assignment.getValue());
 
 		TagNode tag = (TagNode) block.getNodes().get(1);
 		assertNotNull(tag);

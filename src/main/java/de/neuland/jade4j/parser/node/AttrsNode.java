@@ -38,7 +38,7 @@ public abstract class AttrsNode extends Node {
 
 	public String getAttribute(String key) {
 		for (int i = 0, len = this.attributes.size(); i < len; ++i) {
-			if (this.attributes.get(i) != null && this.attributes.get(i).getName().equals(name)) {
+			if (this.attributes.get(i) != null && this.attributes.get(i).getName().equals(key)) {
 				return attributeValueToString(this.attributes.get(i).getValue());
 			}
 		}
@@ -241,6 +241,9 @@ public abstract class AttrsNode extends Node {
                         }
                     }
                     value = s.toString();
+                }else if(expressionValue!=null && expressionValue instanceof Boolean){
+                    if((Boolean) expressionValue)
+                        value = expressionValue.toString();
                 }else if(expressionValue!=null){
                     value = expressionValue.toString();
                 }

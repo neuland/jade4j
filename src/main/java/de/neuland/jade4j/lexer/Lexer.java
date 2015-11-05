@@ -226,12 +226,6 @@ public class Lexer {
     }
     
 
-    public void handleBlankLines() {
-        while (scanner.isAdditionalBlankline()) {
-            consume(1);
-            lineno++;
-        }
-    }
 
     public void consume(int len) {
         scanner.consume(len);
