@@ -305,6 +305,7 @@ In Version 1.0.0 we added a lot of features of JadeJs 1.11. There are also some 
 - Instead of 'h1(attributes, class = "test")' you must use 'h1(class= "test")&attributes(attributes)'
 - Instead of '!!! 5' you must use 'doctype html'
 - Jade Syntax for Conditional Comments is not supported anymore
+- Thanks to rzara for contributing to issue-108
 
 <a name="authors"></a>
 ## Authors
