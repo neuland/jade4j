@@ -40,7 +40,7 @@ public class FilterNode extends Node {
 				values.add(node.getValue());
 		}
 
-		String result = StringUtils.join("\n", values);
+		String result = StringUtils.join(values, "\n");
 		if (filter != null) {
             result = filter.convert(result, attributes, model);
 		}

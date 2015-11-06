@@ -163,7 +163,7 @@ public class Parser {
       String text;
       if (body instanceof PipelessText) {
         this.advance();
-        text = StringUtils.join("\n",body.getValues());
+        text = StringUtils.join(body.getValues(),"\n");
       } else {
         text = "";
       }
