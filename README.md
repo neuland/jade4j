@@ -29,7 +29,7 @@ jade4j's intention is to be able to process jade templates in Java without the n
 index.jade
 
 ```
-!!! 5
+doctype html
 html
   head
     title= pageName
@@ -92,7 +92,7 @@ Just add following dependency definitions to your `pom.xml`.
 <dependency>
   <groupId>de.neuland-bfi</groupId>
   <artifactId>jade4j</artifactId>
-  <version>0.4.1</version>
+  <version>0.4.3</version>
 </dependency>
 ```
 
@@ -267,7 +267,7 @@ config.setTemplateLoader(loader);
 
 The original jade implementation uses JavaScript for expression handling in `if`, `unless`, `for`, `case` commands, like this
 
-    book = {"price": 4.99, "title": "The Book"}
+    - var book = {"price": 4.99, "title": "The Book"}
     if book.price < 5.50 && !book.soldOut
       p.sale special offer: #{book.title}
 
@@ -286,7 +286,7 @@ We are using a slightly modified JEXL version which to have better control of th
 JEXL comes with the three builtin functions `new`, `size` and `empty`. For properties with this name the `.` notation does not work, but you can access them with `[]`.
 
 ```
-book = {size: 540}
+- var book = {size: 540}
 book.size // does not work
 book["size"] // works
 ```
