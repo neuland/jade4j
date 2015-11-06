@@ -17,10 +17,6 @@ public class DoctypeTest extends TokenTest {
 		assertTrue(nextToken.getClass() == Doctype.class);
 
 		nextToken = lexer.next();
-		assertThat(nextToken.getValue(), is("newline"));
-		assertTrue(nextToken.getClass() == Newline.class);
-
-		nextToken = lexer.next();
 		assertThat(nextToken.getValue(), is("eos"));
 		assertTrue(nextToken.getClass() == Eos.class);
 	}

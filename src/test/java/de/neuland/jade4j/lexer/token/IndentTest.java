@@ -22,7 +22,6 @@ public class IndentTest extends TokenTest {
         assertToken("tr");
         assertToken("newline");
         assertToken("td");
-        assertToken("newline");
         assertToken("eos");
     }
 

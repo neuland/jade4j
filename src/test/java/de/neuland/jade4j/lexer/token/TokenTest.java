@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import de.neuland.jade4j.TestFileHelper;
+import de.neuland.jade4j.expression.JexlExpressionHandler;
 import de.neuland.jade4j.lexer.Lexer;
 import de.neuland.jade4j.template.FileTemplateLoader;
 
@@ -15,7 +16,7 @@ public class TokenTest {
         FileTemplateLoader loader;
         try {
             loader = new FileTemplateLoader(TestFileHelper.getLexerResourcePath(""), "UTF-8");
-            return new Lexer(fileName, loader);
+            return new Lexer(fileName, loader,new JexlExpressionHandler());
         } catch (Exception e) {
             e.printStackTrace();
             return null;

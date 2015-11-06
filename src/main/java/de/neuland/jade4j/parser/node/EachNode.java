@@ -9,7 +9,6 @@ import org.apache.commons.collections.IteratorUtils;
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
-import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 
@@ -23,7 +22,7 @@ public class EachNode extends Node {
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
 		Object result;
 		try {
-			result = ExpressionHandler.evaluateExpression(getCode(), model);
+			result = template.getExpressionHandler().evaluateExpression(getCode(), model);
 		} catch (ExpressionException e) {
 			throw new JadeCompilerException(this, template.getTemplateLoader(), e);
 		}

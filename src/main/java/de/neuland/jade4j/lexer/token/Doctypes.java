@@ -7,8 +7,7 @@ public class Doctypes {
     private static Map<String, String> doctypes = new HashMap<String, String>();
     
     static {
-        doctypes.put("5", "<!DOCTYPE html>");
-        doctypes.put("html", "<!DOCTYPE html>");
+        doctypes.put("default", "<!DOCTYPE html>");
         doctypes.put("xml", "<?xml version=\"1.0\" encoding=\"utf-8\" ?>");
         doctypes.put("transitional", "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
         doctypes.put("strict", "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");

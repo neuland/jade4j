@@ -18,7 +18,7 @@ public class ConditionalNode extends Node {
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
 		for (IfConditionNode conditionNode : this.conditions) {
 			try {
-				if (conditionNode.isDefault() || checkCondition(model, conditionNode.getValue()) ^ conditionNode.isInverse()) {
+				if (conditionNode.isDefault() || checkCondition(model, conditionNode.getValue(),template.getExpressionHandler()) ^ conditionNode.isInverse()) {
 					conditionNode.getBlock().execute(writer, model, template);
 					return;
 				}
@@ -28,8 +28,8 @@ public class ConditionalNode extends Node {
 		}
 	}
 
-	private boolean checkCondition(JadeModel model, String condition) throws ExpressionException {
-		Boolean value = ExpressionHandler.evaluateBooleanExpression(condition, model);
+	private boolean checkCondition(JadeModel model, String condition, ExpressionHandler expressionHandler) throws ExpressionException {
+		Boolean value = expressionHandler.evaluateBooleanExpression(condition, model);
 		return (value == null) ? false : value;
 	}
 

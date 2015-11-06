@@ -5,6 +5,7 @@ import de.neuland.jade4j.Jade4J.Mode;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.exceptions.JadeException;
 import de.neuland.jade4j.expression.ExpressionHandler;
+import de.neuland.jade4j.expression.JexlExpressionHandler;
 import de.neuland.jade4j.filter.*;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.parser.Parser;
@@ -32,6 +33,7 @@ public class JadeConfiguration {
     private Map<String, Filter> filters = new HashMap<String, Filter>();
     private Map<String, Object> sharedVariables = new HashMap<String, Object>();
     private TemplateLoader templateLoader = new FileTemplateLoader("", "UTF-8");
+    private ExpressionHandler expressionHandler = new JexlExpressionHandler();
     protected static final int MAX_ENTRIES = 1000;
 
     public JadeConfiguration() {
@@ -80,9 +82,10 @@ public class JadeConfiguration {
     private JadeTemplate createTemplate(String name) throws JadeException, IOException {
         JadeTemplate template = new JadeTemplate();
 
-        Parser parser = new Parser(name, templateLoader);
+        Parser parser = new Parser(name, templateLoader,expressionHandler);
         Node root = parser.parse();
         template.setTemplateLoader(templateLoader);
+        template.setExpressionHandler(expressionHandler);
         template.setRootNode(root);
         template.setPrettyPrint(prettyPrint);
         template.setMode(getMode());
@@ -121,6 +124,14 @@ public class JadeConfiguration {
         this.templateLoader = templateLoader;
     }
 
+    public void setExpressionHandler(ExpressionHandler expressionHandler) {
+        this.expressionHandler = expressionHandler;
+    }
+
+    public ExpressionHandler getExpressionHandler() {
+        return expressionHandler;
+    }
+
     public Mode getMode() {
         return mode;
     }
@@ -143,13 +154,13 @@ public class JadeConfiguration {
 
     public void setCaching(boolean cache) {
         if (cache != this.caching) {
-            ExpressionHandler.setCache(cache);
+            expressionHandler.setCache(cache);
             this.caching = cache;
         }
     }
 
     public void clearCache() {
-        ExpressionHandler.clearCache();
+        expressionHandler.clearCache();
         cache.clear();
     }
 }

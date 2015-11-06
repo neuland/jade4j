@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
-import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 
@@ -25,7 +24,7 @@ public class ExpressionNode extends Node {
 	@Override
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
 		try {
-			Object result = ExpressionHandler.evaluateStringExpression(getValue(), model);
+			Object result = template.getExpressionHandler().evaluateExpression(getValue(), model);
 			if (result == null || !buffer) {
 				return;
 			}
