@@ -1,5 +1,13 @@
 # History
 
+## 1.0.0 / 2015-11-06
+* In this version we updated to a lot of features of JadeJs 1.11 (2015-06-12).
+* Breaking Change: Instead of 'id = 5' you must use '- var id = 5'
+* Breaking Change: Instead of 'h1(attributes, class = "test")' you must use 'h1(class= "test")&attributes(attributes)'
+* Breaking Change: Instead of '!!! 5' you must use 'doctype html'
+* Breaking Change: Instead of '!!! 5' you must use 'doctype html'
+* Jade Syntax for Conditional Comments is not supported anymore
+
 ## 0.4.1 / 2014-11-29
 * fixed tab support #79
 * .jade file extension appending is now done before the template loader #71

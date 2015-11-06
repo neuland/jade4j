@@ -19,7 +19,7 @@ jade4j's intention is to be able to process jade templates in Java without the n
 - [Expressions](#expressions)
 - [Reserved Words](#reserved-words)
 - [Framework Integrations](#framework-integrations)
-- [Breaking Changes in 0.5.0](#breaking-changes)
+- [Breaking Changes in 1.0.0](#breaking-changes)
 - [Authors](#authors)
 - [License](#license)
 
@@ -299,8 +299,8 @@ You can read more about this in the [JEXL documentation](http://commons.apache.o
 If you want to use jade4j with Spring check out our [neuland/spring-jade4j](https://github.com/neuland/spring-jade4j) project.
 
 <a name="breaking-changes"></a>
-## Breaking Changes in 0.5.0
-In Version 0.5.0 we added a lot of features of JadeJs 1.10. There are also some Breaking Changes:
+## Breaking Changes in 1.0.0
+In Version 1.0.0 we added a lot of features of JadeJs 1.11. There are also some Breaking Changes:
 - Instead of 'id = 5' you must use '- var id = 5'
 - Instead of 'h1(attributes, class = "test")' you must use 'h1(class= "test")&attributes(attributes)'
 - Instead of '!!! 5' you must use 'doctype html'
