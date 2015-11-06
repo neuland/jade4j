@@ -351,6 +351,7 @@ public class CompilerTest {
     }
 
     @Test
+    @Ignore("Not working in Jade JS")
     public void expressionLenientVariableEvaluation() throws IOException {
         run("expression_lenient");
     }
