@@ -10,6 +10,7 @@ import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.util.ArgumentSplitter;
+import org.apache.commons.lang3.StringUtils;
 
 public class CallNode extends AttrsNode {
 
