@@ -11,6 +11,7 @@ public class TestFileHelper {
     public static final String TESTFILE_ORIGINAL_FOLDER = "/originalTests/";
     public static final String TESTFILE_20150927_ORIGINAL_FOLDER = "/originalTests20150927/";
     public static final String TESTFILE_20150515_ORIGINAL_FOLDER = "/originalTests20150515/";
+    public static final String TESTFILE_ISSUES_FOLDER = "/issues/";
     public static final String TESTFILE_COMPILER_ERROR_FOLDER = "/compiler/errors/";
     
 	public static String getResourcePath(String fileName) throws FileNotFoundException {
@@ -67,6 +68,14 @@ public class TestFileHelper {
 	public static String getOriginal20150515ResourcePath(String fileName) {
 		try {
 			return getResourcePath(TESTFILE_20150515_ORIGINAL_FOLDER + fileName);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	public static String getIssuesResourcePath(String fileName) {
+		try {
+			return getResourcePath(TESTFILE_ISSUES_FOLDER + fileName);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
