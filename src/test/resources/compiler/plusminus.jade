@@ -1,0 +1,12 @@
+- var error = true
+input.ap-input--ok1
+input(class="ap-input--ok2")
+input(class=error ? "ap-input--error1" : "")
+input(class=(error==false) ? "ap-input--error2" : "")
+input(class="#{error ? 'ap-input--error3' : ''}")
+
+- var x = 1;
+ul
+  while x < 10
+    - x++;
+    li= x
