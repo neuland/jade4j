@@ -1,5 +1,20 @@
 # History
 
+## 1.0.0 / 2015-11-06
+* In this version we updated to a lot of features of JadeJs 1.11 (2015-06-12).
+* Breaking Change: Instead of 'id = 5' you must use '- var id = 5'
+* Breaking Change: Instead of 'h1(attributes, class = "test")' you must use 'h1(class= "test")&attributes(attributes)'
+* Breaking Change: Instead of '!!! 5' you must use 'doctype html'
+* Breaking Change: Instead of '!!! 5' you must use 'doctype html'
+* Jade Syntax for Conditional Comments is not supported anymore
+* Thanks to rzara for contributing to issue-108
+
+## 0.4.3 / 2015-05-27
+* Accepted pull request from dusanmsk (#91) regarding mixin argument splitting and added further tests.
+
+## 0.4.2 / 2015-03-18
+* added issue89: Test files renamed (was #89 instead of #90).
+
 ## 0.4.1 / 2014-11-29
 * fixed tab support #79
 * .jade file extension appending is now done before the template loader #71

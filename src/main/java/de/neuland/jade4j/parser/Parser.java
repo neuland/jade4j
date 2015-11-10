@@ -163,7 +163,7 @@ public class Parser {
       String text;
       if (body instanceof PipelessText) {
         this.advance();
-        text = String.join("\n",body.getValues());
+        text = StringUtils.join(body.getValues(),"\n");
       } else {
         text = "";
       }
@@ -400,9 +400,10 @@ public class Parser {
 
     private String resolvePath(String templateName) {
         URI currentUri = URI.create(filename);
+        currentUri.getPath();
         URI templateUri = currentUri.resolve(templateName);
         String path = templateUri.toString();
-        if(templateName.indexOf(".") == -1)
+        if(StringUtils.lastIndexOf(templateUri.toString(),"/") >= StringUtils.lastIndexOf(templateUri.toString(),"."))
             path += ".jade";
         return path;
     }

@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import com.sun.deploy.util.StringUtils;
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.util.ArgumentSplitter;
+import org.apache.commons.lang3.StringUtils;
 
 public class CallNode extends AttrsNode {
 
@@ -48,42 +48,44 @@ public class CallNode extends AttrsNode {
 			throw new IllegalStateException(e);
 		}
 
+		if (hasBlock()) {
+			List<MixinBlockNode> injectionPoints = getInjectionPoints(mixin.getBlock());
+            for (MixinBlockNode point : injectionPoints) {
+				point.getNodes().add(block);
+            }
+		}
+
 		if (this.isCall()) {
+			model.pushScope();
+			model.put("block", block);
+			writeVariables(model, mixin, template);
+			writeAttributes(model, mixin, template);
+			mixin.getBlock().execute(writer, model, template);
+			model.put("block",null);
+			model.popScope();
 
 		}else{
 
 		}
 
 
-		if (hasBlock()) {
-			List<BlockNode> injectionPoints = getInjectionPoints(mixin.getBlock());
-            for (BlockNode point : injectionPoints) {
-				point.getNodes().add(block);
-            }
-		}
 
-		model.pushScope();
-		model.put("block", block);
-		writeVariables(model, mixin, template);
-		writeAttributes(model, mixin, template);
-		mixin.getBlock().execute(writer, model, template);
-		model.popScope();
 
 	}
 
-	private List<BlockNode> getInjectionPoints(Node block) {
-        List<BlockNode> result = new ArrayList<BlockNode>();
+	private List<MixinBlockNode> getInjectionPoints(Node block) {
+        List<MixinBlockNode> result = new ArrayList<MixinBlockNode>();
 		for (Node node : block.getNodes()) {
-			if (node instanceof BlockNode && !node.hasNodes()) {
-                result.add((BlockNode) node);
+			if (node instanceof MixinBlockNode && !node.hasNodes()) {
+                result.add((MixinBlockNode) node);
 			} else if(node instanceof ConditionalNode){
                 for (IfConditionNode condition : ((ConditionalNode) node).getConditions()) {
                     result.addAll(getInjectionPoints(condition.getBlock()));
                 }
-            } else if(node instanceof CaseNode){
-                for (CaseConditionNode condition : ((CaseNode) node).getCaseConditionNodes()) {
-                    result.addAll(getInjectionPoints(condition.getBlock()));
-                }
+//            } else if(node instanceof CaseNode.When){
+//                for (CaseConditionNode condition : ((CaseNode) node).getCaseConditionNodes()) {
+//                    result.addAll(getInjectionPoints(condition.getBlock()));
+//                }
             } else if (node.hasBlock()) {
                 result.addAll(getInjectionPoints(node.getBlock()));
             }
@@ -122,8 +124,6 @@ public class CallNode extends AttrsNode {
 		if (attributeBlocks.size()>0) {
     		if (attributes.size()>0) {
 				LinkedHashMap<String,String> attrs = attrs(model, template);
-      			String val = this.visitAttributes(model, template);
-      			attributeBlocks.push(val);
     		}
 			model.put("attributes", StringUtils.join(attributeBlocks, ","));
   		} else if (attributes.size()>0) {

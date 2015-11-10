@@ -8,18 +8,20 @@ import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public abstract class AttrsNode extends Node {
 
-	protected List<Attr> attributes = new LinkedList<Attr>();
+    private static final String[] selfClosingTags = {"area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"};
+    protected LinkedList<Attr> attributes = new LinkedList<Attr>();
 	protected LinkedList<String> attributeBlocks = new LinkedList<String>();
 	protected List<String> attributeNames = new LinkedList<String>();
 	protected boolean selfClosing = false;
 	protected Node codeNode;
 	private boolean textOnly;
-	private ArrayList<String> classes = new ArrayList<String>();
+
 
 	public void setAttribute(String key, Object value, boolean escaped) {
 		if (!"class".equals(key) && this.attributeNames.indexOf(key) != -1) {
@@ -36,7 +38,7 @@ public abstract class AttrsNode extends Node {
 
 	public String getAttribute(String key) {
 		for (int i = 0, len = this.attributes.size(); i < len; ++i) {
-			if (this.attributes.get(i) != null && this.attributes.get(i).getName().equals(name)) {
+			if (this.attributes.get(i) != null && this.attributes.get(i).getName().equals(key)) {
 				return attributeValueToString(this.attributes.get(i).getValue());
 			}
 		}
@@ -73,9 +75,12 @@ public abstract class AttrsNode extends Node {
 
         // shallow copy
 		if (this.attributes != null) {
-			clone.attributes = new ArrayList<Attr>(this.attributes);
-		}
+			clone.attributes = new LinkedList<Attr>(this.attributes);
 
+		}
+        if (this.attributes != null) {
+            clone.attributeBlocks = new LinkedList<String>(this.attributeBlocks);
+        }
 		return clone;
 	}
 	public void addAttributes(String src){
@@ -111,23 +116,33 @@ public abstract class AttrsNode extends Node {
 
         if(attributeBlocks.size()>0){
             //Todo: AttributesBlock needs to be evaluated
-//            if(attributes.size()>0){
-//                LinkedHashMap<String,String> attrs = attrs(model, template);
-////                attributeBlocks.push(attrs)
-//            }
-//
-//            return attrsToString(attrs);
+            for (String attributeBlock : attributeBlocks) {
+                HashMap<String,String> o = null;
+                try {
+                    o = (HashMap<String,String>)template.getExpressionHandler().evaluateExpression(attributeBlock, model);
+                } catch (ExpressionException e) {
+                    e.printStackTrace();
+                }
+                if(o!=null) {
+                    for (Map.Entry<String, String> entry : o.entrySet()) {
+                        Attr attr = new Attr();
+                        attr.setName(entry.getKey());
+                        attr.setValue(entry.getValue());
+                        attributes.add(attr);
+                    }
+                }
+            }
             LinkedHashMap<String,String> attrs = attrs(model, template);
-            return attrsToString(attrs);
+            return attrsToString(attrs, template);
         }else{
             LinkedHashMap<String,String> attrs = attrs(model, template);
-            return attrsToString(attrs);
+            return attrsToString(attrs, template);
         }
 
 
     }
 
-    private String attrsToString(LinkedHashMap<String, String> attrs) {
+    private String attrsToString(LinkedHashMap<String, String> attrs, JadeTemplate template) {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : attrs.entrySet()) {
                 sb.append(" ");
@@ -136,27 +151,34 @@ public abstract class AttrsNode extends Node {
                 sb.append("=").append('"');
                 sb.append(entry.getValue());
                 sb.append('"');
+            }else if(entry.getValue() == null && !isTerse(template)){
+                sb.append("=").append('"');
+                sb.append(entry.getKey());
+                sb.append('"');
             }
         }
         return sb.toString();
     }
 
     protected LinkedHashMap<String,String> attrs(JadeModel model, JadeTemplate template) {
+        ArrayList<String> classes = new ArrayList<String>();
         LinkedHashMap<String,String> newAttributes = new LinkedHashMap<String,String>();
         for (Attr attribute : attributes) {
             try {
-                addAttributesToMap(newAttributes, attribute, model, template);
+                addAttributesToMap(newAttributes,classes, attribute, model, template);
             } catch (ExpressionException e) {
                 throw new JadeCompilerException(this, template.getTemplateLoader(), e);
             }
         }
+        LinkedHashMap<String,String> finalAttributes = new LinkedHashMap<String,String>();
+        finalAttributes.putAll(newAttributes);
         if(!classes.isEmpty()){
-            newAttributes.put("class",String.join(" ",classes));
+            finalAttributes.put("class", StringUtils.join(classes," "));
         }
-        return newAttributes;
+        return finalAttributes;
     }
 
-    private void addAttributesToMap(HashMap<String, String> newAttributes, Attr attribute, JadeModel model, JadeTemplate template) throws ExpressionException {
+    private void addAttributesToMap(HashMap<String, String> newAttributes, ArrayList<String> classes, Attr attribute, JadeModel model, JadeTemplate template) throws ExpressionException {
         String name = attribute.getName();
         String key = name;
         boolean escaped = false;
@@ -219,6 +241,11 @@ public abstract class AttrsNode extends Node {
                         }
                     }
                     value = s.toString();
+                }else if(expressionValue!=null && expressionValue instanceof Boolean){
+                    if((Boolean) expressionValue)
+                        value = expressionValue.toString();
+                }else if(expressionValue!=null){
+                    value = expressionValue.toString();
                 }
             }
             if(!StringUtils.isBlank(value))
@@ -286,5 +313,13 @@ public abstract class AttrsNode extends Node {
         } catch (ExpressionException e) {
             throw new JadeCompilerException(this, template.getTemplateLoader(), e);
         }
+    }
+
+    public boolean isTerse(JadeTemplate template) {
+        return isSelfClosing(template) && template.isTerse();
+    }
+
+    public boolean isSelfClosing(JadeTemplate template) {
+        return !template.isXml() && ArrayUtils.contains(selfClosingTags, name);
     }
 }

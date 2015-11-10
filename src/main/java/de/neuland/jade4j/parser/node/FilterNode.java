@@ -12,6 +12,7 @@ import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.filter.Filter;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
+import org.apache.commons.lang3.StringUtils;
 
 public class FilterNode extends Node {
 
@@ -39,7 +40,7 @@ public class FilterNode extends Node {
 				values.add(node.getValue());
 		}
 
-		String result = String.join("\n",values);
+		String result = StringUtils.join(values, "\n");
 		if (filter != null) {
             result = filter.convert(result, attributes, model);
 		}

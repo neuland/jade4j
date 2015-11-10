@@ -1,0 +1,24 @@
+h1 hello world
+
+block foo
+  p default foo
+
+block bar
+  p default bar
+  
+.prepend
+  block world
+    |  world
+  
+.append
+  block hello
+    | hello
+
+ul
+  block listA
+    li 1
+    li 2
+ul
+  block listB
+    li c
+    li d

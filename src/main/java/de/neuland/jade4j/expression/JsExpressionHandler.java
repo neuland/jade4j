@@ -2,11 +2,9 @@ package de.neuland.jade4j.expression;
 
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.model.JadeModel;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import javax.script.*;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Work In Progress - Using ScriptEngineManager
