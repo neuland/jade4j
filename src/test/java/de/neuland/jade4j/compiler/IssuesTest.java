@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class IssuesTest {
-    private static String[] ignoredCases = new String[]{"101"};
+    private static String[] ignoredCases = new String[]{"100","101"};
 
     private String file;
 
@@ -42,6 +42,7 @@ public class IssuesTest {
         jade.setFilter("cdata", new CDATAFilter());
         jade.setFilter("custom-filter", new CustomTestFilter());
         jade.setFilter("marked", new MarkdownFilter());
+        jade.setFilter("markdown", new MarkdownFilter());
         jade.setFilter("verbatim", new VerbatimFilter());
         jade.setFilter("js", new JsFilter());
         jade.setFilter("css", new CssFilter());
