@@ -100,6 +100,11 @@ public class CompilerTest {
     }
 
     @Test
+    public void minusMinusPlusPlusMatching() {
+        run("plusminus");
+    }
+    
+    @Test
     public void caseTag() {
         run("case");
     }

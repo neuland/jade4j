@@ -14,8 +14,8 @@ import java.util.regex.Pattern;
 public class JexlExpressionHandler implements ExpressionHandler {
 
 	private static final int MAX_ENTRIES = 5000;
-	public static Pattern plusplus = Pattern.compile("([a-zA-Z0-9-_]*[a-zA-Z0-9])\\+\\+");
-	public static Pattern minusminus = Pattern.compile("([a-zA-Z0-9-_]*[a-zA-Z0-9])--");
+	public static Pattern plusplus = Pattern.compile("([a-zA-Z0-9-_]*[a-zA-Z0-9])\\+\\+\\s*;{0,1}\\s*$");
+	public static Pattern minusminus = Pattern.compile("([a-zA-Z0-9-_]*[a-zA-Z0-9])--\\s*;{0,1}\\s*$");
 	private JexlEngine jexl;
 
 	public JexlExpressionHandler() {
