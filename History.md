@@ -1,5 +1,8 @@
 # History
 
+## 1.0.2 / 2015-11-10
+* Fixing Issue 113: &attributes on Mixin not working
+
 ## 1.0.1 / 2015-11-10
 * Fixing Issue 112: Fixed ++ and -- recognition
 * Fixing Issue 111: Maven Upgrade auf 3.2.5
