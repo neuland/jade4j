@@ -26,13 +26,6 @@
         </license>
     </licenses>
 
-    <repositories>
-      <repository>
-        <id>jade4j-coffeescript-filter-releases</id>
-        <url>https://raw.github.com/neuland/jade4j-coffeescript-filter/master/releases</url>
-      </repository>
-    </repositories>
-
     <scm>
         <url>https://github.com/neuland/jade4j</url>
         <connection>scm:git:git://github.com/neuland/jade4j.git</connection>
@@ -240,12 +233,6 @@
             <groupId>org.pegdown</groupId>
             <artifactId>pegdown</artifactId>
             <version>1.1.0</version>
-        </dependency>
-        <dependency>
-          <groupId>de.neuland</groupId>
-          <artifactId>jade4j-coffeescript-filter</artifactId>
-          <version>0.2.0</version>
-            <!--<scope>test</scope>-->
         </dependency>
     </dependencies>
 </project>
