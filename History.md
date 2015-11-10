@@ -1,5 +1,10 @@
 # History
 
+## 1.0.1 / 2015-11-10
+* Fixing Issue 112: Fixed ++ and -- recognition
+* Fixing Issue 111: Maven Upgrade auf 3.2.5
+* Added Testcases for closed Issues
+
 ## 1.0.0 / 2015-11-06
 * In this version we updated to a lot of features of JadeJs 1.11 (2015-06-12).
 * Breaking Change: Instead of 'id = 5' you must use '- var id = 5'
