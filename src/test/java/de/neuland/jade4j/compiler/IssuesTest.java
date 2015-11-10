@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class IssuesTest {
-    private static String[] ignoredCases = new String[]{"104b_mixin","layout","101"};
+    private static String[] ignoredCases = new String[]{"101"};
 
     private String file;
 
@@ -71,7 +71,7 @@ public class IssuesTest {
 
         Collection<String[]> data = new ArrayList<String[]>();
         for (File file : files) {
-            if (!ArrayUtils.contains(ignoredCases, file.getName().replace(".jade", ""))) {
+            if (!ArrayUtils.contains(ignoredCases, file.getName().replace(".jade", "")) && !file.getName().startsWith("_")) {
                 data.add(new String[]{file.getName()});
             }
 
