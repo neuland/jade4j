@@ -113,13 +113,13 @@ public abstract class AttrsNode extends Node {
     }
 
 	protected String visitAttributes(JadeModel model, JadeTemplate template) {
-
+        LinkedList<Attr> newAttributes = new LinkedList<Attr>(attributes);
         if(attributeBlocks.size()>0){
             //Todo: AttributesBlock needs to be evaluated
             for (String attributeBlock : attributeBlocks) {
                 HashMap<String,String> o = null;
                 try {
-                    o = (HashMap<String,String>)template.getExpressionHandler().evaluateExpression(attributeBlock, model);
+                    o = (HashMap<String,String>) template.getExpressionHandler().evaluateExpression(attributeBlock, model);
                 } catch (ExpressionException e) {
                     e.printStackTrace();
                 }
@@ -128,14 +128,14 @@ public abstract class AttrsNode extends Node {
                         Attr attr = new Attr();
                         attr.setName(entry.getKey());
                         attr.setValue(entry.getValue());
-                        attributes.add(attr);
+                        newAttributes.add(attr);
                     }
                 }
             }
-            LinkedHashMap<String,String> attrs = attrs(model, template);
+            LinkedHashMap<String,String> attrs = attrs(model, template,newAttributes);
             return attrsToString(attrs, template);
         }else{
-            LinkedHashMap<String,String> attrs = attrs(model, template);
+            LinkedHashMap<String,String> attrs = attrs(model, template, newAttributes);
             return attrsToString(attrs, template);
         }
 
@@ -160,10 +160,10 @@ public abstract class AttrsNode extends Node {
         return sb.toString();
     }
 
-    protected LinkedHashMap<String,String> attrs(JadeModel model, JadeTemplate template) {
+    protected LinkedHashMap<String,String> attrs(JadeModel model, JadeTemplate template, LinkedList<Attr> attrs) {
         ArrayList<String> classes = new ArrayList<String>();
         LinkedHashMap<String,String> newAttributes = new LinkedHashMap<String,String>();
-        for (Attr attribute : attributes) {
+        for (Attr attribute : attrs) {
             try {
                 addAttributesToMap(newAttributes,classes, attribute, model, template);
             } catch (ExpressionException e) {

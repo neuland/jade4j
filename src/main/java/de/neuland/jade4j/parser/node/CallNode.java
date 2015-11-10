@@ -1,8 +1,6 @@
 package de.neuland.jade4j.parser.node;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.ExpressionException;
@@ -121,13 +119,37 @@ public class CallNode extends AttrsNode {
 	private void writeAttributes(JadeModel model, MixinNode mixin, JadeTemplate template) {
 //		model.put("attributes", mergeInheritedAttributes(model));
 //		model.put("attributes", getArguments());
+		LinkedList<Attr> newAttributes = new LinkedList<Attr>(attributes);
 		if (attributeBlocks.size()>0) {
-    		if (attributes.size()>0) {
-				LinkedHashMap<String,String> attrs = attrs(model, template);
+			//Todo: AttributesBlock needs to be evaluated
+
+			for (String attributeBlock : attributeBlocks) {
+			   Object o = null;
+			   try {
+				   o = template.getExpressionHandler().evaluateExpression(attributeBlock, model);
+			   } catch (ExpressionException e) {
+				   e.printStackTrace();
+			   }
+			   if(o!=null) {
+				   if(o instanceof HashMap) {
+					   for (Map.Entry<String, String> entry : ((HashMap<String,String>) o).entrySet()) {
+						   Attr attr = new Attr();
+						   attr.setName(entry.getKey());
+						   attr.setValue(entry.getValue());
+						   newAttributes.add(attr);
+					   }
+				   }else if(o instanceof String){
+					   System.out.print(o);
+				   }
+
+			   }
+		   }
+    		if (newAttributes.size()>0) {
+				LinkedHashMap<String,String> attrs = attrs(model, template, newAttributes);
+				model.put("attributes", attrs);
     		}
-			model.put("attributes", StringUtils.join(attributeBlocks, ","));
-  		} else if (attributes.size()>0) {
-			LinkedHashMap<String,String> attrs = attrs(model, template);
+  		} else if (newAttributes.size()>0) {
+			LinkedHashMap<String,String> attrs = attrs(model, template, newAttributes);
 			model.put("attributes", attrs);
   		}
 
