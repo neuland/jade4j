@@ -21,7 +21,7 @@ public class JadeParserTest extends ParserTest {
         assertThat(blockNode.getNodes(), notNullValue());
 
         Node node = blockNode.pollNode();
-        assertThat(node.getValue(), equalTo("5"));
+        assertThat(node.getValue(), equalTo("html"));
 
         node = blockNode.pollNode();
         assertThat(node.getValue(), equalTo("div"));

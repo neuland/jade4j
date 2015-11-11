@@ -44,7 +44,8 @@ public class TextTest extends TokenTest {
 		assertToken(Text.class,    "Hello Berlin");
 		assertToken(Newline.class, "newline");
 		assertToken(Text.class,    "Hello Tokyo");
-		assertToken(Newline.class, "newline");
+		assertToken(Outdent.class, "outdent");
+		assertToken(Outdent.class, "outdent");
 		assertToken(Outdent.class, "outdent");
 		assertToken(Eos.class,     "eos");
 	}

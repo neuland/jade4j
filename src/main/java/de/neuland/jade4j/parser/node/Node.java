@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
+import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 
@@ -85,7 +86,6 @@ public abstract class Node implements Cloneable {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
-
 	@Override
 	public Node clone() throws CloneNotSupportedException {
 		Node clone = (Node) super.clone();

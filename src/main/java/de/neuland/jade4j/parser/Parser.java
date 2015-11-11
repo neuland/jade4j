@@ -2,87 +2,57 @@ package de.neuland.jade4j.parser;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.neuland.jade4j.expression.ExpressionHandler;
+import de.neuland.jade4j.lexer.token.*;
+import de.neuland.jade4j.parser.node.*;
+import de.neuland.jade4j.util.CharacterParser;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.neuland.jade4j.exceptions.JadeParserException;
 import de.neuland.jade4j.lexer.Assignment;
 import de.neuland.jade4j.lexer.Each;
 import de.neuland.jade4j.lexer.Lexer;
-import de.neuland.jade4j.lexer.token.Attribute;
-import de.neuland.jade4j.lexer.token.Block;
-import de.neuland.jade4j.lexer.token.CaseToken;
-import de.neuland.jade4j.lexer.token.Colon;
-import de.neuland.jade4j.lexer.token.Comment;
-import de.neuland.jade4j.lexer.token.CssClass;
-import de.neuland.jade4j.lexer.token.CssId;
-import de.neuland.jade4j.lexer.token.Default;
-import de.neuland.jade4j.lexer.token.Doctype;
-import de.neuland.jade4j.lexer.token.Dot;
-import de.neuland.jade4j.lexer.token.Else;
-import de.neuland.jade4j.lexer.token.ElseIf;
-import de.neuland.jade4j.lexer.token.Eos;
-import de.neuland.jade4j.lexer.token.Expression;
-import de.neuland.jade4j.lexer.token.ExtendsToken;
-import de.neuland.jade4j.lexer.token.Filter;
-import de.neuland.jade4j.lexer.token.If;
-import de.neuland.jade4j.lexer.token.Include;
-import de.neuland.jade4j.lexer.token.Indent;
-import de.neuland.jade4j.lexer.token.Mixin;
-import de.neuland.jade4j.lexer.token.MixinInject;
-import de.neuland.jade4j.lexer.token.Newline;
-import de.neuland.jade4j.lexer.token.Outdent;
-import de.neuland.jade4j.lexer.token.Tag;
-import de.neuland.jade4j.lexer.token.Text;
-import de.neuland.jade4j.lexer.token.Token;
-import de.neuland.jade4j.lexer.token.When;
-import de.neuland.jade4j.lexer.token.While;
-import de.neuland.jade4j.lexer.token.Yield;
-import de.neuland.jade4j.parser.node.AssigmentNode;
-import de.neuland.jade4j.parser.node.BlockNode;
-import de.neuland.jade4j.parser.node.CaseConditionNode;
-import de.neuland.jade4j.parser.node.CaseNode;
-import de.neuland.jade4j.parser.node.ConditionalNode;
-import de.neuland.jade4j.parser.node.DoctypeNode;
-import de.neuland.jade4j.parser.node.EachNode;
-import de.neuland.jade4j.parser.node.ExpressionNode;
-import de.neuland.jade4j.parser.node.FilterNode;
-import de.neuland.jade4j.parser.node.IfConditionNode;
-import de.neuland.jade4j.parser.node.LiteralNode;
-import de.neuland.jade4j.parser.node.MixinInjectNode;
-import de.neuland.jade4j.parser.node.MixinNode;
-import de.neuland.jade4j.parser.node.Node;
-import de.neuland.jade4j.parser.node.TagNode;
-import de.neuland.jade4j.parser.node.TextNode;
-import de.neuland.jade4j.parser.node.WhileNode;
 import de.neuland.jade4j.template.TemplateLoader;
 
 public class Parser {
 
     public static final Pattern FILE_EXTENSION_PATTERN = Pattern.compile(".*\\.\\w+$");
     private Lexer lexer;
-    private Map<String, Node> blocks = new LinkedHashMap<String, Node>();
+    private LinkedHashMap<String, BlockNode> blocks = new LinkedHashMap<String,BlockNode>();
     private String[] textOnlyTags = {"script", "style"};
     private Integer _spaces = null;
     private final TemplateLoader templateLoader;
+    private ExpressionHandler expressionHandler;
     private Parser extending;
     private final String filename;
     private LinkedList<Parser> contexts = new LinkedList<Parser>();
+    private CharacterParser characterParser;
+    private int inMixin = 0;
+    private HashMap mixins = new HashMap<String,MixinNode>();
+    private int inBlock = 0;
 
-    public Parser(String filename, TemplateLoader templateLoader) throws IOException {
+    public Parser(String filename, TemplateLoader templateLoader,ExpressionHandler expressionHandler) throws IOException {
         this.filename = filename;
         this.templateLoader = templateLoader;
-        lexer = new Lexer(filename, templateLoader);
+        this.expressionHandler = expressionHandler;
+        lexer = new Lexer(filename, templateLoader,expressionHandler);
+        characterParser = new CharacterParser();
+        getContexts().push(this);
+    }
+    public Parser(String src, String filename, TemplateLoader templateLoader,ExpressionHandler expressionHandler) throws IOException {
+        this.filename = filename;
+        this.templateLoader = templateLoader;
+        this.expressionHandler = expressionHandler;
+        lexer = new Lexer(src,filename, templateLoader,expressionHandler);
+        characterParser = new CharacterParser();
         getContexts().push(this);
     }
 
@@ -92,7 +62,7 @@ public class Parser {
         block.setFileName(filename);
         while (!(peek() instanceof Eos)) {
             if (peek() instanceof Newline) {
-                nextToken();
+                advance();
             } else {
                 Node expr = parseExpr();
                 if (expr != null) {
@@ -104,21 +74,24 @@ public class Parser {
             getContexts().push(extending);
             Node rootNode = extending.parse();
             getContexts().pop();
-            liftMixins(rootNode,block);
+            liftMixins(rootNode,block.getNodes());
             return rootNode;
         }
 
         return block;
     }
 
-    private void liftMixins( Node rootNode, Node node ) {
-        if (node instanceof MixinNode) {
-            rootNode.getNodes().add(0,node);
-        } else {
-            for (Node child : node.getNodes()) {
-                liftMixins(rootNode,child);
-            }
-        }
+    private void liftMixins(Node rootNode, LinkedList<Node> nodes) {
+	for (Node child : nodes) {
+	    if (child instanceof MixinNode) {
+		MixinNode mixin = (MixinNode) child;
+		if (!mixin.isCall()) {
+		    rootNode.getNodes().push(child);
+		}
+	    } else {
+		liftMixins(rootNode, child.getNodes());
+	    }
+	}
     }
 
     private Node parseExpr() {
@@ -129,17 +102,23 @@ public class Parser {
         if (token instanceof Mixin) {
             return parseMixin();
         }
-        if (token instanceof MixinInject) {
-            return parseMixinInject();
-        }
         if (token instanceof Block) {
             return parseBlock();
+        }
+        if (token instanceof MixinBlock) {
+            return parseMixinBlock();
+        }
+        if (token instanceof CaseToken) {
+            return parseCase();
         }
         if (token instanceof ExtendsToken) {
             return parseExtends();
         }
         if (token instanceof Include) {
             return parseInclude();
+        }
+        if (token instanceof Doctype) {
+            return parseDoctype();
         }
         if (token instanceof Filter) {
             return parseFilter();
@@ -153,49 +132,80 @@ public class Parser {
         if (token instanceof Each) {
             return parseEach();
         }
-        if (token instanceof While) {
-            return parseWhile();
-        }
-        if (token instanceof CssClass || token instanceof CssId) {
-            return parseCssClassOrId();
-        }
-        if (token instanceof If) {
-            return parseConditional();
-        }
-        if (token instanceof CaseToken) {
-            return parseCase();
-        }
-        if (token instanceof Assignment) {
-            return parseAssignment();
-        }
-        if (token instanceof Doctype) {
-            return parseDoctype();
-        }
+//        if (token instanceof Code) {
+//            return parseCode();
+//        }
         if (token instanceof Expression) {
             return parseCode();
+        }
+        if (token instanceof BlockCode) {
+            return parseBlockCode();
+        }
+        if (token instanceof Call) {
+            return parseCall();
+        }
+        if (token instanceof Interpolation) {
+            return parseInterpolation();
         }
         if (token instanceof Yield) {
             return parseYield();
         }
+        if (token instanceof CssClass || token instanceof CssId) {
+            return parseCssClassOrId();
+        }
+        if (token instanceof While) {
+            return parseWhile();
+        }
+        if (token instanceof If) {
+            return parseConditional();
+        }
+        if (token instanceof Assignment) {
+            return parseAssignment();
+        }
+
         throw new JadeParserException(filename, lexer.getLineno(), templateLoader, token);
+    }
+    /**
+     * block code
+     */
+
+    private Node parseBlockCode(){
+      Token tok = this.expect(BlockCode.class);
+      CodeNode node;
+      Token body = this.peek();
+      String text;
+      if (body instanceof PipelessText) {
+        this.advance();
+        text = StringUtils.join(body.getValues(),"\n");
+      } else {
+        text = "";
+      }
+        node = new CodeNode();
+        node.setValue(text);
+        node.setLineNumber(tok.getLineNumber());
+        return node;
     }
 
     private Node parseComment() {
         Token token = expect(Comment.class);
 
-        CommentNode node;
-        if (peek() instanceof Indent) {
-            node = new BlockCommentNode();
-            node.setBlock(block());
+        Node block = this.parseTextBlock();
+        if (block != null ) {
+            BlockCommentNode node = new BlockCommentNode();
+            node.setBlock(block);
+            node.setBuffered(token.isBuffer());
+            node.setLineNumber(token.getLineNumber());
+            node.setFileName(filename);
+            node.setValue(token.getValue());
+            return node;
         } else {
-            node = new CommentNode();
+            CommentNode node = new CommentNode();
+            node.setBuffered(token.isBuffer());
+            node.setLineNumber(token.getLineNumber());
+            node.setFileName(filename);
+            node.setValue(token.getValue());
+            return node;
         }
-        node.setBuffered(token.isBuffer());
-        node.setLineNumber(token.getLineNumber());
-        node.setFileName(filename);
-        node.setValue(token.getValue());
-
-        return node;
     }
 
     private Node parseMixin() {
@@ -204,78 +214,88 @@ public class Parser {
         node.setName(mixinToken.getValue());
         node.setLineNumber(mixinToken.getLineNumber());
         node.setFileName(filename);
+
         if (StringUtils.isNotBlank(mixinToken.getArguments())) {
             node.setArguments(mixinToken.getArguments());
         }
+
         if (peek() instanceof Indent) {
+            this.inMixin++;
             node.setBlock(block());
+            node.setCall(false);
+            this.mixins.put(mixinToken.getValue(),node);
+            this.inMixin--;
+            return node;
+        }else{
+            node.setCall(true);
+            return node;
         }
-        return node;
     }
 
-    private Node parseMixinInject() {
-        Token token = expect(MixinInject.class);
-        MixinInject mixinInjectToken = (MixinInject) token;
-        MixinInjectNode node = new MixinInjectNode();
-        node.setName(mixinInjectToken.getValue());
-        node.setLineNumber(mixinInjectToken.getLineNumber());
-        node.setFileName(filename);
+    private Node parseCall() {
+        Token token = expect(Call.class);
+        Call callToken = (Call) token;
+        MixinNode mixin = new MixinNode();
+        mixin.setBlock(new BlockNode());
+        mixin.setName(callToken.getValue());
+        mixin.setLineNumber(callToken.getLineNumber());
+        mixin.setFileName(filename);
+        mixin.setCall(true);
 
-        if (StringUtils.isNotBlank(mixinInjectToken.getArguments())) {
-            node.setArguments(mixinInjectToken.getArguments());
+        if (StringUtils.isNotBlank(callToken.getArguments())) {
+            mixin.setArguments(callToken.getArguments());
         }
-
-        while (true) {
-            Token incomingToken = peek();
-            if (incomingToken instanceof CssId) {
-                Token tok = nextToken();
-                node.addAttribute("id", tok.getValue());
-            } else if (incomingToken instanceof CssClass) {
-                Token tok = nextToken();
-                node.addAttribute("class", tok.getValue());
-            } else if (incomingToken instanceof Attribute) {
-                Attribute tok = (Attribute) nextToken();
-                node.addAttributes(tok.getAttributes());
-            } else {
-                break;
-            }
-        }
-
-        if (peek() instanceof Text) {
-            node.setBlock(parseText());
-        } else if (peek() instanceof Indent) {
-            node.setBlock(block());
-        }
-        return node;
+        this.tag(mixin);
+//        if(mixin.)
+        if(mixin.hasBlock() && mixin.getBlock().getNodes().isEmpty())
+            mixin.setBlock(null);
+        return mixin;
     }
 
     private Node parseCssClassOrId() {
-        Token tok = nextToken();
+        Token tok = advance();
         Tag div = new Tag("div", line());
         lexer.defer(div);
         lexer.defer(tok);
         return parseExpr();
     }
-
     private Node parseBlock() {
         Token token = expect(Block.class);
         Block block = (Block) token;
         String mode = block.getMode();
         String name = block.getValue().trim();
 
-        Node blockNode;
+        this.inBlock++;
+        BlockNode blockNode;
         if (peek() instanceof Indent) {
             blockNode = block();
         } else {
             blockNode = new BlockNode();
             blockNode.setLineNumber(block.getLineNumber());
             blockNode.setFileName(filename);
+            LiteralNode node = new LiteralNode();
+            node.setValue("");
+            blockNode.push(node);
+        }
+        this.inBlock--;
+        blockNode.setName(name);
+        blockNode.setLineNumber(line());
+
+        BlockNode prev;
+        if(this.blocks.get(name)==null)
+            prev = new BlockNode();
+        else
+            prev = this.blocks.get(name);
+
+
+        if ("replace".equals(prev.getMode())) {
+            this.blocks.put(name, prev);
+            return prev;
         }
 
         ((BlockNode) blockNode).setMode(mode);
 
         if (blocks.containsKey(name)) {
-            BlockNode prev = (BlockNode) blocks.get(name);
             if ("append".equals(prev.getMode())) {
                 blockNode.getNodes().addAll(prev.getNodes());
             }
@@ -291,37 +311,67 @@ public class Parser {
         return blockNode;
     }
 
+    private Node parseMixinBlock(){
+        Token tok = expect(MixinBlock.class);
+        if(this.inMixin == 0){
+            throw new JadeParserException(filename, lexer.getLineno(), templateLoader, "Anonymous blocks are not allowed unless they are part of a mixin.");
+        }
+        return new MixinBlockNode();
+    }
+
     private Node parseInclude() {
         Token token = expect(Include.class);
         Include includeToken = (Include) token;
         String templateName = includeToken.getValue().trim();
+        String path = resolvePath(templateName);
 
-        String extension = FilenameUtils.getExtension(templateName);
-        if (!"".equals(extension) && !"jade".equals(extension)) {
-            FilterNode node = new FilterNode();
-            node.setLineNumber(lexer.getLineno());
-            node.setFileName(filename);
-            node.setValue(extension);
+        try {
+            if (includeToken.getFilter() != null) {
+                Reader reader = templateLoader.getReader(path);
+                FilterNode node = new FilterNode();
+                node.setValue(includeToken.getFilter());
+                node.setLineNumber(line());
+                node.setFileName(filename);
+                TextNode text = new TextNode();
+                text.setValue(IOUtils.toString(reader));
+                BlockNode block = new BlockNode();
+                LinkedList<Node> nodes = new LinkedList<Node>();
+                nodes.add(text);
+                block.setNodes(nodes);
+                if (block != null)
+                    node.setTextBlock(block);
+                else {
+                    node.setTextBlock(new BlockNode());
+                }
+                return node;
+            }
+        } catch (IOException e) {
+            throw new JadeParserException(filename, lexer.getLineno(), templateLoader, "the included file [" + templateName + "] could not be opened\n" + e.getMessage());
+        }
+
+        // non-jade
+        String extension = FilenameUtils.getExtension(path);
+        if (!"jade".equals(extension)) {
             try {
-                Reader reader = templateLoader.getReader(resolvePath(templateName));
-                Node textNode = new TextNode();
-                textNode.setFileName(filename);
-                textNode.setLineNumber(lexer.getLineno());
-                textNode.setValue(IOUtils.toString(reader));
-                node.setTextBlock(textNode);
+                Reader reader = templateLoader.getReader(path);
+                LiteralNode node = new LiteralNode();
+                node.setLineNumber(lexer.getLineno());
+                node.setFileName(filename);
+                node.setValue(IOUtils.toString(reader));
+                return node;
             } catch (IOException e) {
                 throw new JadeParserException(filename, lexer.getLineno(), templateLoader, "the included file [" + templateName + "] could not be opened\n" + e.getMessage());
             }
-            return node;
         }
 
         Parser parser = createParser(templateName);
         parser.setBlocks(blocks);
+        parser.setMixins(mixins);
         contexts.push(parser);
         Node ast = parser.parse();
         contexts.pop();
 
-        if (peek() instanceof Indent && ast instanceof BlockNode) {
+        if (peek() instanceof Indent && ast != null) {
             ((BlockNode) ast).getIncludeBlock().push(block());
         }
 
@@ -347,7 +397,7 @@ public class Parser {
     private Parser createParser(String templateName) {
         templateName = ensureJadeExtension(templateName);
         try {
-            return new Parser(resolvePath(templateName), templateLoader);
+            return new Parser(resolvePath(templateName), templateLoader,expressionHandler);
         } catch (IOException e) {
             throw new JadeParserException(filename, lexer.getLineno(), templateLoader, "the template [" + templateName
                     + "] could not be opened\n" + e.getMessage());
@@ -355,7 +405,7 @@ public class Parser {
     }
 
     private String ensureJadeExtension(String templateName) {
-        if ( StringUtils.isBlank(FilenameUtils.getExtension(templateName))) {
+        if (!"jade".equals(FilenameUtils.getExtension(templateName))) {
             return templateName + ".jade";
         }
         return templateName;
@@ -363,17 +413,31 @@ public class Parser {
 
     private String resolvePath(String templateName) {
         URI currentUri = URI.create(filename);
+        currentUri.getPath();
         URI templateUri = currentUri.resolve(templateName);
-        return templateUri.toString();
+        String path = templateUri.toString();
+        if(StringUtils.lastIndexOf(templateUri.toString(),"/") >= StringUtils.lastIndexOf(templateUri.toString(),"."))
+            path += ".jade";
+        return path;
     }
 
     private BlockNode parseYield() {
-        nextToken();
-        BlockNode block = (BlockNode) new BlockNode();
+        advance();
+        BlockNode block = new BlockNode();
         block.setLineNumber(lexer.getLineno());
         block.setFileName(filename);
         block.setYield(true);
         return block;
+    }
+    private Node parseInterpolation() {
+        Token token = advance();
+        String name = token.getValue();
+        TagNode tagNode = new TagNode();
+        tagNode.setLineNumber(lexer.getLineno());
+        tagNode.setFileName(filename);
+        tagNode.setName(name);
+        tagNode.setBuffer(true);
+        return this.tag(tagNode);
     }
 
     private Node blockExpansion() {
@@ -389,24 +453,23 @@ public class Parser {
         return block();
     }
 
-    private Node block() {
+    private BlockNode block() {
         BlockNode block = new BlockNode();
         block.setLineNumber(lexer.getLineno());
         block.setFileName(filename);
         expect(Indent.class);
-        while (!(peek() instanceof Outdent) && !(peek() instanceof Eos)) {
+        while (!(peek() instanceof Outdent)) {
             if (peek() instanceof Newline) {
-                nextToken();
+                advance();
             } else {
                 Node parseExpr = this.parseExpr();
+                parseExpr.setFileName(filename);
                 if (parseExpr != null) {
                     block.push(parseExpr);
                 }
             }
         }
-        if (peek() instanceof Outdent) {
-            expect(Outdent.class);
-        }
+        expect(Outdent.class);
         return block;
     }
 
@@ -415,7 +478,7 @@ public class Parser {
         List<CaseConditionNode> caseConditionalNodes = new LinkedList<CaseConditionNode>();
         while (!(peek() instanceof Outdent) && !(peek() instanceof Eos)) {
             if (peek() instanceof Newline) {
-                nextToken();
+                advance();
             } else {
                 caseConditionalNodes.add(this.parseCaseCondition());
             }
@@ -427,10 +490,15 @@ public class Parser {
     }
 
     private Node parseText() {
-        Token token = expect(Text.class);
-        Node node = new TextNode();
-        node.setValue(token.getValue());
-        node.setLineNumber(token.getLineNumber());
+        Token tok = expect(Text.class);
+        Node[] tokens = this.parseInlineTagsInText(tok.getValue());
+        if (tokens.length == 1) return tokens[0];
+        BlockNode node = new BlockNode();
+        for (int i = 0; i < tokens.length; i++) {
+          node.push(tokens[i]);
+        }
+        node.setValue(tok.getValue());
+        node.setLineNumber(tok.getLineNumber());
         node.setFileName(filename);
         return node;
     }
@@ -445,8 +513,8 @@ public class Parser {
         node.setLineNumber(eachToken.getLineNumber());
         node.setFileName(filename);
         node.setBlock(block());
-        if (peek() instanceof Else) {
-            nextToken();
+        if (peek() instanceof Else || peek() instanceof Expression) {
+            advance();
             node.setElseNode(block());
         }
         return node;
@@ -459,7 +527,11 @@ public class Parser {
         node.setValue(whileToken.getValue());
         node.setLineNumber(whileToken.getLineNumber());
         node.setFileName(filename);
-        node.setBlock(block());
+        BlockNode block = block();
+        if(block!=null)
+            node.setBlock(block);
+        else
+            node.setBlock(new BlockNode());
         return node;
     }
 
@@ -475,18 +547,7 @@ public class Parser {
     }
 
     private Node parseTag() {
-        // ast-filter look-ahead
-        int i = 2;
-        if (lookahead(i) instanceof Attribute) {
-            i++;
-        }
-        if (lookahead(i) instanceof Colon) {
-            i++;
-            if (lookahead(i) instanceof Indent) {
-                return this.parseASTFilter();
-            }
-        }
-        Token token = nextToken();
+        Token token = advance();
         String name = token.getValue();
         TagNode tagNode = new TagNode();
         tagNode.setLineNumber(lexer.getLineno());
@@ -494,22 +555,50 @@ public class Parser {
         tagNode.setName(name);
         tagNode.setValue(name);
         tagNode.setSelfClosing(token.isSelfClosing());
+        return this.tag(tagNode);
+    }
 
+    private Node tag(AttrsNode tagNode){
+        // ast-filter look-ahead
+        boolean seenAttrs = false;
         while (true) {
             Token incomingToken = peek();
             if (incomingToken instanceof CssId) {
-                Token tok = nextToken();
-                tagNode.addAttribute("id", tok.getValue());
+                Token tok = advance();
+                tagNode.setAttribute("id", tok.getValue(),false);
                 continue;
             } else if (incomingToken instanceof CssClass) {
-                Token tok = nextToken();
-                tagNode.addAttribute("class", tok.getValue());
+                Token tok = advance();
+                tagNode.setAttribute("class", tok.getValue(),false);
                 continue;
-            } else if (incomingToken instanceof Attribute) {
-                Attribute tok = (Attribute) nextToken();
-                tagNode.addAttributes(tok.getAttributes());
+            } else if (incomingToken instanceof AttributeList) {
+                if (seenAttrs) {
+                    //console.warn(this.filename + ', line ' + this.peek().line + ':\nYou should not have jade tags with multiple attributes.');
+                }
+                seenAttrs = true;
+                AttributeList tok = (AttributeList) advance();
+                Map<String, Object> attrs = tok.getAttributes();
                 tagNode.setSelfClosing(tok.isSelfClosing());
+                for (String name : attrs.keySet()) {
+                    Object value = attrs.get(name);
+                    if(value instanceof ValueString) {
+                        ValueString valueString = (ValueString) value;
+                        tagNode.setAttribute(name, valueString.getValue(),valueString.isEscape());
+                    }else if(value instanceof ExpressionString) {
+                        ExpressionString expressionString = (ExpressionString) value;
+                        tagNode.setAttribute(name, value, expressionString.isEscape());
+                    }else if(value instanceof Boolean){
+                        tagNode.setAttribute(name, value, false);
+                    }else if(value instanceof String){
+                        tagNode.setAttribute(name, value, false);
+                    }
+
+                }
                 continue;
+            } else if (incomingToken instanceof AttributesBlock) {
+                Token tok = this.advance();
+                tagNode.addAttributes(tok.getValue());
+                break;
             } else {
                 break;
             }
@@ -520,91 +609,132 @@ public class Parser {
         if (peek() instanceof Dot) {
             dot = true;
             tagNode.setTextOnly(true);
-            nextToken();
+            advance();
         }
 
         // (text | code | ':')?
         if (peek() instanceof Text) {
-            tagNode.setTextNode(parseText());
+            tagNode.getBlock().push(parseText());
         } else if (peek() instanceof Expression) {
             tagNode.setCodeNode(parseCode());
         } else if (peek() instanceof Colon) {
-            Token next = nextToken();
+            Token next = advance();
             BlockNode block = new BlockNode();
             block.setLineNumber(next.getLineNumber());
             block.setFileName(filename);
-            tagNode.setBlock(block);
             block.push(parseExpr());
+            tagNode.setBlock(block);
         }
 
         // newline*
         while (peek() instanceof Newline) {
-            nextToken();
+            advance();
         }
-
-        if (!tagNode.isTextOnly()) {
-            if (Arrays.asList(textOnlyTags).contains(tagNode.getName())) {
-                tagNode.setTextOnly(true);
+        if (tagNode.isTextOnly()) {
+            Node block = this.parseTextBlock();
+            if(block == null)
+                block = new BlockNode();
+            tagNode.setBlock(block);
+        }else if(peek() instanceof Indent){
+            BlockNode block = block();
+//            if(!tagNode.hasBlock())
+//                tagNode.setBlock(new BlockNode());
+            for (int i = 0, len = block.getNodes().size(); i < len; ++i) {
+                tagNode.getBlock().push(block.getNodes().get(i));
             }
         }
-
-        // script special-case
-        if ("script".equals(tagNode.getName())) {
-            String type = tagNode.getAttribute("type");
-            if (!dot && StringUtils.isNotBlank(type)) {
-                String cleanType = type.replaceAll("^['\"]|['\"]$", "");
-                if (!"text/javascript".equals(cleanType)) {
-                    tagNode.setTextOnly(false);
-                }
-            }
-        }
-
-        if (peek() instanceof Indent) {
-            if (tagNode.isTextOnly()) {
-                lexer.setPipeless(true);
-                tagNode.setTextNode(parseTextBlock());
-                lexer.setPipeless(false);
-            } else {
-                Node blockNode = block();
-                if (tagNode.hasBlock()) {
-                    tagNode.getBlock().getNodes().addAll(blockNode.getNodes());
-                } else {
-                    tagNode.setBlock(blockNode);
-                }
-            }
-        }
+//        else{
+//            if (Arrays.asList(textOnlyTags).contains(tagNode.getName())) {
+//                tagNode.setTextOnly(true);
+//            }
+//        }
+//
+//        // script special-case
+//        if ("script".equals(tagNode.getName())) {
+//            String type = tagNode.getAttribute("type");
+//            if (!dot && StringUtils.isNotBlank(type)) {
+//                String cleanType = type.replaceAll("^['\"]|['\"]$", "");
+//                if (!"text/javascript".equals(cleanType)) {
+//                    tagNode.setTextOnly(false);
+//                }
+//            }
+//        }
+//
+//        if (peek() instanceof Indent) {
+//            if (tagNode.isTextOnly()) {
+//                lexer.setPipeless(true);
+//                tagNode.setTextNode(parseTextBlock());
+//                lexer.setPipeless(false);
+//            } else {
+//                Node blockNode = block();
+//                if (tagNode.hasBlock()) {
+//                    tagNode.getBlock().getNodes().addAll(blockNode.getNodes());
+//                } else {
+//                    tagNode.setBlock(blockNode);
+//                }
+//            }
+//        }
 
         return tagNode;
+
+    }
+    private Node[] parseInlineTagsInText(String str) {
+        int line = this.line();
+        Matcher matcher = Pattern.compile("(\\\\)?#\\[((?:.|\\n)*)$").matcher(str);
+        if (matcher.find(0) && matcher.groupCount()>1) {
+            if (matcher.group(1) != null) { // escape
+                TextNode text = new TextNode();
+                text.setValue(str.substring(0, matcher.start()) + "#[");//Not sure if Matcher.end() is correct
+                text.setLineNumber(line);
+                Node[] rest = this.parseInlineTagsInText(matcher.group(2));
+                if (rest[0] instanceof TextNode) {
+                    text.setValue(text.getValue() + rest[0].getValue());
+                    rest = ArrayUtils.remove(rest,0);
+                }
+                Node[] textNodes = {text};
+                return ArrayUtils.addAll(textNodes, rest);
+            } else {
+                TextNode text = new TextNode();
+                text.setValue(str.substring(0, matcher.start()));//Not sure if Matcher.end() is correct
+                text.setLineNumber(line);
+                Node[] textNodes = {text};
+                Node[] buffer = textNodes;
+                String rest = matcher.group(2);
+                CharacterParser.Match range = characterParser.parseMax(rest);
+                Parser inner = null;
+                try {
+                    inner = new Parser(range.getSrc(), this.filename, this.templateLoader,this.expressionHandler); //Need to be reviewed
+                } catch (IOException e) {
+                    throw new JadeParserException(this.filename,line,templateLoader,"Could not parse text");
+                }
+                buffer = ArrayUtils.add(buffer,inner.parse());
+                return ArrayUtils.addAll(buffer, this.parseInlineTagsInText(rest.substring(range.getEnd() + 1)));
+            }
+        } else {
+            TextNode text = new TextNode();
+            text.setValue(str);
+            text.setLineNumber(line);
+            Node[] textNodes = {text};
+            return textNodes;
+        }
     }
 
     private Node parseTextBlock() {
-        TextNode textNode = new TextNode();
-        textNode.setLineNumber(line());
-        textNode.setFileName(filename);
-        Token token = expect(Indent.class);
-        Indent indentToken = (Indent) token;
-        int spaces = indentToken.getIndents();
-        if (null == this._spaces)
-            this._spaces = spaces;
-        String indentStr = StringUtils.repeat(" ", spaces - this._spaces);
-        while (!(peek() instanceof Outdent)) {
-            if (peek() instanceof Newline) {
-                textNode.appendText("\n");
-                this.nextToken();
-            } else if (peek() instanceof Indent) {
-                textNode.appendText("\n");
-                textNode.appendText(this.parseTextBlock().getValue());
-                textNode.appendText("\n");
-            } else {
-                textNode.appendText(indentStr + this.nextToken().getValue());
-            }
+        BlockNode blockNode = new BlockNode();
+        blockNode.setLineNumber(line());
+        blockNode.setFileName(filename);
+        Token body  = peek();
+        if(!(body instanceof PipelessText)){
+            return null;
         }
-
-        if (spaces == this._spaces)
-            this._spaces = null;
-
-        token = expect(Outdent.class);
-        return textNode;
+        this.advance();
+        ArrayList<String> values = body.getValues();
+        Node[] textNodes = {};
+        for (String value : values) {
+            textNodes = ArrayUtils.addAll(textNodes,parseInlineTagsInText(value));
+        }
+        blockNode.setNodes(new LinkedList<Node>(Arrays.asList(textNodes)));
+        return blockNode;
     }
 
     private Node parseConditional() {
@@ -637,16 +767,95 @@ public class Parser {
 
         return conditional;
     }
+//    var block = new nodes.Block;
+//    block.line = this.line();
+//    block.filename = this.filename;
+//    this.expect('indent');
+//    while ('outdent' != this.peek().type) {
+//      switch (this.peek().type) {
+//        case 'comment':
+//        case 'newline':
+//          this.advance();
+//          break;
+//        case 'when':
+//          block.push(this.parseWhen());
+//          break;
+//        case 'default':
+//          block.push(this.parseDefault());
+//          break;
+//        default:
+//          throw new Error('Unexpected token "' + this.peek().type
+//                          + '", expected "when", "default" or "newline"');
+//      }
+//    }
+//    this.expect('outdent');
+//
+//    node.block = block;
+//
+//    return node;
+    private Node parseBlockExpansion(){
+      if (this.peek() instanceof Colon) {
+        this.advance();
+          BlockNode blockNode = new BlockNode();
+          blockNode.push(this.parseExpr());
+          return blockNode;
+      } else {
+        return this.block();
+      }
+    }
 
     private Node parseCase() {
-        Token token = expect(CaseToken.class);
-        CaseToken caseToken = (CaseToken) token;
-        CaseNode node = new CaseNode();
-        node.setLineNumber(caseToken.getLineNumber());
-        node.setFileName(filename);
-        node.setValue(caseToken.getValue());
-        node.setConditions(whenBlock());
+        String val = expect(CaseToken.class).getValue();
+        Node node = new CaseNode();
+        node.setValue(val);
+        node.setLineNumber(line());
+
+        Node block = new BlockNode();
+        block.setLineNumber(line());
+        block.setFileName(filename);
+        expect(Indent.class);
+        while (!(peek() instanceof Outdent)) {
+            if (peek() instanceof Comment) {
+                advance();
+            } else if (peek() instanceof Newline) {
+                advance();
+            } else if (peek() instanceof When) {
+                block.push(parseWhen());
+            } else if (peek() instanceof Default) {
+                block.push(parseDefault());
+            } else {
+                throw new JadeParserException(filename,lexer.getLineno(),templateLoader,"Unexpected token \"" + this.peek() + "\", expected \"when\", \"default\" or \"newline\"");
+            }
+        }
+        expect(Outdent.class);
+        node.setBlock(block);
         return node;
+    }
+    /**
+     * when
+     */
+
+    private Node parseWhen(){
+      String val = this.expect(When.class).getValue();
+        CaseNode.When when = new CaseNode.When();
+        when.setValue(val);
+        if (!(this.peek() instanceof Newline)) {
+          when.setBlock(this.parseBlockExpansion());
+        }
+        return when;
+
+    }
+
+    /**
+     * default
+     */
+
+    private Node parseDefault(){
+        expect(Default.class);
+        Node when = new CaseNode.When();
+        when.setValue("default");
+        when.setBlock(this.parseBlockExpansion());
+        return when;
     }
 
     private CaseConditionNode parseCaseCondition() {
@@ -710,7 +919,7 @@ public class Parser {
     private Node parseFilter() {
         Token token = expect(Filter.class);
         Filter filterToken = (Filter) token;
-        Attribute attr = (Attribute) accept(Attribute.class);
+        AttributeList attr = (AttributeList) accept(AttributeList.class);
         lexer.setPipeless(true);
         Node tNode = parseTextBlock();
         lexer.setPipeless(false);
@@ -719,7 +928,11 @@ public class Parser {
         node.setValue(filterToken.getValue());
         node.setLineNumber(line());
         node.setFileName(filename);
-        node.setTextBlock(tNode);
+        if(tNode!=null)
+            node.setTextBlock(tNode);
+        else{
+            node.setTextBlock(new BlockNode());
+        }
         if (attr != null) {
             node.setAttributes(attr.getAttributes());
         }
@@ -729,7 +942,7 @@ public class Parser {
     private Node parseASTFilter() {
         Token token = expect(Filter.class);
         Filter filterToken = (Filter) token;
-        Attribute attr = (Attribute) accept(Attribute.class);
+        AttributeList attr = (AttributeList) accept(AttributeList.class);
 
         token = expect(Colon.class);
 
@@ -757,7 +970,7 @@ public class Parser {
         }
     }
 
-    private Token nextToken() {
+    private Token advance() {
         return lexer.advance();
     }
 
@@ -777,17 +990,17 @@ public class Parser {
     private Token expect(Class expectedTokenClass) {
         Token t = this.peek();
         if (t.getClass().equals(expectedTokenClass)) {
-            return nextToken();
+            return advance();
         } else {
             throw new JadeParserException(filename, lexer.getLineno(), templateLoader, expectedTokenClass, t.getClass());
         }
     }
 
-    public Map<String, Node> getBlocks() {
+    public Map<String, BlockNode> getBlocks() {
         return blocks;
     }
 
-    public void setBlocks(Map<String, Node> blocks) {
+    public void setBlocks(LinkedHashMap<String, BlockNode> blocks) {
         this.blocks = blocks;
     }
 
@@ -797,5 +1010,9 @@ public class Parser {
 
     public void setContexts(LinkedList<Parser> contexts) {
         this.contexts = contexts;
+    }
+
+    public void setMixins(HashMap mixins) {
+        this.mixins = mixins;
     }
 }

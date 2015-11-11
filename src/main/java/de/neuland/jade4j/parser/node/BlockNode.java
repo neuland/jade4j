@@ -12,9 +12,25 @@ public class BlockNode extends Node {
 	private String mode;
 
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
-		for (Node node : getNodes()) {
-			node.execute(writer, model, template);
+
+		// Pretty print multi-line text
+		if (writer.isPp() && getNodes().size() > 1 && !writer.isEscape() && getNodes().get(0) instanceof TextNode && getNodes().get(1) instanceof TextNode)
+			writer.prettyIndent(1, true);
+
+		for (int i = 0; i < getNodes().size(); ++i) {
+			// Pretty print text
+			if (writer.isPp() && i > 0 && !writer.isEscape() && getNodes().get(i) instanceof TextNode && getNodes().get(i - 1) instanceof TextNode)
+				writer.prettyIndent(1, false);
+
+			getNodes().get(i).execute(writer, model, template);
+			// Multiple text nodes are separated by newlines
+			Node nextNode = null;
+			if(i+1 < getNodes().size())
+				nextNode = getNodes().get(i + 1);
+			if (nextNode !=null && getNodes().get(i) instanceof TextNode && nextNode instanceof TextNode)
+				writer.append("\n");
 		}
+
 	}
 
 	public void setYield(boolean yield) {
@@ -34,21 +50,25 @@ public class BlockNode extends Node {
 	}
 
 	public BlockNode getIncludeBlock() {
+		BlockNode ret = null;
 		for (Node node : getNodes()) {
 			if (node instanceof BlockNode && ((BlockNode) node).isYield()) {
 				return (BlockNode) node;
 			}
-			if (node instanceof TagNode && ((TagNode) node).isTextOnly()) {
+			else if (node instanceof TagNode && ((TagNode) node).isTextOnly()) {
 				continue;
 			}
-			if (node instanceof BlockNode && ((BlockNode) node).getIncludeBlock() != null) {
-				return ((BlockNode) node).getIncludeBlock();
+			else if (node instanceof BlockNode && ((BlockNode) node).getIncludeBlock() != null) {
+				ret =  ((BlockNode) node).getIncludeBlock();
 			}
-			if (node.hasBlock() && node.getBlock() instanceof BlockNode) {
-				return ((BlockNode) node.getBlock()).getIncludeBlock();
+			else if (node.hasBlock()) {
+				ret =  ((BlockNode) node.getBlock()).getIncludeBlock();
+			}
+			if(ret instanceof BlockNode && ((BlockNode) ret).isYield()){
+				return ret;
 			}
 		}
-		return this;
+		return ret;
 	}
 
 	public String getMode() {

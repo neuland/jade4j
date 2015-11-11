@@ -1,6 +1,7 @@
 package de.neuland.jade4j.lexer;
 
 import java.io.BufferedReader;
+import java.io.LineNumberReader;
 import java.io.Reader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,7 +15,10 @@ public class Scanner {
     public Scanner(Reader reader) {
     	initFromReader(reader);
     }
-    
+    public Scanner(String input) {
+    	this.input = input;
+    }
+
     public void consume(int length) {
         input = input.substring(length);
     }
@@ -32,14 +36,26 @@ public class Scanner {
     private void initFromReader(Reader reader) {
         try {
             StringBuilder sb = new StringBuilder();
-            BufferedReader in = new BufferedReader(reader);
-            String s = in.readLine();
-            while (s != null) {
-                if (StringUtils.isNotBlank(s)) {
+            LineNumberReader in = new LineNumberReader(reader);
+            String s = "";
+            boolean first = true;
+//            int c = 0;
+//            while ((c = in.read()) != -1) {
+//                if(c != '\uFEFF' && !first) {
+//                    sb.append((char) c);
+//                }
+//                first = false;
+//            }
+            while ((s = in.readLine()) != null) {
+                if(!first) {
+                    sb.append("\n");
+                }else{
+                    s = s.replaceAll("^\\uFEFF", "");
+                }
+                first=false;
+                if (StringUtils.isNotEmpty(s)) {
                     sb.append(s);
                 }
-                sb.append("\n");
-                s = in.readLine();
             }
             input = sb.toString();
             if (StringUtils.isNotBlank(input)) {
