@@ -1,5 +1,8 @@
 # History
 
+## 1.0.3 / 2015-11-11
+* Fixing Issue 114: Blank strings in brackets being casted to 0
+
 ## 1.0.2 / 2015-11-10
 * Fixing Issue 113: &attributes on Mixin not working
 
