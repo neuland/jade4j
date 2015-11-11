@@ -6,6 +6,7 @@ import org.apache.commons.collections.ListUtils;
 import java.util.Collection;
 
 public class JadeJexlArithmetic extends JexlArithmetic {
+
     public JadeJexlArithmetic(boolean lenient) {
         super(lenient);
     }
@@ -33,5 +34,15 @@ public class JadeJexlArithmetic extends JexlArithmetic {
         }
 
         return true;
+    }
+
+    @Override
+    public Object add(Object left, Object right) {
+        if (left instanceof String || right instanceof String) {
+            return left.toString() + right.toString();
+        }
+        else {
+            return super.add(left, right);
+        }
     }
 }
