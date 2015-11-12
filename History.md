@@ -1,5 +1,9 @@
 # History
 
+## 1.0.4 / 2015-11-12
+* Fixing Issue 115: &attributes() -> Classcast Exception with integers as keys in maps
+* Fixing Issue 104: mixin definitions are ignored in extension template (Thanks to rzara)
+
 ## 1.0.3 / 2015-11-11
 * Fixing Issue 114: Blank strings in brackets being casted to 0
 
