@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.lexer.token.*;
 import de.neuland.jade4j.parser.node.*;
-import de.neuland.jade4j.parser.node.BlockCommentNode;
 import de.neuland.jade4j.util.CharacterParser;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -75,10 +74,24 @@ public class Parser {
             getContexts().push(extending);
             Node rootNode = extending.parse();
             getContexts().pop();
+            liftMixins(rootNode,block.getNodes());
             return rootNode;
         }
 
         return block;
+    }
+
+    private void liftMixins(Node rootNode, LinkedList<Node> nodes) {
+	for (Node child : nodes) {
+	    if (child instanceof MixinNode) {
+		MixinNode mixin = (MixinNode) child;
+		if (!mixin.isCall()) {
+		    rootNode.getNodes().push(child);
+		}
+	    } else {
+		liftMixins(rootNode, child.getNodes());
+	    }
+	}
     }
 
     private Node parseExpr() {

@@ -29,7 +29,7 @@ public class OriginalJade20150515Test {
              "filters.coffeescript", "filters.less", "filters.markdown", "filters.stylus",
              "mixin.blocks", "mixin.merge",  "styles","regression.784","mixin.attrs","include-filter-stylus",
             "include-filter","filters-empty","each.else","classes","blocks-in-if","mixins.rest-args","filters.cdata","block-code",
-            "attrs-data","attrs.interpolation","include-extends-of-common-template","include-with-text","inheritance.extend.mixins","interpolation.escape","layout.multi.append.prepend.block","source"};
+            "attrs-data","attrs.interpolation","include-extends-of-common-template","include-with-text","interpolation.escape","layout.multi.append.prepend.block","source"};
 
     private String file;
 

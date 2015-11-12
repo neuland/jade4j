@@ -415,6 +415,16 @@ public class CompilerTest {
         run("reportedIssue89",true);
     }
 
+    @Test
+    public void mixinExtendInclude() {
+        run("mixin_extend_include");
+    }
+
+    @Test
+    public void mixinExtend() {
+        run("mixin_extend");
+    }
+
     private void run(String testName) {
         run(testName, false);
     }
