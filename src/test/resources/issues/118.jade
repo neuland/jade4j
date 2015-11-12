@@ -1,0 +1,11 @@
+mixin first()
+    p&attributes(attributes)
+        block
+
+mixin second
+    p&attributes(attributes)
+        block
+
++first()("abc"="def")
+    +second
+        p bla bla

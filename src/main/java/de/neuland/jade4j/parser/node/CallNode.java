@@ -144,14 +144,14 @@ public class CallNode extends AttrsNode {
 
 			   }
 		   }
-    		if (newAttributes.size()>0) {
-				LinkedHashMap<String,String> attrs = attrs(model, template, newAttributes);
-				model.put("attributes", attrs);
-    		}
-  		} else if (newAttributes.size()>0) {
+  		}
+
+		if (newAttributes.size()>0) {
 			LinkedHashMap<String,String> attrs = attrs(model, template, newAttributes);
 			model.put("attributes", attrs);
-  		}
+  		}else{
+			model.put("attributes", null);
+		}
 
 	}
 
