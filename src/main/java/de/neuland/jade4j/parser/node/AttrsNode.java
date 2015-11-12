@@ -126,7 +126,7 @@ public abstract class AttrsNode extends Node {
                 if(o!=null) {
                     for (Map.Entry<String, String> entry : o.entrySet()) {
                         Attr attr = new Attr();
-                        attr.setName(entry.getKey());
+                        attr.setName(String.valueOf(entry.getKey()));
                         attr.setValue(entry.getValue());
                         newAttributes.add(attr);
                     }
