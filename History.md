@@ -1,5 +1,8 @@
 # History
 
+## 1.0.5 / 2015-11-12
+* Fixing Issue 116: &attributes() -> Classcast Exception with integers as keys in maps, inside of loops
+
 ## 1.0.4 / 2015-11-12
 * Fixing Issue 115: &attributes() -> Classcast Exception with integers as keys in maps
 * Fixing Issue 104: mixin definitions are ignored in extension template (Thanks to rzara)
