@@ -513,7 +513,7 @@ public class Parser {
         node.setLineNumber(eachToken.getLineNumber());
         node.setFileName(filename);
         node.setBlock(block());
-        if (peek() instanceof Else || peek() instanceof Expression) {
+        if (peek() instanceof Else) {
             advance();
             node.setElseNode(block());
         }
@@ -884,12 +884,11 @@ public class Parser {
         codeNode.setLineNumber(expressionToken.getLineNumber());
         codeNode.setFileName(filename);
         boolean block = false;
-        int i = 1;
-        while (lookahead(i) != null && lookahead(i) instanceof Newline)
-            ++i;
-        block = lookahead(i) instanceof Indent;
+//        int i = 1;
+//        while (lookahead(i) != null && lookahead(i) instanceof Newline)
+//            ++i;
+        block = peek() instanceof Indent;
         if (block) {
-            skip(i - 1);
             codeNode.setBlock((BlockNode) block());
         }
         return codeNode;
