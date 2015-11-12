@@ -970,17 +970,17 @@ public class Lexer {
                             }
                             break;
                         case KEY:
-                            if (key.isEmpty() && (str.charAt(i) == '"' || str.charAt(i) == '\'')) {
+                            if (key.isEmpty() && !str.isEmpty() && (str.charAt(i) == '"' || str.charAt(i) == '\'')) {
                                 loc = Loc.KEY_CHAR;
                                 quote = String.valueOf(str.charAt(i));
-                            } else if (str.charAt(i) == '!' || str.charAt(i) == '=') {
+                            } else if (!str.isEmpty() &&(str.charAt(i) == '!' || str.charAt(i) == '=')) {
                                 escapedAttr = str.charAt(i) != '!';
                                 if (str.charAt(i) == '!') i++;
                                 if (str.charAt(i) != '=')
                                     throw new JadeLexerException("Unexpected character " + str.charAt(i) + " expected `=`", filename, getLineno(), templateLoader);
                                 loc = Loc.VALUE;
                                 state = characterParser.defaultState();
-                            } else {
+                            } else if(!str.isEmpty()){
                                 key += str.charAt(i);
                             }
                             break;
