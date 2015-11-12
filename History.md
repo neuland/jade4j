@@ -1,5 +1,9 @@
 # History
 
+## 1.0.6 / 2015-11-12
+* Fixing issue 118: Problems with nested/inherited attributes
+* Fixing issue 117: &attributes() -> String index out of range when mixin called with ()()
+
 ## 1.0.5 / 2015-11-12
 * Fixing Issue 116: &attributes() -> Classcast Exception with integers as keys in maps, inside of loops
 
