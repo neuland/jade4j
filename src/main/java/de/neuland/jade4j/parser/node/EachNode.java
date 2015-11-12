@@ -68,7 +68,7 @@ public class EachNode extends Node {
 			executeElseNode(model, writer, template);
 			return;
 		}
-		for (String key : keys) {
+		for (Object key : keys) {
 			model.put(getValue(), result.get(key));
 			model.put(getKey(), key);
 			getBlock().execute(writer, model, template);
