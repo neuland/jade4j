@@ -92,7 +92,7 @@ Just add following dependency definitions to your `pom.xml`.
 <dependency>
   <groupId>de.neuland-bfi</groupId>
   <artifactId>jade4j</artifactId>
-  <version>0.4.3</version>
+  <version>1.0.4</version>
 </dependency>
 ```
 
