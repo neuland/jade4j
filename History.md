@@ -1,5 +1,8 @@
 # History
 
+## 1.0.7 / 2015-11-16
+* Fixing issue 101: "}" symbol breaks the template inside of a string
+
 ## 1.0.6 / 2015-11-12
 * Fixing issue 118: Problems with nested/inherited attributes
 * Fixing issue 117: &attributes() -> String index out of range when mixin called with ()()
