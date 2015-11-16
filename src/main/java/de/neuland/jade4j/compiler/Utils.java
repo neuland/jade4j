@@ -15,7 +15,7 @@ import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.parser.node.ExpressionString;
 
 public class Utils {
-	public static Pattern interpolationPattern = Pattern.compile("(\\\\)?([#!])\\{(.*?)\\}");
+	public static Pattern interpolationPattern = Pattern.compile("(\\\\)?([#!])\\{");
 	public static CharacterParser characterParser = new CharacterParser();
 	public static List<Object> prepareInterpolate(String string, boolean xmlEscape) {
 		List<Object> result = new LinkedList<Object>();
@@ -31,10 +31,27 @@ public class Utils {
 
 			boolean escape = matcher.group(1) != null;
 			String flag = matcher.group(2);
-			String code = matcher.group(3);
+
+			int openBrackets = 1;
+			boolean closingBracketFound = false;
+			int closingBracketIndex = matcher.end();
+			while (!closingBracketFound && closingBracketIndex < string.length()) {
+				char currentChar = string.charAt(closingBracketIndex);
+				if (currentChar == '{') {
+					openBrackets ++;
+				}
+				else if (currentChar == '}') {
+					openBrackets --;
+					if (openBrackets == 0) {
+						closingBracketFound = true;
+					}
+				}
+				closingBracketIndex++;
+			}
+			String code = string.substring(matcher.end(), closingBracketIndex -1);
 
 			if (escape) {
-				String escapedExpression = matcher.group(0).substring(1);
+				String escapedExpression = string.substring(matcher.start(0), closingBracketIndex).substring(1);
 				if (xmlEscape) {
 					escapedExpression = escapeHTML(escapedExpression);
 				}
@@ -46,7 +63,7 @@ public class Utils {
 				}
 				result.add(expression);
 			}
-			start = matcher.end(0);
+			start = closingBracketIndex;
 		}
 		String last = string.substring(start);
 		if (xmlEscape) {
