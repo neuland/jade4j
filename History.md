@@ -1,7 +1,7 @@
 # History
 
 ## 1.0.7 / 2015-11-16
-* Fixing issue 101: "}" symbol breaks the template inside of a string
+* Fixing issue 101: "}" symbol breaks the template inside of a string (Thanks to moio)
 
 ## 1.0.6 / 2015-11-12
 * Fixing issue 118: Problems with nested/inherited attributes
