@@ -635,7 +635,7 @@ public class Lexer {
     }
 
     private Token fail() {
-        throw new JadeLexerException("unexpected text " + scanner.getInput().substring(0, 5), filename, getLineno(), templateLoader);
+        throw new JadeLexerException("unexpected text " + StringUtils.substring(scanner.getInput(),0,5), filename, getLineno(), templateLoader);
     }
 
     private Token extendsToken() {

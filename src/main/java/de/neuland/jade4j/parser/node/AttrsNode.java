@@ -145,15 +145,11 @@ public abstract class AttrsNode extends Node {
     private String attrsToString(LinkedHashMap<String, String> attrs, JadeTemplate template) {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : attrs.entrySet()) {
-                sb.append(" ");
+            sb.append(" ");
             sb.append(entry.getKey());
-            if (entry.getValue() != null) {
+            if(entry.getValue() != null) {
                 sb.append("=").append('"');
                 sb.append(entry.getValue());
-                sb.append('"');
-            }else if(entry.getValue() == null && !isTerse(template)){
-                sb.append("=").append('"');
-                sb.append(entry.getKey());
                 sb.append('"');
             }
         }
