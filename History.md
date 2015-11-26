@@ -1,5 +1,9 @@
 # History
 
+## 1.0.8 / 2015-11-26
+* Fixing issue 120: Terse Mode not working as expected
+* Fixed IndexOutOfBoundsException in substring.
+
 ## 1.0.7 / 2015-11-16
 * Fixing issue 101: "}" symbol breaks the template inside of a string (Thanks to moio)
 
