@@ -36,7 +36,7 @@ public class Parser {
     private LinkedList<Parser> contexts = new LinkedList<Parser>();
     private CharacterParser characterParser;
     private int inMixin = 0;
-    private HashMap mixins = new HashMap<String,MixinNode>();
+    private HashMap<String,MixinNode> mixins = new HashMap<String,MixinNode>();
     private int inBlock = 0;
 
     public Parser(String filename, TemplateLoader templateLoader,ExpressionHandler expressionHandler) throws IOException {
@@ -74,24 +74,16 @@ public class Parser {
             getContexts().push(extending);
             Node rootNode = extending.parse();
             getContexts().pop();
-            liftMixins(rootNode,block.getNodes());
+
+            // hoist mixins
+            Set<String> keySet = this.mixins.keySet();
+            for (String name : keySet) {
+                rootNode.getNodes().push(this.mixins.get(name));
+            }
             return rootNode;
         }
 
         return block;
-    }
-
-    private void liftMixins(Node rootNode, LinkedList<Node> nodes) {
-	for (Node child : nodes) {
-	    if (child instanceof MixinNode) {
-		MixinNode mixin = (MixinNode) child;
-		if (!mixin.isCall()) {
-		    rootNode.getNodes().push(child);
-		}
-	    } else {
-		liftMixins(rootNode, child.getNodes());
-	    }
-	}
     }
 
     private Node parseExpr() {
