@@ -108,7 +108,11 @@ public abstract class AttrsNode extends Node {
         this.codeNode = codeNode;
     }
 
-	public boolean hasCodeNode() {
+    public Node getCodeNode() {
+        return codeNode;
+    }
+
+    public boolean hasCodeNode() {
         return codeNode != null;
     }
 

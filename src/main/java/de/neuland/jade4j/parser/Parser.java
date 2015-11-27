@@ -246,7 +246,10 @@ public class Parser {
             mixin.setArguments(callToken.getArguments());
         }
         this.tag(mixin);
-//        if(mixin.)
+        if(mixin.hasCodeNode()) {
+            mixin.getBlock().push(mixin.getCodeNode());
+            mixin.setCodeNode(null);
+        }
         if(mixin.hasBlock() && mixin.getBlock().getNodes().isEmpty())
             mixin.setBlock(null);
         return mixin;

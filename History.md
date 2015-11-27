@@ -1,5 +1,10 @@
 # History
 
+
+## 1.0.9 / 2015-11-27
+* Fixing jade-Output without doctype
+* Fixing issue 122: Mixin Block after Mixin Call on same Line
+
 ## 1.0.8 / 2015-11-26
 * Fixing issue 120: Terse Mode not working as expected
 * Fixed IndexOutOfBoundsException in substring.
