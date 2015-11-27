@@ -615,7 +615,6 @@ public class Parser {
             } else if (incomingToken instanceof AttributesBlock) {
                 Token tok = this.advance();
                 tagNode.addAttributes(tok.getValue());
-                break;
             } else {
                 break;
             }

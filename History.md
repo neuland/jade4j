@@ -2,6 +2,7 @@
 
 
 ## 1.0.10 / 2015-11-27
+* Fixing issue 124: Mixin Merge not working correct
 * Some Mixin refinements
 * Fixing include-with-text.jade
 
