@@ -295,20 +295,42 @@ public class Parser {
             this.blocks.put(name, prev);
             return prev;
         }
+        LinkedList<Node> allNodes = new LinkedList<Node>();
+        allNodes.addAll(prev.getPrepended());
+        allNodes.addAll(blockNode.getNodes());
+        allNodes.addAll(prev.getAppended());
+        //ok
 
-        ((BlockNode) blockNode).setMode(mode);
 
-        if (blocks.containsKey(name)) {
-            if ("append".equals(prev.getMode())) {
-                blockNode.getNodes().addAll(prev.getNodes());
+        if ("append".equals(mode)) {
+            LinkedList<Node> appendedNodes = new LinkedList<Node>();
+            if(prev.getParser() == this){
+                appendedNodes.addAll(prev.getAppended());
+                appendedNodes.addAll(blockNode.getNodes());
+            }else{
+                appendedNodes.addAll(blockNode.getNodes());
+                appendedNodes.addAll(prev.getAppended());
             }
-            if ("prepend".equals(prev.getMode())) {
-                blockNode.getNodes().addAll(0, prev.getNodes());
+            prev.setAppended(appendedNodes);
+        } else if ("prepend".equals(mode)) {
+            LinkedList<Node> prependedNodes = new LinkedList<Node>();
+            if(prev.getParser() == this){
+                prependedNodes.addAll(blockNode.getNodes());
+                prependedNodes.addAll(prev.getPrepended());
+            }else{
+                prependedNodes.addAll(prev.getPrepended());
+                prependedNodes.addAll(blockNode.getNodes());
             }
-            if ("replace".equals(prev.getMode())) {
-                blockNode = prev;
-            }
+            prev.setPrepended(prependedNodes);
+
         }
+
+        blockNode.setNodes(allNodes);
+        blockNode.setAppended(prev.getAppended());
+        blockNode.setPrepended(prev.getPrepended());
+        blockNode.setMode(mode);
+        blockNode.setParser(this);
+        blockNode.setSubBlock(this.inBlock>0);
 
         blocks.put(name, blockNode);
         return blockNode;
