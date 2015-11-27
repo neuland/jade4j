@@ -243,7 +243,7 @@ public class CompilerTest {
 
     @Test
     public void mixinBlocks() {
-        run("mixin_blocks");
+        run("mixin_blocks",true);
     }
 
     @Test

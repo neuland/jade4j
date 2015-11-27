@@ -79,7 +79,7 @@ public class TagNode extends AttrsNode {
 
         if (!writer.isCompiledTag()) {
           if (!writer.isCompiledDoctype() && "html".equals(name)) {
-              template.setDoctype(null);
+//              template.setDoctype(null);
           }
           writer.setCompiledTag(true);
         }
