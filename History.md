@@ -1,6 +1,10 @@
 # History
 
 
+## 1.0.10 / 2015-11-27
+* Some Mixin refinements
+* Fixing include-with-text.jade
+
 ## 1.0.9 / 2015-11-27
 * Fixing jade-Output without doctype
 * Fixing issue 122: Mixin Block after Mixin Call on same Line

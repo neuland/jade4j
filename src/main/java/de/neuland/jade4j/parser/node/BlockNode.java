@@ -58,7 +58,7 @@ public class BlockNode extends Node {
 	}
 
 	public BlockNode getIncludeBlock() {
-		BlockNode ret = null;
+		BlockNode ret = this;
 		for (Node node : getNodes()) {
 			if (node instanceof BlockNode && ((BlockNode) node).isYield()) {
 				return (BlockNode) node;
