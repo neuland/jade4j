@@ -210,6 +210,19 @@ public class Parser {
         if (StringUtils.isNotBlank(mixinToken.getArguments())) {
             node.setArguments(mixinToken.getArguments());
         }
+        List<String> args = node.getArguments();
+
+        String rest;
+
+        //Überprüfe ob letztes Argument alles restlichen Argumente enhalten soll.
+        if (args.size() > 0) {
+            Matcher matcher = Pattern.compile("^\\.\\.\\.").matcher(args.get(args.size() - 1).trim());
+            if (matcher.find(0)) {
+                rest = args.remove(args.size() - 1).trim().replaceAll("^\\.\\.\\.", "");
+                node.setRest(rest);
+
+            }
+        }
 
         if (peek() instanceof Indent) {
             this.inMixin++;
@@ -237,6 +250,8 @@ public class Parser {
         if (StringUtils.isNotBlank(callToken.getArguments())) {
             mixin.setArguments(callToken.getArguments());
         }
+
+
         this.tag(mixin);
         if(mixin.hasCodeNode()) {
             mixin.getBlock().push(mixin.getCodeNode());

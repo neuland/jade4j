@@ -1,6 +1,9 @@
 # History
 
 
+## 1.1.0 / 2015-11-29
+* Feature: Add Rest Attributes to Mixins
+
 ## 1.0.10 / 2015-11-27
 * Fixing issue 124: Mixin Merge not working correct
 * Some Mixin refinements

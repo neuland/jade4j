@@ -8,6 +8,7 @@ import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.util.ArgumentSplitter;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class CallNode extends AttrsNode {
@@ -97,6 +98,7 @@ public class CallNode extends AttrsNode {
 		if (names == null) {
 			return;
 		}
+
 		for (int i = 0; i < names.size(); i++) {
 			String key = names.get(i);
 			Object value = null;
@@ -113,6 +115,24 @@ public class CallNode extends AttrsNode {
 			if (key != null) {
 				model.put(key, value);
 			}
+		}
+		if(mixin.getRest()!=null) {
+			ArrayList<Object> restArguments = new ArrayList<Object>();
+			for (int i = names.size(); i < arguments.size(); i++) {
+				Object value = null;
+				if (i < values.size()) {
+					value = values.get(i);
+				}
+				if (value != null) {
+					try {
+						value = template.getExpressionHandler().evaluateExpression(values.get(i), model);
+					} catch (Throwable e) {
+						throw new JadeCompilerException(this, template.getTemplateLoader(), e);
+					}
+				}
+				restArguments.add(value);
+			}
+			model.put(mixin.getRest(), restArguments);
 		}
 	}
 
