@@ -214,7 +214,6 @@ public class Parser {
 
         String rest;
 
-        //Überprüfe ob letztes Argument alles restlichen Argumente enhalten soll.
         if (args.size() > 0) {
             Matcher matcher = Pattern.compile("^\\.\\.\\.").matcher(args.get(args.size() - 1).trim());
             if (matcher.find(0)) {
