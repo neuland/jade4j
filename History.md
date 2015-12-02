@@ -1,5 +1,8 @@
 # History
 
+## 1.1.2 / 2015-12-02
+* Fixing issue #126: Concatinate Null with String => NullPointerException
+* Improved error messages
 
 ## 1.1.1 / 2015-12-02
 * Fixing issue 125: NumberFormatException when comparing loop-iterator with a String
