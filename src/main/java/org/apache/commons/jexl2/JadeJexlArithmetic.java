@@ -12,15 +12,7 @@ public class JadeJexlArithmetic extends JexlArithmetic {
     public JadeJexlArithmetic(boolean lenient) {
         super(lenient);
     }
-    /**
-     * Performs a comparison.
-     * @param left the left operand
-     * @param right the right operator
-     * @param operator the operator
-     * @return -1 if left  &lt; right; +1 if left &gt > right; 0 if left == right
-     * @throws ArithmeticException if either left or right is null
-     * @since 2.1
-     */
+
     protected int compare(Object left, Object right, String operator) {
         if (left != null && right != null) {
             if (left instanceof BigDecimal || right instanceof BigDecimal) {
