@@ -81,11 +81,11 @@ public class CharacterParser {
 //        src: src.substring(start, end)
 //      };
 //    }
-    public Match parseMax(String src){
+    public Match parseMax(String src) throws SyntaxError {
         Options options = new Options();
         return this.parseMax(src, options);
     }
-    public Match parseMax(String src,Options options){
+    public Match parseMax(String src,Options options) throws SyntaxError {
         if(options == null)
             options = new Options();
       int start = options.getStart();
@@ -93,7 +93,7 @@ public class CharacterParser {
       State state = this.defaultState();
       while (state.getRoundDepth() >= 0 && state.getCurlyDepth() >= 0 && state.getSquareDepth() >= 0) {
         if (index >= src.length()) {
-          throw new Error("The end of the string was reached with no closing bracket found.");
+          throw new SyntaxError("The end of the string was reached with no closing bracket found.");
         }
         this.parseChar(src.charAt(index++), state);
       }
@@ -137,21 +137,21 @@ public class CharacterParser {
             return state.getSquareDepth();
         return -1;
     }
-    public Match parseMaxBracket(String src,char bracket) {
+    public Match parseMaxBracket(String src,char bracket) throws SyntaxError {
         return this.parseMaxBracket(src,bracket,new Options());
     }
-    public Match parseMaxBracket(String src,char bracket,Options options){
+    public Match parseMaxBracket(String src,char bracket,Options options) throws SyntaxError {
         if (options == null)
             options = new Options();
         int start = options.getStart();
         int index = start;
         State state = this.defaultState();
         if (bracket != ')' && bracket != '}' && bracket != ']') {
-            throw new Error("Bracket specified (" + String.valueOf(bracket) + ") is not one of \")\", \"]\", or \"}\"");
+            throw new SyntaxError("Bracket specified (" + String.valueOf(bracket) + ") is not one of \")\", \"]\", or \"}\"");
         }
         while (getStateProp(state,bracket) >= 0) {
             if (index >= src.length()) {
-                throw new Error("The end of the string was reached with no closing bracket \"" + bracket + "\" found.");
+                throw new SyntaxError("The end of the string was reached with no closing bracket \"" + bracket + "\" found.");
             }
             this.parseChar(src.charAt(index++), state);
         }

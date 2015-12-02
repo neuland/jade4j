@@ -730,7 +730,12 @@ public class Parser {
                 Node[] textNodes = {text};
                 Node[] buffer = textNodes;
                 String rest = matcher.group(2);
-                CharacterParser.Match range = characterParser.parseMax(rest);
+                CharacterParser.Match range = null;
+                try {
+                    range = characterParser.parseMax(rest);
+                } catch (CharacterParser.SyntaxError syntaxError) {
+                    throw new JadeParserException(this.filename,line,templateLoader," See "+matcher.group(0));
+                }
                 Parser inner = null;
                 try {
                     inner = new Parser(range.getSrc(), this.filename, this.templateLoader,this.expressionHandler); //Need to be reviewed

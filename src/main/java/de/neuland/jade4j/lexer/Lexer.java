@@ -9,10 +9,7 @@ import java.util.regex.Pattern;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.lexer.token.*;
-import de.neuland.jade4j.util.CharacterParser;
-import de.neuland.jade4j.util.Options;
-import de.neuland.jade4j.util.StringReplacer;
-import de.neuland.jade4j.util.StringReplacerCallback;
+import de.neuland.jade4j.util.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -278,8 +275,8 @@ public class Lexer {
         CharacterParser.Match range;
         try {
             range = characterParser.parseMax(scanner.getInput(), options);
-        }catch(Error error){
-            throw new JadeLexerException(error.getMessage(), filename, getLineno(), templateLoader);
+        }catch(CharacterParser.SyntaxError exception){
+            throw new JadeLexerException(exception.getMessage() + " See "+ StringUtils.substring(scanner.getInput(),0,5), filename, getLineno(), templateLoader);
         }
         if(scanner.getInput().charAt(range.getEnd()) != end)
             throw new JadeLexerException("start character " + start + " does not match end character " + scanner.getInput().charAt(range.getEnd()), filename, getLineno(), templateLoader);
@@ -877,14 +874,19 @@ public class Lexer {
                 String expr = m.group(2);
                 if (escape != null) return match;
                 try {
-                    CharacterParser.Match range = characterParser.parseMax(expr);
-                    if (expr.charAt(range.getEnd()) != '}')
+                    try {
+                        CharacterParser.Match range = characterParser.parseMax(expr);
+                        if (expr.charAt(range.getEnd()) != '}')
+                            return substr(match, 0, 2) + interpolate(match.substring(2), quote);
+                        expressionHandler.assertExpression(range.getSrc());
+                        return quote + " + (" + range.getSrc() + ") + " + quote + interpolate(expr.substring(range.getEnd() + 1), quote);
+                    } catch (ExpressionException ex) {
                         return substr(match, 0, 2) + interpolate(match.substring(2), quote);
-                    expressionHandler.assertExpression(range.getSrc());
-                    return quote + " + (" + range.getSrc() + ") + " + quote + interpolate(expr.substring(range.getEnd() + 1), quote);
-                } catch (Exception ex) {
-                    return substr(match, 0, 2) + interpolate(match.substring(2), quote);
+                    }
+                }catch(CharacterParser.SyntaxError e){
+                    throw new JadeLexerException(e.getMessage()+ " See " + match, filename, getLineno(), templateLoader);
                 }
+
             }
         });
     }
