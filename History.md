@@ -1,6 +1,9 @@
 # History
 
 
+## 1.1.1 / 2015-12-02
+* Fixing issue 125: NumberFormatException when comparing loop-iterator with a String
+
 ## 1.1.0 / 2015-11-29
 * Feature: Add Rest Attributes to Mixins
 
