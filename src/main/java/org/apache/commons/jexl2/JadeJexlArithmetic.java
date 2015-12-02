@@ -1,7 +1,6 @@
 package org.apache.commons.jexl2;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -80,7 +79,7 @@ public class JadeJexlArithmetic extends JexlArithmetic {
             controlNullOperand();
             return false;
         } else if (val instanceof Boolean) {
-            return ((Boolean) val).booleanValue();
+            return (Boolean) val;
         } else if (val instanceof Number) {
             double number = toDouble(val);
             return !Double.isNaN(number) && number != 0.d;
@@ -96,8 +95,8 @@ public class JadeJexlArithmetic extends JexlArithmetic {
 
     @Override
     public Object add(Object left, Object right) {
-        if (left instanceof String || right instanceof String) {
-            return left.toString() + right.toString();
+        if (left instanceof String && right instanceof String) {
+            return (String)left + right;
         }
         else {
             return super.add(left, right);
