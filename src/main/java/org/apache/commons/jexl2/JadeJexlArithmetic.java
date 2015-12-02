@@ -15,7 +15,9 @@ public class JadeJexlArithmetic extends JexlArithmetic {
 
     protected int compare(Object left, Object right, String operator) {
         if (left != null && right != null) {
-            if (left instanceof BigDecimal || right instanceof BigDecimal) {
+            if (left instanceof String || right instanceof String) {
+                return toString(left).compareTo(toString(right));
+            } else if (left instanceof BigDecimal || right instanceof BigDecimal) {
                 BigDecimal l = toBigDecimal(left);
                 BigDecimal r = toBigDecimal(right);
                 return l.compareTo(r);
@@ -42,8 +44,6 @@ public class JadeJexlArithmetic extends JexlArithmetic {
                 } else {
                     return 0;
                 }
-            } else if (left instanceof String || right instanceof String) {
-                return toString(left).compareTo(toString(right));
             } else if (isNumberable(left) || isNumberable(right)) {
                 long lhs = toLong(left);
                 long rhs = toLong(right);
