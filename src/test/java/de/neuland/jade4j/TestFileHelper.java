@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 public class TestFileHelper {
 
     public static final String TESTFILE_LEXER_FOLDER = "/lexer/";
+    public static final String TESTFILE_LEXER_0_0_8_FOLDER = "/lexer_0.0.8/";
     public static final String TESTFILE_PARSER_FOLDER = "/parser/";
     public static final String TESTFILE_COMPILER_FOLDER = "/compiler/";
     public static final String TESTFILE_ORIGINAL_FOLDER = "/originalTests/";
@@ -29,6 +30,10 @@ public class TestFileHelper {
 	public static String getLexerResourcePath(String fileName) throws FileNotFoundException {
 		return getResourcePath(TESTFILE_LEXER_FOLDER + fileName);
 	}
+
+    public static String getLexer_0_0_8_ResourcePath(String fileName) throws FileNotFoundException {
+        return getResourcePath(TESTFILE_LEXER_0_0_8_FOLDER + fileName);
+    }
     
 	public static String getParserResourcePath(String fileName) {
 		try {
