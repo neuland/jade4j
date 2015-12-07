@@ -42,7 +42,7 @@ public class EachNode extends Node {
 			Iterator<?> iterator = IteratorUtils.arrayIterator(result);
 			runIterator(iterator, model, writer, template);
 		} else if (result instanceof Map) {
-			runMap((Map<String, Object>) result, model, writer, template);
+			runMap((Map<Object, Object>) result, model, writer, template);
 		}
 	}
 
@@ -62,13 +62,13 @@ public class EachNode extends Node {
 		}
 	}
 
-	private void runMap(Map<String, Object> result, JadeModel model, IndentWriter writer, JadeTemplate template) {
-		Set<String> keys = result.keySet();
+	private void runMap(Map<Object, Object> result, JadeModel model, IndentWriter writer, JadeTemplate template) {
+		Set<Object> keys = result.keySet();
 		if (keys.size() == 0) {
 			executeElseNode(model, writer, template);
 			return;
 		}
-		for (String key : keys) {
+		for (Object key : keys) {
 			model.put(getValue(), result.get(key));
 			model.put(getKey(), key);
 			getBlock().execute(writer, model, template);

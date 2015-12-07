@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.lexer.token.*;
 import de.neuland.jade4j.parser.node.*;
-import de.neuland.jade4j.parser.node.BlockCommentNode;
 import de.neuland.jade4j.util.CharacterParser;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -37,7 +36,7 @@ public class Parser {
     private LinkedList<Parser> contexts = new LinkedList<Parser>();
     private CharacterParser characterParser;
     private int inMixin = 0;
-    private HashMap mixins = new HashMap<String,MixinNode>();
+    private HashMap<String,MixinNode> mixins = new HashMap<String,MixinNode>();
     private int inBlock = 0;
 
     public Parser(String filename, TemplateLoader templateLoader,ExpressionHandler expressionHandler) throws IOException {
@@ -75,6 +74,12 @@ public class Parser {
             getContexts().push(extending);
             Node rootNode = extending.parse();
             getContexts().pop();
+
+            // hoist mixins
+            Set<String> keySet = this.mixins.keySet();
+            for (String name : keySet) {
+                rootNode.getNodes().push(this.mixins.get(name));
+            }
             return rootNode;
         }
 
@@ -163,7 +168,7 @@ public class Parser {
       String text;
       if (body instanceof PipelessText) {
         this.advance();
-        text = String.join("\n",body.getValues());
+        text = StringUtils.join(body.getValues(),"\n");
       } else {
         text = "";
       }
@@ -205,6 +210,18 @@ public class Parser {
         if (StringUtils.isNotBlank(mixinToken.getArguments())) {
             node.setArguments(mixinToken.getArguments());
         }
+        List<String> args = node.getArguments();
+
+        String rest;
+
+        if (args.size() > 0) {
+            Matcher matcher = Pattern.compile("^\\.\\.\\.").matcher(args.get(args.size() - 1).trim());
+            if (matcher.find(0)) {
+                rest = args.remove(args.size() - 1).trim().replaceAll("^\\.\\.\\.", "");
+                node.setRest(rest);
+
+            }
+        }
 
         if (peek() instanceof Indent) {
             this.inMixin++;
@@ -232,8 +249,13 @@ public class Parser {
         if (StringUtils.isNotBlank(callToken.getArguments())) {
             mixin.setArguments(callToken.getArguments());
         }
+
+
         this.tag(mixin);
-//        if(mixin.)
+        if(mixin.hasCodeNode()) {
+            mixin.getBlock().push(mixin.getCodeNode());
+            mixin.setCodeNode(null);
+        }
         if(mixin.hasBlock() && mixin.getBlock().getNodes().isEmpty())
             mixin.setBlock(null);
         return mixin;
@@ -279,20 +301,42 @@ public class Parser {
             this.blocks.put(name, prev);
             return prev;
         }
+        LinkedList<Node> allNodes = new LinkedList<Node>();
+        allNodes.addAll(prev.getPrepended());
+        allNodes.addAll(blockNode.getNodes());
+        allNodes.addAll(prev.getAppended());
+        //ok
 
-        ((BlockNode) blockNode).setMode(mode);
 
-        if (blocks.containsKey(name)) {
-            if ("append".equals(prev.getMode())) {
-                blockNode.getNodes().addAll(prev.getNodes());
+        if ("append".equals(mode)) {
+            LinkedList<Node> appendedNodes = new LinkedList<Node>();
+            if(prev.getParser() == this){
+                appendedNodes.addAll(prev.getAppended());
+                appendedNodes.addAll(blockNode.getNodes());
+            }else{
+                appendedNodes.addAll(blockNode.getNodes());
+                appendedNodes.addAll(prev.getAppended());
             }
-            if ("prepend".equals(prev.getMode())) {
-                blockNode.getNodes().addAll(0, prev.getNodes());
+            prev.setAppended(appendedNodes);
+        } else if ("prepend".equals(mode)) {
+            LinkedList<Node> prependedNodes = new LinkedList<Node>();
+            if(prev.getParser() == this){
+                prependedNodes.addAll(blockNode.getNodes());
+                prependedNodes.addAll(prev.getPrepended());
+            }else{
+                prependedNodes.addAll(prev.getPrepended());
+                prependedNodes.addAll(blockNode.getNodes());
             }
-            if ("replace".equals(prev.getMode())) {
-                blockNode = prev;
-            }
+            prev.setPrepended(prependedNodes);
+
         }
+
+        blockNode.setNodes(allNodes);
+        blockNode.setAppended(prev.getAppended());
+        blockNode.setPrepended(prev.getPrepended());
+        blockNode.setMode(mode);
+        blockNode.setParser(this);
+        blockNode.setSubBlock(this.inBlock>0);
 
         blocks.put(name, blockNode);
         return blockNode;
@@ -400,9 +444,10 @@ public class Parser {
 
     private String resolvePath(String templateName) {
         URI currentUri = URI.create(filename);
+        currentUri.getPath();
         URI templateUri = currentUri.resolve(templateName);
         String path = templateUri.toString();
-        if(templateName.indexOf(".") == -1)
+        if(StringUtils.lastIndexOf(templateUri.toString(),"/") >= StringUtils.lastIndexOf(templateUri.toString(),"."))
             path += ".jade";
         return path;
     }
@@ -499,7 +544,7 @@ public class Parser {
         node.setLineNumber(eachToken.getLineNumber());
         node.setFileName(filename);
         node.setBlock(block());
-        if (peek() instanceof Else || peek() instanceof Expression) {
+        if (peek() instanceof Else) {
             advance();
             node.setElseNode(block());
         }
@@ -584,7 +629,6 @@ public class Parser {
             } else if (incomingToken instanceof AttributesBlock) {
                 Token tok = this.advance();
                 tagNode.addAttributes(tok.getValue());
-                break;
             } else {
                 break;
             }
@@ -686,7 +730,12 @@ public class Parser {
                 Node[] textNodes = {text};
                 Node[] buffer = textNodes;
                 String rest = matcher.group(2);
-                CharacterParser.Match range = characterParser.parseMax(rest);
+                CharacterParser.Match range = null;
+                try {
+                    range = characterParser.parseMax(rest);
+                } catch (CharacterParser.SyntaxError syntaxError) {
+                    throw new JadeParserException(this.filename,line,templateLoader," See "+matcher.group(0));
+                }
                 Parser inner = null;
                 try {
                     inner = new Parser(range.getSrc(), this.filename, this.templateLoader,this.expressionHandler); //Need to be reviewed
@@ -870,12 +919,11 @@ public class Parser {
         codeNode.setLineNumber(expressionToken.getLineNumber());
         codeNode.setFileName(filename);
         boolean block = false;
-        int i = 1;
-        while (lookahead(i) != null && lookahead(i) instanceof Newline)
-            ++i;
-        block = lookahead(i) instanceof Indent;
+//        int i = 1;
+//        while (lookahead(i) != null && lookahead(i) instanceof Newline)
+//            ++i;
+        block = peek() instanceof Indent;
         if (block) {
-            skip(i - 1);
             codeNode.setBlock((BlockNode) block());
         }
         return codeNode;

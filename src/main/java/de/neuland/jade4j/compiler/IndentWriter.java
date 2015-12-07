@@ -13,6 +13,8 @@ public class IndentWriter {
     private Writer writer;
     private String pp = "  ";
     private boolean escape;
+    private boolean compiledTag;
+    private boolean compiledDoctype;
 
     public IndentWriter(Writer writer) {
         this.writer = writer;
@@ -74,5 +76,21 @@ public class IndentWriter {
 
     public boolean isPp(){
         return this.pp.length()!=0 && useIndent;
+    }
+
+    public void setCompiledTag(boolean compiledTag) {
+        this.compiledTag = compiledTag;
+    }
+
+    public boolean isCompiledTag() {
+        return compiledTag;
+    }
+
+    public boolean isCompiledDoctype() {
+        return compiledDoctype;
+    }
+
+    public void setCompiledDoctype(boolean compiledDoctype) {
+        this.compiledDoctype = compiledDoctype;
     }
 }

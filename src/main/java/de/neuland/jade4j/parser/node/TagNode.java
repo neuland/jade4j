@@ -1,8 +1,10 @@
 package de.neuland.jade4j.parser.node;
 
+import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
+import de.neuland.jade4j.lexer.token.Doctypes;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 import org.apache.commons.lang3.ArrayUtils;
@@ -11,7 +13,6 @@ import java.util.LinkedList;
 
 public class TagNode extends AttrsNode {
     private Node textNode;
-    private static final String[] selfClosingTags = {"area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"};
     private static final String[] inlineTags = { "a", "abbr", "acronym", "b", "br", "code", "em", "font", "i", "img", "ins", "kbd", "map", "samp", "small", "span", "strong", "sub", "sup"};
     private boolean buffer = false;
 
@@ -75,6 +76,14 @@ public class TagNode extends AttrsNode {
     @Override
     public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
         writer.increment();
+
+        if (!writer.isCompiledTag()) {
+          if (!writer.isCompiledDoctype() && "html".equals(name)) {
+//              template.setDoctype(null);
+          }
+          writer.setCompiledTag(true);
+        }
+
         if ("pre".equals(this.name)) writer.setEscape(true);
         if(writer.isPp() && !isInline()){
             writer.prettyIndent(0,true);
@@ -118,14 +127,6 @@ public class TagNode extends AttrsNode {
 
     private boolean isEmpty() {
         return !hasBlock() && !hasTextNode() && !hasCodeNode();
-    }
-
-    public boolean isTerse(JadeTemplate template) {
-        return isSelfClosing(template) && template.isTerse();
-    }
-
-    public boolean isSelfClosing(JadeTemplate template) {
-        return !template.isXml() && ArrayUtils.contains(selfClosingTags, name);
     }
 
     private String bufferName(JadeTemplate template, JadeModel model) {

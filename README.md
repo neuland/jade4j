@@ -19,6 +19,7 @@ jade4j's intention is to be able to process jade templates in Java without the n
 - [Expressions](#expressions)
 - [Reserved Words](#reserved-words)
 - [Framework Integrations](#framework-integrations)
+- [Breaking Changes in 1.0.0](#breaking-changes)
 - [Authors](#authors)
 - [License](#license)
 
@@ -28,7 +29,7 @@ jade4j's intention is to be able to process jade templates in Java without the n
 index.jade
 
 ```
-!!! 5
+doctype html
 html
   head
     title= pageName
@@ -91,7 +92,7 @@ Just add following dependency definitions to your `pom.xml`.
 <dependency>
   <groupId>de.neuland-bfi</groupId>
   <artifactId>jade4j</artifactId>
-  <version>0.4.1</version>
+  <version>1.1.2</version>
 </dependency>
 ```
 
@@ -266,7 +267,7 @@ config.setTemplateLoader(loader);
 
 The original jade implementation uses JavaScript for expression handling in `if`, `unless`, `for`, `case` commands, like this
 
-    book = {"price": 4.99, "title": "The Book"}
+    - var book = {"price": 4.99, "title": "The Book"}
     if book.price < 5.50 && !book.soldOut
       p.sale special offer: #{book.title}
 
@@ -285,7 +286,7 @@ We are using a slightly modified JEXL version which to have better control of th
 JEXL comes with the three builtin functions `new`, `size` and `empty`. For properties with this name the `.` notation does not work, but you can access them with `[]`.
 
 ```
-book = {size: 540}
+- var book = {size: 540}
 book.size // does not work
 book["size"] // works
 ```
@@ -297,12 +298,22 @@ You can read more about this in the [JEXL documentation](http://commons.apache.o
 
 If you want to use jade4j with Spring check out our [neuland/spring-jade4j](https://github.com/neuland/spring-jade4j) project.
 
+<a name="breaking-changes"></a>
+## Breaking Changes in 1.0.0
+In Version 1.0.0 we added a lot of features of JadeJs 1.11. There are also some Breaking Changes:
+- Instead of 'id = 5' you must use '- var id = 5'
+- Instead of 'h1(attributes, class = "test")' you must use 'h1(class= "test")&attributes(attributes)'
+- Instead of '!!! 5' you must use 'doctype html'
+- Jade Syntax for Conditional Comments is not supported anymore
+- Thanks to rzara for contributing to issue-108
+
 <a name="authors"></a>
 ## Authors
 
 - Artur Tomas / [atomiccoder](https://github.com/atomiccoder)
 - Stefan Kuper / [planetk](https://github.com/planetk)
 - Michael Geers / [naltatis](https://github.com/naltatis)
+- Christoph Blömer / [chbloemer](https://github.com/chbloemer)
 
 Special thanks to [TJ Holowaychuk](https://github.com/visionmedia) the creator of jade!
 

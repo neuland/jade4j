@@ -14,8 +14,8 @@ import java.util.regex.Pattern;
 public class JexlExpressionHandler implements ExpressionHandler {
 
 	private static final int MAX_ENTRIES = 5000;
-	public static Pattern plusplus = Pattern.compile("([a-zA-Z0-9-_]*[a-zA-Z0-9])\\+\\+");
-	public static Pattern minusminus = Pattern.compile("([a-zA-Z0-9-_]*[a-zA-Z0-9])--");
+	public static Pattern plusplus = Pattern.compile("([a-zA-Z0-9-_]*[a-zA-Z0-9])\\+\\+\\s*;{0,1}\\s*$");
+	public static Pattern minusminus = Pattern.compile("([a-zA-Z0-9-_]*[a-zA-Z0-9])--\\s*;{0,1}\\s*$");
 	private JexlEngine jexl;
 
 	public JexlExpressionHandler() {
@@ -30,11 +30,11 @@ public class JexlExpressionHandler implements ExpressionHandler {
 
 	public Object evaluateExpression(String expression, JadeModel model) throws ExpressionException {
 		try {
-			if(expression.startsWith("{")) {
-				return expression;
-			}else{
-			if(expression.startsWith("var")){
-				expression = expression.substring(3);
+//			if(expression.startsWith("{")) {
+//				return expression;
+//			}else{
+			if(expression.startsWith("var ")){
+				expression = expression.substring(4);
 			}
 				Matcher matcher = plusplus.matcher(expression);
 				if(matcher.find(0) && matcher.groupCount()==1) {
@@ -49,7 +49,7 @@ public class JexlExpressionHandler implements ExpressionHandler {
 				Expression e = jexl.createExpression(expression);
 				Object evaluate = e.evaluate(new MapContext(model));
 				return evaluate;
-			}
+//			}
 
 		} catch (Exception e) {
 			throw new ExpressionException(expression, e);

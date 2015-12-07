@@ -10,26 +10,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MixinNode extends CallNode {
+	private String rest;
+
 	@Override
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
 		if (isCall()) {
 			super.execute(writer, model, template);
 		} else {
 			model.setMixin(getName(), this);
-
-
-   			List<String> args = getArguments();
-
-//			String rest;
-//
-//   			//Überprüfe ob letztes Argument alles restlichen Argumente enhalten soll.
-//			if (args.size()>0 ) {
-//				Matcher matcher = Pattern.compile("^\\.\\.\\.").matcher(args.get(args.size()-1).trim());
-//				if(matcher.find(0))
-//     				rest = args.remove(args.size()-1).trim().replaceAll("^\\.\\.\\.", "");
-//   			}
-
 		}
 	}
 
+	public void setRest(String rest) {
+		this.rest = rest;
+	}
+
+	public String getRest() {
+		return rest;
+	}
 }

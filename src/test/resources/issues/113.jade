@@ -1,0 +1,9 @@
+-var bla = "foo"
+mixin test()
+    div
+        +test2()&attributes(attributes)
+
+mixin test2()
+    p&attributes(attributes)
+
++test()(data-bla=bla)

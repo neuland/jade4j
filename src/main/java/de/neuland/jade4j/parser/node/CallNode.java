@@ -1,16 +1,15 @@
 package de.neuland.jade4j.parser.node;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
-import com.sun.deploy.util.StringUtils;
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.util.ArgumentSplitter;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class CallNode extends AttrsNode {
 
@@ -48,42 +47,44 @@ public class CallNode extends AttrsNode {
 			throw new IllegalStateException(e);
 		}
 
+		if (hasBlock()) {
+			List<MixinBlockNode> injectionPoints = getInjectionPoints(mixin.getBlock());
+            for (MixinBlockNode point : injectionPoints) {
+				point.getNodes().add(block);
+            }
+		}
+
 		if (this.isCall()) {
+			model.pushScope();
+			model.put("block", block);
+			writeVariables(model, mixin, template);
+			writeAttributes(model, mixin, template);
+			mixin.getBlock().execute(writer, model, template);
+			model.put("block",null);
+			model.popScope();
 
 		}else{
 
 		}
 
 
-		if (hasBlock()) {
-			List<BlockNode> injectionPoints = getInjectionPoints(mixin.getBlock());
-            for (BlockNode point : injectionPoints) {
-				point.getNodes().add(block);
-            }
-		}
 
-		model.pushScope();
-		model.put("block", block);
-		writeVariables(model, mixin, template);
-		writeAttributes(model, mixin, template);
-		mixin.getBlock().execute(writer, model, template);
-		model.popScope();
 
 	}
 
-	private List<BlockNode> getInjectionPoints(Node block) {
-        List<BlockNode> result = new ArrayList<BlockNode>();
+	private List<MixinBlockNode> getInjectionPoints(Node block) {
+        List<MixinBlockNode> result = new ArrayList<MixinBlockNode>();
 		for (Node node : block.getNodes()) {
-			if (node instanceof BlockNode && !node.hasNodes()) {
-                result.add((BlockNode) node);
+			if (node instanceof MixinBlockNode && !node.hasNodes()) {
+                result.add((MixinBlockNode) node);
 			} else if(node instanceof ConditionalNode){
                 for (IfConditionNode condition : ((ConditionalNode) node).getConditions()) {
                     result.addAll(getInjectionPoints(condition.getBlock()));
                 }
-            } else if(node instanceof CaseNode){
-                for (CaseConditionNode condition : ((CaseNode) node).getCaseConditionNodes()) {
-                    result.addAll(getInjectionPoints(condition.getBlock()));
-                }
+//            } else if(node instanceof CaseNode.When){
+//                for (CaseConditionNode condition : ((CaseNode) node).getCaseConditionNodes()) {
+//                    result.addAll(getInjectionPoints(condition.getBlock()));
+//                }
             } else if (node.hasBlock()) {
                 result.addAll(getInjectionPoints(node.getBlock()));
             }
@@ -97,6 +98,7 @@ public class CallNode extends AttrsNode {
 		if (names == null) {
 			return;
 		}
+
 		for (int i = 0; i < names.size(); i++) {
 			String key = names.get(i);
 			Object value = null;
@@ -114,22 +116,62 @@ public class CallNode extends AttrsNode {
 				model.put(key, value);
 			}
 		}
+		if(mixin.getRest()!=null) {
+			ArrayList<Object> restArguments = new ArrayList<Object>();
+			for (int i = names.size(); i < arguments.size(); i++) {
+				Object value = null;
+				if (i < values.size()) {
+					value = values.get(i);
+				}
+				if (value != null) {
+					try {
+						value = template.getExpressionHandler().evaluateExpression(values.get(i), model);
+					} catch (Throwable e) {
+						throw new JadeCompilerException(this, template.getTemplateLoader(), e);
+					}
+				}
+				restArguments.add(value);
+			}
+			model.put(mixin.getRest(), restArguments);
+		}
 	}
 
 	private void writeAttributes(JadeModel model, MixinNode mixin, JadeTemplate template) {
 //		model.put("attributes", mergeInheritedAttributes(model));
 //		model.put("attributes", getArguments());
+		LinkedList<Attr> newAttributes = new LinkedList<Attr>(attributes);
 		if (attributeBlocks.size()>0) {
-    		if (attributes.size()>0) {
-				LinkedHashMap<String,String> attrs = attrs(model, template);
-      			String val = this.visitAttributes(model, template);
-      			attributeBlocks.push(val);
-    		}
-			model.put("attributes", StringUtils.join(attributeBlocks, ","));
-  		} else if (attributes.size()>0) {
-			LinkedHashMap<String,String> attrs = attrs(model, template);
-			model.put("attributes", attrs);
+			//Todo: AttributesBlock needs to be evaluated
+
+			for (String attributeBlock : attributeBlocks) {
+			   Object o = null;
+			   try {
+				   o = template.getExpressionHandler().evaluateExpression(attributeBlock, model);
+			   } catch (ExpressionException e) {
+				   e.printStackTrace();
+			   }
+			   if(o!=null) {
+				   if(o instanceof HashMap) {
+					   for (Map.Entry<String, String> entry : ((HashMap<String,String>) o).entrySet()) {
+						   Attr attr = new Attr();
+						   attr.setName(entry.getKey());
+						   attr.setValue(entry.getValue());
+						   newAttributes.add(attr);
+					   }
+				   }else if(o instanceof String){
+					   System.out.print(o);
+				   }
+
+			   }
+		   }
   		}
+
+		if (newAttributes.size()>0) {
+			LinkedHashMap<String,String> attrs = attrs(model, template, newAttributes);
+			model.put("attributes", attrs);
+  		}else{
+			model.put("attributes", null);
+		}
 
 	}
 

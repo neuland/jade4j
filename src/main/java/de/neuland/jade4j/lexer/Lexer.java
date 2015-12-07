@@ -9,10 +9,7 @@ import java.util.regex.Pattern;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.lexer.token.*;
-import de.neuland.jade4j.util.CharacterParser;
-import de.neuland.jade4j.util.Options;
-import de.neuland.jade4j.util.StringReplacer;
-import de.neuland.jade4j.util.StringReplacerCallback;
+import de.neuland.jade4j.util.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -226,12 +223,6 @@ public class Lexer {
     }
     
 
-    public void handleBlankLines() {
-        while (scanner.isAdditionalBlankline()) {
-            consume(1);
-            lineno++;
-        }
-    }
 
     public void consume(int len) {
         scanner.consume(len);
@@ -284,8 +275,8 @@ public class Lexer {
         CharacterParser.Match range;
         try {
             range = characterParser.parseMax(scanner.getInput(), options);
-        }catch(Error error){
-            throw new JadeLexerException(error.getMessage(), filename, getLineno(), templateLoader);
+        }catch(CharacterParser.SyntaxError exception){
+            throw new JadeLexerException(exception.getMessage() + " See "+ StringUtils.substring(scanner.getInput(),0,5), filename, getLineno(), templateLoader);
         }
         if(scanner.getInput().charAt(range.getEnd()) != end)
             throw new JadeLexerException("start character " + start + " does not match end character " + scanner.getInput().charAt(range.getEnd()), filename, getLineno(), templateLoader);
@@ -641,7 +632,7 @@ public class Lexer {
     }
 
     private Token fail() {
-        throw new JadeLexerException("unexpected text " + scanner.getInput().substring(0, 5), filename, getLineno(), templateLoader);
+        throw new JadeLexerException("unexpected text " + StringUtils.substring(scanner.getInput(),0,5), filename, getLineno(), templateLoader);
     }
 
     private Token extendsToken() {
@@ -883,14 +874,19 @@ public class Lexer {
                 String expr = m.group(2);
                 if (escape != null) return match;
                 try {
-                    CharacterParser.Match range = characterParser.parseMax(expr);
-                    if (expr.charAt(range.getEnd()) != '}')
+                    try {
+                        CharacterParser.Match range = characterParser.parseMax(expr);
+                        if (expr.charAt(range.getEnd()) != '}')
+                            return substr(match, 0, 2) + interpolate(match.substring(2), quote);
+                        expressionHandler.assertExpression(range.getSrc());
+                        return quote + " + (" + range.getSrc() + ") + " + quote + interpolate(expr.substring(range.getEnd() + 1), quote);
+                    } catch (ExpressionException ex) {
                         return substr(match, 0, 2) + interpolate(match.substring(2), quote);
-                    expressionHandler.assertExpression(range.getSrc());
-                    return quote + " + (" + range.getSrc() + ") + " + quote + interpolate(expr.substring(range.getEnd() + 1), quote);
-                } catch (Exception ex) {
-                    return substr(match, 0, 2) + interpolate(match.substring(2), quote);
+                    }
+                }catch(CharacterParser.SyntaxError e){
+                    throw new JadeLexerException(e.getMessage()+ " See " + match, filename, getLineno(), templateLoader);
                 }
+
             }
         });
     }
@@ -976,17 +972,17 @@ public class Lexer {
                             }
                             break;
                         case KEY:
-                            if (key.isEmpty() && (str.charAt(i) == '"' || str.charAt(i) == '\'')) {
+                            if (key.isEmpty() && !str.isEmpty() && (str.charAt(i) == '"' || str.charAt(i) == '\'')) {
                                 loc = Loc.KEY_CHAR;
                                 quote = String.valueOf(str.charAt(i));
-                            } else if (str.charAt(i) == '!' || str.charAt(i) == '=') {
+                            } else if (!str.isEmpty() &&(str.charAt(i) == '!' || str.charAt(i) == '=')) {
                                 escapedAttr = str.charAt(i) != '!';
                                 if (str.charAt(i) == '!') i++;
                                 if (str.charAt(i) != '=')
                                     throw new JadeLexerException("Unexpected character " + str.charAt(i) + " expected `=`", filename, getLineno(), templateLoader);
                                 loc = Loc.VALUE;
                                 state = characterParser.defaultState();
-                            } else {
+                            } else if(!str.isEmpty()){
                                 key += str.charAt(i);
                             }
                             break;
@@ -1138,7 +1134,7 @@ public class Lexer {
                 }
                 tok = this.stash.pollLast();
                 // indent
-            } else if (indents > 0 && (indentStack.size() < 1 || indents != indentStack.get(0))) {
+            } else if (indents > 0 && (indentStack.size() == 0 || indents != indentStack.get(0))) {
                 indentStack.push(indents);
                 tok = new Indent("indent", lineno);
                 tok.setIndents(indents);

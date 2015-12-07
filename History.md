@@ -1,5 +1,69 @@
 # History
 
+## 1.1.2 / 2015-12-02
+* Fixing issue #126: Concatinate Null with String => NullPointerException
+* Improved error messages
+
+## 1.1.1 / 2015-12-02
+* Fixing issue 125: NumberFormatException when comparing loop-iterator with a String
+
+## 1.1.0 / 2015-11-29
+* Feature: Add Rest Attributes to Mixins
+
+## 1.0.10 / 2015-11-27
+* Fixing issue 124: Mixin Merge not working correct
+* Some Mixin refinements
+* Fixing include-with-text.jade
+
+## 1.0.9 / 2015-11-27
+* Fixing jade-Output without doctype
+* Fixing issue 122: Mixin Block after Mixin Call on same Line
+* Fixing issue 123: Block append not working correct.
+
+## 1.0.8 / 2015-11-26
+* Fixing issue 120: Terse Mode not working as expected
+* Fixed IndexOutOfBoundsException in substring.
+
+## 1.0.7 / 2015-11-16
+* Fixing issue 101: "}" symbol breaks the template inside of a string (Thanks to moio)
+
+## 1.0.6 / 2015-11-12
+* Fixing issue 118: Problems with nested/inherited attributes
+* Fixing issue 117: &attributes() -> String index out of range when mixin called with ()()
+
+## 1.0.5 / 2015-11-12
+* Fixing Issue 116: &attributes() -> Classcast Exception with integers as keys in maps, inside of loops
+
+## 1.0.4 / 2015-11-12
+* Fixing Issue 115: &attributes() -> Classcast Exception with integers as keys in maps
+* Fixing Issue 104: mixin definitions are ignored in extension template (Thanks to rzara)
+
+## 1.0.3 / 2015-11-11
+* Fixing Issue 114: Blank strings in brackets being casted to 0
+
+## 1.0.2 / 2015-11-10
+* Fixing Issue 113: &attributes on Mixin not working
+
+## 1.0.1 / 2015-11-10
+* Fixing Issue 112: Fixed ++ and -- recognition
+* Fixing Issue 111: Maven Upgrade auf 3.2.5
+* Added Testcases for closed Issues
+
+## 1.0.0 / 2015-11-06
+* In this version we updated to a lot of features of JadeJs 1.11 (2015-06-12).
+* Breaking Change: Instead of 'id = 5' you must use '- var id = 5'
+* Breaking Change: Instead of 'h1(attributes, class = "test")' you must use 'h1(class= "test")&attributes(attributes)'
+* Breaking Change: Instead of '!!! 5' you must use 'doctype html'
+* Breaking Change: Instead of '!!! 5' you must use 'doctype html'
+* Jade Syntax for Conditional Comments is not supported anymore
+* Thanks to rzara for contributing to issue-108
+
+## 0.4.3 / 2015-05-27
+* Accepted pull request from dusanmsk (#91) regarding mixin argument splitting and added further tests.
+
+## 0.4.2 / 2015-03-18
+* added issue89: Test files renamed (was #89 instead of #90).
+
 ## 0.4.1 / 2014-11-29
 * fixed tab support #79
 * .jade file extension appending is now done before the template loader #71

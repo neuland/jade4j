@@ -56,7 +56,7 @@ public class CompilerTest {
 
     @Test
     public void complexIndentOutdentFile() {
-        run("complex_indent_outdent_file");
+        run("complex_indent_outdent_file",true);
     }
 
     @Test
@@ -99,6 +99,11 @@ public class CompilerTest {
         run("while");
     }
 
+    @Test
+    public void minusMinusPlusPlusMatching() {
+        run("plusminus");
+    }
+    
     @Test
     public void caseTag() {
         run("case");
@@ -201,6 +206,7 @@ public class CompilerTest {
     }
 
     @Test
+    @Ignore("not supported since Jade 1.0 anymore")
     public void conditionalComment() {
         run("conditional_comment");
     }
@@ -217,7 +223,7 @@ public class CompilerTest {
 
     @Test
     public void attribute() {
-        run("attribute");
+        run("attribute",true);
     }
 
     @Test
@@ -237,7 +243,7 @@ public class CompilerTest {
 
     @Test
     public void mixinBlocks() {
-        run("mixin_blocks");
+        run("mixin_blocks",true);
     }
 
     @Test
@@ -350,6 +356,7 @@ public class CompilerTest {
     }
 
     @Test
+    @Ignore("Not working in Jade JS")
     public void expressionLenientVariableEvaluation() throws IOException {
         run("expression_lenient");
     }
@@ -372,7 +379,7 @@ public class CompilerTest {
 
     @Test
     public void includeNonJade() {
-        run("include_non_jade");
+        run("include_non_jade",true);
     }
 
     @Test
@@ -405,7 +412,17 @@ public class CompilerTest {
 
     @Test
     public void reportedIssue90() {
-        run("reportedIssue89");
+        run("reportedIssue89",true);
+    }
+
+    @Test
+    public void mixinExtendInclude() {
+        run("mixin_extend_include");
+    }
+
+    @Test
+    public void mixinExtend() {
+        run("mixin_extend");
     }
 
     private void run(String testName) {
