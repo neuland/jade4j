@@ -1,16 +1,16 @@
 package de.neuland.jade4j.lexer.token;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import de.neuland.jade4j.parser.node.ExpressionString;
 import de.neuland.jade4j.parser.node.ValueString;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class AttributeList extends Token {
 	private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
 
-	public AttributeList(String value, int lineNumber) {
-		super(value, lineNumber);
+	public AttributeList(int lineNumber) {
+		super(null, lineNumber);
 	}
 
 	public Map<String, Object> getAttributes() {
