@@ -29,7 +29,7 @@ public class OriginalJade20150515Test {
              "filters.coffeescript", "filters.less", "filters.markdown", "filters.stylus",
              "mixin.merge",  "styles","regression.784","mixin.attrs","include-filter-stylus",
             "include-filter","filters-empty","each.else","classes","blocks-in-if","filters.cdata","block-code",
-            "attrs-data","attrs.interpolation","include-extends-of-common-template"};
+            "attrs-data","attrs.interpolation"};
 //    "mixins.rest-args"
     private String file;
 
@@ -76,7 +76,7 @@ public class OriginalJade20150515Test {
 
         Collection<String[]> data = new ArrayList<String[]>();
         for (File file : files) {
-            if (!ArrayUtils.contains(ignoredCases, file.getName().replace(".jade", ""))) {
+            if (ArrayUtils.contains(ignoredCases, file.getName().replace(".jade", ""))) {
                 data.add(new String[]{file.getName()});
             }
 

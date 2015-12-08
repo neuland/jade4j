@@ -396,12 +396,12 @@ public class Parser {
         }
 
         Parser parser = createParser(templateName);
-        parser.setBlocks(blocks);
+        parser.setBlocks(new LinkedHashMap<String,BlockNode>(blocks));
         parser.setMixins(mixins);
         contexts.push(parser);
         Node ast = parser.parse();
         contexts.pop();
-
+        ast.setFileName(path);
         if (peek() instanceof Indent && ast != null) {
             ((BlockNode) ast).getIncludeBlock().push(block());
         }

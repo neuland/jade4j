@@ -1,5 +1,10 @@
 # History
 
+## 1.1.3 / 2015-12-08
+* Fixed Testcase: include-extends-of-common-template
+* Added Lexer Testcases
+* Updated Dependencies to newest version.
+
 ## 1.1.2 / 2015-12-02
 * Fixing issue #126: Concatinate Null with String => NullPointerException
 * Improved error messages
