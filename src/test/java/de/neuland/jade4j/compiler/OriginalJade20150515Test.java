@@ -76,7 +76,7 @@ public class OriginalJade20150515Test {
 
         Collection<String[]> data = new ArrayList<String[]>();
         for (File file : files) {
-            if (ArrayUtils.contains(ignoredCases, file.getName().replace(".jade", ""))) {
+            if (!ArrayUtils.contains(ignoredCases, file.getName().replace(".jade", ""))) {
                 data.add(new String[]{file.getName()});
             }
 
