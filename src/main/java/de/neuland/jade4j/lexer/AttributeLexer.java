@@ -1,9 +1,9 @@
 package de.neuland.jade4j.lexer;
 
+import de.neuland.jade4j.lexer.token.AttributeList;
+
 import java.util.Deque;
 import java.util.LinkedList;
-
-import de.neuland.jade4j.lexer.token.AttributeList;
 
 public class AttributeLexer {
 
@@ -27,7 +27,7 @@ public class AttributeLexer {
     }
 
     public AttributeList getToken(String input, int lineno) {
-        token = new AttributeList(input, lineno);
+        token = new AttributeList(lineno);
         for (int i = 0; i < input.length(); i++) {
             parse(input.charAt(i));
         }

@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import de.neuland.jade4j.TestFileHelper;
 import de.neuland.jade4j.expression.JexlExpressionHandler;
 import de.neuland.jade4j.lexer.token.Eos;
-import de.neuland.jade4j.lexer.token.Indent;
 import de.neuland.jade4j.lexer.token.Token;
 import de.neuland.jade4j.template.FileTemplateLoader;
 import org.apache.commons.io.FileUtils;
@@ -69,10 +68,6 @@ public class OriginalLexer_0_0_8_Test {
         return simpleClassName;
     }
 
-    private boolean ignoreUndefinedValues(String value) {
-        return value == null;
-    }
-
     private ExpectedToken tokenFromJsonLine(String expected) {
         return new Gson().fromJson(expected, ExpectedToken.class);
     }
@@ -88,7 +83,7 @@ public class OriginalLexer_0_0_8_Test {
     }
 
     @Test
-    public void shouldCompileJadeToHtml() throws Exception {
+    public void shouldLexJadeToTokens() throws Exception {
         FileTemplateLoader loader1 = new FileTemplateLoader(TestFileHelper.getLexer_0_0_8_ResourcePath("cases/"), "UTF-8");
         Lexer lexer1 = new Lexer(file, loader1, new JexlExpressionHandler());
         LinkedList<Token> tokens = lexer1.getTokens();
@@ -110,17 +105,9 @@ public class OriginalLexer_0_0_8_Test {
     private void assertToken(Token token, ExpectedToken expectedToken) {
         assertThat(typeOf(token)).isEqualTo(expectedToken.type);
         assertThat(token.isSelfClosing()).isEqualTo(expectedToken.selfClosing);
-        //TODO: Jade4J should return undefined (null)
-        //TODO: Indent should return no of indent
-        if (!ignoreUndefinedValues(expectedToken.val) && !ignoreIndent(token)) {
-            assertThat(token.getValue()).isEqualTo(expectedToken.val);
-        }
+        assertThat(token.getValue()).isEqualTo(expectedToken.val);
         //TODO: FileReader do not reads last line correct => Scanner.java
         //assertThat(token.getLineNumber()).isEqualTo(expectedToken.line);
-    }
-
-    private boolean ignoreIndent(Token token) {
-        return token instanceof Indent;
     }
 
     @Parameterized.Parameters(name = "{0}")

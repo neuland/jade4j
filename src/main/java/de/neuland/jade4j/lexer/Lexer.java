@@ -1,20 +1,22 @@
 package de.neuland.jade4j.lexer;
 
+import de.neuland.jade4j.exceptions.ExpressionException;
+import de.neuland.jade4j.exceptions.JadeLexerException;
+import de.neuland.jade4j.expression.ExpressionHandler;
+import de.neuland.jade4j.lexer.token.*;
+import de.neuland.jade4j.template.TemplateLoader;
+import de.neuland.jade4j.util.CharacterParser;
+import de.neuland.jade4j.util.Options;
+import de.neuland.jade4j.util.StringReplacer;
+import de.neuland.jade4j.util.StringReplacerCallback;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import de.neuland.jade4j.exceptions.ExpressionException;
-import de.neuland.jade4j.expression.ExpressionHandler;
-import de.neuland.jade4j.lexer.token.*;
-import de.neuland.jade4j.util.*;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import de.neuland.jade4j.exceptions.JadeLexerException;
-import de.neuland.jade4j.template.TemplateLoader;
 
 public class Lexer {
     private static final Pattern cleanRe = Pattern.compile("^['\"]|['\"]$");
@@ -381,7 +383,7 @@ public class Lexer {
         }
         if (indentStack.size() > 0) {
             indentStack.poll();
-            return new Outdent("outdent", lineno);
+            return new Outdent(lineno);
         } else {
             return new Eos("eos", lineno);
         }
@@ -470,7 +472,7 @@ public class Lexer {
             if (':' == name.charAt(name.length() - 1)) {
                 name = name.substring(0, name.length() - 1);
                 tok = new Tag(name, lineno);
-                this.defer(new Colon(":", lineno));
+                this.defer(new Colon(lineno));
                 while (' ' == scanner.getInput().charAt(0))
                     scanner.consume(1);
             } else {
@@ -490,7 +492,7 @@ public class Lexer {
             matcher.group(0);
             int end = matcher.end();
             consume(end);
-            return new Yield("yield", lineno);
+            return new Yield(lineno);
         }
         return null;
     }
@@ -681,7 +683,7 @@ public class Lexer {
         Matcher matcher = scanner.getMatcherForPattern("^block[ \\t]*(\\n|$)");
         if (matcher.find(0) && matcher.groupCount() > 0) {
             consume(matcher.end()-matcher.group(1).length());
-            return new MixinBlock("mixin-block", lineno);
+            return new MixinBlock(lineno);
         }
         return null;
     }
@@ -690,7 +692,7 @@ public class Lexer {
         Matcher matcher = scanner.getMatcherForPattern("^-\\n");
         if (matcher.find(0)) {
             consume(matcher.end()-1);
-            BlockCode blockCode = new BlockCode("blockCode", lineno);
+            BlockCode blockCode = new BlockCode(lineno);
             this.pipeless = true;
             return blockCode;
         }
@@ -770,7 +772,7 @@ public class Lexer {
         this.pipeless = true;
         Matcher matcher = scanner.getMatcherForPattern("^\\.");
         if (matcher.find(0)) {
-            Dot tok = new Dot(".", lineno);
+            Dot tok = new Dot(lineno);
             consume(matcher.end());
             return tok;
         }
@@ -920,7 +922,7 @@ public class Lexer {
         if ('(' == scanner.getInput().charAt(0)) {
             int index = this.bracketExpression().getEnd();
             String str = scanner.getInput().substring(1, index);
-            AttributeList tok = new AttributeList("attrs", getLineno());
+            AttributeList tok = new AttributeList(getLineno());
 
             assertNestingCorrect(str);
 
@@ -1123,24 +1125,24 @@ public class Lexer {
             // blank line
             if (scanner.isBlankLine()) {
                 this.pipeless = false;
-                return new Newline("newline", lineno);
+                return new Newline(lineno);
             }
 
             // outdent
             if (indentStack.size() > 0 && indents < indentStack.get(0)) {
                 while (indentStack.size() > 0 && indentStack.get(0) > indents) {
-                    stash.add(new Outdent("outdent", lineno));
+                    stash.add(new Outdent(lineno));
                     indentStack.poll();
                 }
                 tok = this.stash.pollLast();
                 // indent
             } else if (indents > 0 && (indentStack.size() == 0 || indents != indentStack.get(0))) {
                 indentStack.push(indents);
-                tok = new Indent("indent", lineno);
+                tok = new Indent(String.valueOf(indents), lineno);
                 tok.setIndents(indents);
                 // newline
             } else {
-                tok = new Newline("newline", lineno);
+                tok = new Newline(lineno);
             }
             this.pipeless = false;
             return tok;
@@ -1197,7 +1199,7 @@ public class Lexer {
                 } while (scanner.getInput().length() > 0 && isMatch);
                 while (scanner.getInput().length() == 0 && tokens.get(tokens.size() - 1).equals(""))
                     tokens.remove(tokens.size() - 1);
-                PipelessText pipelessText = new PipelessText("pipeless-text", lineno);
+                PipelessText pipelessText = new PipelessText(lineno);
                 pipelessText.setValues(tokens);
                 return pipelessText;
             }
@@ -1208,7 +1210,7 @@ public class Lexer {
     private Token colon() {
         String val = scan("^: *");
         if (StringUtils.isNotBlank(val)) {
-            return new Colon(val, lineno);
+            return new Colon(lineno);
         }
         return null;
     }
