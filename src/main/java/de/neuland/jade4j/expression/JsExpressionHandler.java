@@ -10,6 +10,14 @@ import java.util.Map;
  * Work In Progress - Using ScriptEngineManager
  */
 public class JsExpressionHandler implements ExpressionHandler {
+    JexlExpressionHandler jexlExpressionHandler = new JexlExpressionHandler();
+    ScriptEngineManager mgr = new ScriptEngineManager();
+    ScriptEngine jsEngine = mgr.getEngineByName("JavaScript");
+
+    public JsExpressionHandler() {
+
+    }
+
     @Override
     public Boolean evaluateBooleanExpression(String expression, JadeModel model) throws ExpressionException {
         return BooleanUtil.convert(evaluateExpression(expression, model));
@@ -17,9 +25,6 @@ public class JsExpressionHandler implements ExpressionHandler {
 
     @Override
     public Object evaluateExpression(String expression, JadeModel model) throws ExpressionException {
-        ScriptEngineManager mgr = new ScriptEngineManager();
-        ScriptEngine jsEngine = mgr.getEngineByName("JavaScript");
-
         try{
             Bindings bindings = jsEngine.createBindings();
             bindings.putAll(model);
@@ -44,15 +49,7 @@ public class JsExpressionHandler implements ExpressionHandler {
 
     @Override
     public void assertExpression(String expression) throws ExpressionException {
-        ScriptEngineManager mgr = new ScriptEngineManager();
-        ScriptEngine jsEngine = mgr.getEngineByName("Jexl");
-        try{
-          jsEngine.eval("return ("+expression+")");
-        }
-        catch (ScriptException ex){
-            throw new ExpressionException(expression, ex);
-        }
-
+        jexlExpressionHandler.assertExpression(expression);
     }
 
     @Override
