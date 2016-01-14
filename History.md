@@ -1,5 +1,8 @@
 # History
 
+## 1.1.4 / 2016-01-14
+* set fileName property to TextNode (thx to code4craft)
+
 ## 1.1.3 / 2015-12-08
 * Fixed Testcase: include-extends-of-common-template
 * Added Lexer Testcases
