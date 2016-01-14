@@ -1,26 +1,25 @@
 package de.neuland.jade4j.parser;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.net.URI;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import de.neuland.jade4j.exceptions.JadeParserException;
 import de.neuland.jade4j.expression.ExpressionHandler;
+import de.neuland.jade4j.lexer.Assignment;
+import de.neuland.jade4j.lexer.Each;
+import de.neuland.jade4j.lexer.Lexer;
 import de.neuland.jade4j.lexer.token.*;
 import de.neuland.jade4j.parser.node.*;
+import de.neuland.jade4j.template.TemplateLoader;
 import de.neuland.jade4j.util.CharacterParser;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import de.neuland.jade4j.exceptions.JadeParserException;
-import de.neuland.jade4j.lexer.Assignment;
-import de.neuland.jade4j.lexer.Each;
-import de.neuland.jade4j.lexer.Lexer;
-import de.neuland.jade4j.template.TemplateLoader;
+import java.io.IOException;
+import java.io.Reader;
+import java.net.URI;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Parser {
 
@@ -711,11 +710,12 @@ public class Parser {
     private Node[] parseInlineTagsInText(String str) {
         int line = this.line();
         Matcher matcher = Pattern.compile("(\\\\)?#\\[((?:.|\\n)*)$").matcher(str);
+        TextNode text = new TextNode();
+        text.setLineNumber(line);
+        text.setFileName(filename);
         if (matcher.find(0) && matcher.groupCount()>1) {
             if (matcher.group(1) != null) { // escape
-                TextNode text = new TextNode();
                 text.setValue(str.substring(0, matcher.start()) + "#[");//Not sure if Matcher.end() is correct
-                text.setLineNumber(line);
                 Node[] rest = this.parseInlineTagsInText(matcher.group(2));
                 if (rest[0] instanceof TextNode) {
                     text.setValue(text.getValue() + rest[0].getValue());
@@ -724,9 +724,7 @@ public class Parser {
                 Node[] textNodes = {text};
                 return ArrayUtils.addAll(textNodes, rest);
             } else {
-                TextNode text = new TextNode();
                 text.setValue(str.substring(0, matcher.start()));//Not sure if Matcher.end() is correct
-                text.setLineNumber(line);
                 Node[] textNodes = {text};
                 Node[] buffer = textNodes;
                 String rest = matcher.group(2);
@@ -746,9 +744,7 @@ public class Parser {
                 return ArrayUtils.addAll(buffer, this.parseInlineTagsInText(rest.substring(range.getEnd() + 1)));
             }
         } else {
-            TextNode text = new TextNode();
             text.setValue(str);
-            text.setLineNumber(line);
             Node[] textNodes = {text};
             return textNodes;
         }
