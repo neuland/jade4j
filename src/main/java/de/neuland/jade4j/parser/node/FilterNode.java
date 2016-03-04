@@ -1,15 +1,13 @@
 package de.neuland.jade4j.parser.node;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.compiler.Utils;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.filter.Filter;
+import de.neuland.jade4j.lexer.token.Attribute;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 public class FilterNode extends Node {
 
 	private Node textBlock;
-	private Map<String, Object> attributes = new HashMap<String, Object>();
+	private List<Attr> attributes = new LinkedList<Attr>();
 
 	public boolean hasTextBlock() {
 		return textBlock != null;
@@ -52,7 +50,7 @@ public class FilterNode extends Node {
 		writer.append(result);
 	}
 
-	public void setAttributes(Map<String, Object> attributes) {
+	public void setAttributes(List<Attr> attributes) {
 		this.attributes = attributes;
 
 	}

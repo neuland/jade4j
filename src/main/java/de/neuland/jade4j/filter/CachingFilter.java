@@ -1,6 +1,9 @@
 package de.neuland.jade4j.filter;
 
+import de.neuland.jade4j.parser.node.Attr;
+
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class CachingFilter implements Filter {
@@ -16,7 +19,7 @@ public abstract class CachingFilter implements Filter {
 	};
 
 	@Override
-	public String convert(String source, Map<String, Object> attributes, Map<String, Object> model) {
+	public String convert(String source, List<Attr> attributes, Map<String, Object> model) {
 		String key = source.hashCode() + "-" + attributes.hashCode();
 		if (!cache.containsKey(key)) {
 			cache.put(key, convert(source, attributes));
@@ -24,6 +27,6 @@ public abstract class CachingFilter implements Filter {
 		return cache.get(key);
 	}
 
-	abstract protected String convert(String source, Map<String, Object> attributes);
+	abstract protected String convert(String source, List<Attr> attributes);
 
 }

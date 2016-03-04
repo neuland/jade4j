@@ -28,10 +28,7 @@ public abstract class AttrsNode extends Node {
 			throw new Error("Duplicate attribute '" + key + "' is not allowed.");
 		} else {
 			this.attributeNames.add(key);
-			Attr attr = new Attr();
-			attr.setName(key);
-			attr.setValue(value);
-			attr.setEscaped(escaped);
+			Attr attr = new Attr(key,value,escaped);
 			this.attributes.add(attr);
 		}
 	}
@@ -129,9 +126,7 @@ public abstract class AttrsNode extends Node {
                 }
                 if(o!=null) {
                     for (Map.Entry<String, String> entry : o.entrySet()) {
-                        Attr attr = new Attr();
-                        attr.setName(String.valueOf(entry.getKey()));
-                        attr.setValue(entry.getValue());
+                        Attr attr = new Attr(String.valueOf(entry.getKey()),entry.getValue(),false);
                         newAttributes.add(attr);
                     }
                 }

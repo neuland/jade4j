@@ -153,9 +153,7 @@ public class CallNode extends AttrsNode {
 			   if(o!=null) {
 				   if(o instanceof HashMap) {
 					   for (Map.Entry<String, String> entry : ((HashMap<String,String>) o).entrySet()) {
-						   Attr attr = new Attr();
-						   attr.setName(entry.getKey());
-						   attr.setValue(entry.getValue());
+						   Attr attr = new Attr(entry.getKey(),entry.getValue(),false);
 						   newAttributes.add(attr);
 					   }
 				   }else if(o instanceof String){

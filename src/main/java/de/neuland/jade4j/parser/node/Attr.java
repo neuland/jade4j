@@ -8,24 +8,18 @@ public class Attr {
     private Object value;
     private boolean escaped;
 
-    public void setName(String name) {
+    public Attr(String name, Object value, boolean escaped) {
         this.name = name;
+        this.value = value;
+        this.escaped = escaped;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setValue(Object value) {
-        this.value = value;
-    }
-
     public Object getValue() {
         return value;
-    }
-
-    public void setEscaped(boolean escaped) {
-        this.escaped = escaped;
     }
 
     public boolean isEscaped() {

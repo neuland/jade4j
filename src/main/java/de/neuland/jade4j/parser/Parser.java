@@ -607,16 +607,17 @@ public class Parser {
                 }
                 seenAttrs = true;
                 AttributeList tok = (AttributeList) advance();
-                Map<String, Object> attrs = tok.getAttributes();
+                List<Attribute> attrs = tok.getAttributes();
                 tagNode.setSelfClosing(tok.isSelfClosing());
-                for (String name : attrs.keySet()) {
-                    Object value = attrs.get(name);
+                for (Attribute attr : attrs) {
+                    String name = attr.getName();
+                    Object value = attr.getValue();
                     if(value instanceof ValueString) {
                         ValueString valueString = (ValueString) value;
-                        tagNode.setAttribute(name, valueString.getValue(),valueString.isEscape());
+                        tagNode.setAttribute(name, valueString.getValue(),attr.isEscaped());
                     }else if(value instanceof ExpressionString) {
                         ExpressionString expressionString = (ExpressionString) value;
-                        tagNode.setAttribute(name, value, expressionString.isEscape());
+                        tagNode.setAttribute(name, value, attr.isEscaped());
                     }else if(value instanceof Boolean){
                         tagNode.setAttribute(name, value, false);
                     }else if(value instanceof String){
@@ -964,7 +965,7 @@ public class Parser {
             node.setTextBlock(new BlockNode());
         }
         if (attr != null) {
-            node.setAttributes(attr.getAttributes());
+            node.setAttributes(convertToNodeAttributes(attr));
         }
         return node;
     }
@@ -981,8 +982,17 @@ public class Parser {
         node.setBlock(block());
         node.setLineNumber(line());
         node.setFileName(filename);
-        node.setAttributes(attr.getAttributes());
+        node.setAttributes(convertToNodeAttributes(attr));
         return node;
+    }
+
+    private List<Attr> convertToNodeAttributes(AttributeList attr) {
+        List<Attribute> attributes = attr.getAttributes();
+        List<Attr> attributeNodes = new LinkedList<Attr>();
+        for (Attribute attribute : attributes) {
+            attributeNodes.add(new Attr(attribute.getName(),attribute.getValue(),attribute.isEscaped()));
+        }
+        return attributeNodes;
     }
 
     private Token lookahead(int i) {
