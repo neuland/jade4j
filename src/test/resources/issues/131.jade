@@ -1,0 +1,19 @@
+mixin testMixin()
+  h1.test&attributes(attributes)
+
+- var foo = "qux"
+- var bar = "quux"
+- var foobar = "#{foo}-#{bar}"
+- var foobar2 = foo + "-" + bar
+- var foobar3 = foo.toString() + "-" + bar.toString()
+- var foobarbaz = "foobarbaz"
+
++testMixin()(class="#{foobar}")
++testMixin()(class=foobar)
++testMixin()(class="#{foobar2}")
++testMixin()(class=foobar2)
++testMixin()(class="#{foobar3}")
++testMixin()(class=foobar3)
++testMixin()(class="#{foo}-#{bar}")
++testMixin()(class="#{foobarbaz}")
++testMixin()(class=foobarbaz)
