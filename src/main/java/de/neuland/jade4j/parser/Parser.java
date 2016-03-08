@@ -6,6 +6,7 @@ import de.neuland.jade4j.lexer.Assignment;
 import de.neuland.jade4j.lexer.Each;
 import de.neuland.jade4j.lexer.Lexer;
 import de.neuland.jade4j.lexer.token.*;
+import de.neuland.jade4j.lexer.token.AttributeList;
 import de.neuland.jade4j.parser.node.*;
 import de.neuland.jade4j.template.TemplateLoader;
 import de.neuland.jade4j.util.CharacterParser;
