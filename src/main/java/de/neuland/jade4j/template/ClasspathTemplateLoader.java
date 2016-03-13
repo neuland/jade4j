@@ -1,5 +1,7 @@
 package de.neuland.jade4j.template;
 
+import org.apache.commons.io.FilenameUtils;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -22,7 +24,8 @@ public class ClasspathTemplateLoader implements TemplateLoader {
 
     @Override
     public Reader getReader(String name) throws IOException {
-        if(!name.endsWith(suffix))name = name + suffix;
+        String extension = FilenameUtils.getExtension(name);
+        if ("".equals(extension)) name = name + suffix;
         return new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(name), getEncoding());
     }
 
