@@ -22,7 +22,7 @@ public class ClasspathTemplateLoader implements TemplateLoader {
 
     @Override
     public Reader getReader(String name) throws IOException {
-        if(!name.endsWith(suffix))name = name + suffix;
+        if(!name.contains("."))name = name + suffix;
         return new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(name), getEncoding());
     }
 
