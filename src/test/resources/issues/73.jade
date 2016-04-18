@@ -1,0 +1,8 @@
+-var crumbs = [{"url":"http://www.xyz.com","name":"xyz"},{"url":"http://www.abc.com","name":"abc"}]
+each crumb, i in crumbs
+    if i == 1
+        a(href="#{crumb.url}")
+            span.me-home
+                #{crumb.name}
+    else
+        a(href="#{crumb.url}")
