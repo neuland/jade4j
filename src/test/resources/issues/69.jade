@@ -1,0 +1,12 @@
+-var components = [{"name":"Foo"},{"name":"Bar"}]
+script
+  each component in components
+    component.name
+
+script.
+    each component in components
+        component.name
+
+script
+    each component in components
+        =component.name
