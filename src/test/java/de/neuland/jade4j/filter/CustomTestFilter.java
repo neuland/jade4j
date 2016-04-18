@@ -13,8 +13,8 @@ public class CustomTestFilter implements Filter {
             if("foo".equals(attribute.getName())){
                 Object foo = attribute.getValue();
                 String test = null;
-                if(foo instanceof ValueString)
-                    test = ((ValueString) foo).getValue();
+                if(foo instanceof String)
+                    test = (String) foo;
                 if("foo bar".equals(source) && "bar".equals(test)){
                     return "bar baz";
                 }

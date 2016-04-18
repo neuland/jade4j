@@ -21,10 +21,7 @@ public class AttributeList extends Token {
 	}
 
 	public void addAttribute(String name, String value, boolean escapedAttr) {
-		ValueString valueString = new ValueString(value);
-		valueString.setEscape(escapedAttr);
-
-		attributes.add(new Attribute(name,valueString,escapedAttr));
+		attributes.add(new Attribute(name,value,escapedAttr));
 	}
 
 	public void addExpressionAttribute(String name, String expression, boolean escapedAttr) {

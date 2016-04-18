@@ -23,14 +23,14 @@ public abstract class AttrsNode extends Node {
 	private boolean textOnly;
 
 
-	public void setAttribute(String key, Object value, boolean escaped) {
+	public AttrsNode setAttribute(String key, Object value, boolean escaped) {
 		if (!"class".equals(key) && this.attributeNames.indexOf(key) != -1) {
 			throw new Error("Duplicate attribute '" + key + "' is not allowed.");
-		} else {
-			this.attributeNames.add(key);
-			Attr attr = new Attr(key,value,escaped);
-			this.attributes.add(attr);
 		}
+        this.attributeNames.add(key);
+        Attr attr = new Attr(key,value,escaped);
+        this.attributes.add(attr);
+        return this;
 	}
 
 	public String getAttribute(String key) {
@@ -157,10 +157,11 @@ public abstract class AttrsNode extends Node {
 
     protected LinkedHashMap<String,String> attrs(JadeModel model, JadeTemplate template, LinkedList<Attr> attrs) {
         ArrayList<String> classes = new ArrayList<String>();
+        ArrayList<Boolean> classEscaping = new ArrayList<Boolean>();
         LinkedHashMap<String,String> newAttributes = new LinkedHashMap<String,String>();
         for (Attr attribute : attrs) {
             try {
-                addAttributesToMap(newAttributes,classes, attribute, model, template);
+                addAttributesToMap(newAttributes,classes,classEscaping, attribute, model, template);
             } catch (ExpressionException e) {
                 throw new JadeCompilerException(this, template.getTemplateLoader(), e);
             }
@@ -173,10 +174,9 @@ public abstract class AttrsNode extends Node {
         return finalAttributes;
     }
 
-    private void addAttributesToMap(HashMap<String, String> newAttributes, ArrayList<String> classes, Attr attribute, JadeModel model, JadeTemplate template) throws ExpressionException {
+    private void addAttributesToMap(HashMap<String, String> newAttributes, ArrayList<String> classes, ArrayList<Boolean> classEscaping, Attr attribute, JadeModel model, JadeTemplate template) throws ExpressionException {
         String name = attribute.getName();
-        String key = name;
-        boolean escaped = false;
+        boolean escaped = attribute.isEscaped();
 //        if ("class".equals(key)) {
 //          classes.push(attr.val);
 //          classEscaping.push(attr.escaped);
@@ -210,13 +210,14 @@ public abstract class AttrsNode extends Node {
 
         String value = null;
         Object attributeValue = attribute.getValue();
-        if("class".equals(key)) {
+        if("class".equals(name)) {
             if (attributeValue instanceof String) {
                 escaped = attribute.isEscaped();
                 value = getInterpolatedAttributeValue(name, attributeValue,escaped, model, template);
             } else if (attributeValue instanceof ExpressionString) {
                 escaped = ((ExpressionString) attributeValue).isEscape();
                 Object expressionValue = evaluateExpression((ExpressionString) attributeValue, model,template.getExpressionHandler());
+                //Array to String
                 if (expressionValue != null && expressionValue.getClass().isArray()) {
                     StringBuffer s = new StringBuffer("");
                     boolean first = true;
@@ -236,6 +237,16 @@ public abstract class AttrsNode extends Node {
                         }
                     }
                     value = s.toString();
+                }else if (expressionValue != null && expressionValue.getClass().isAssignableFrom(HashMap.class)) {
+                    HashMap<String,Object> map = (HashMap<String,Object>) expressionValue;
+                    for (Map.Entry<String,Object> entry : map.entrySet()) {
+                        if(entry.getValue() instanceof Boolean){
+                            if(((Boolean) entry.getValue()) == true){
+                                classes.add(entry.getKey());
+                                classEscaping.add(false);
+                            }
+                        }
+                    }
                 }else if(expressionValue!=null && expressionValue instanceof Boolean){
                     if((Boolean) expressionValue)
                         value = expressionValue.toString();
@@ -243,32 +254,23 @@ public abstract class AttrsNode extends Node {
                     value = expressionValue.toString();
                 }
             }
-            if(!StringUtils.isBlank(value))
+            if(!StringUtils.isBlank(value)) {
                 classes.add(value);
+                classEscaping.add(escaped);
+            }
             return;
-//        }else if("id".equals(key)){
-//            value = (String) attribute;
-        }else if (attributeValue instanceof String) {
-            escaped = attribute.isEscaped();
-            value = getInterpolatedAttributeValue(name, attributeValue, escaped, model, template);
-        } else if (attributeValue instanceof Boolean) {
-            if ((Boolean) attributeValue) {
-                value = name;
-            } else {
-                return;
-            }
-            if (template.isTerse()) {
-                value = null;
-            }
         } else if (attributeValue instanceof ExpressionString) {
-            escaped = ((ExpressionString) attributeValue).isEscape();
-            Object expressionValue = evaluateExpression((ExpressionString) attributeValue, model, template.getExpressionHandler());
+//            isConstant
+            ExpressionString expressionString = (ExpressionString) attributeValue;
+            escaped = expressionString.isEscape();
+            Object expressionValue = evaluateExpression(expressionString, model, template.getExpressionHandler());
             if (expressionValue == null) {
                 return;
             }
             // TODO: refactor
             if (expressionValue instanceof Boolean) {
-                if ((Boolean) expressionValue) {
+                Boolean booleanValue = (Boolean) expressionValue;
+                if (booleanValue) {
                     value = name;
                 } else {
                     return;
@@ -278,16 +280,25 @@ public abstract class AttrsNode extends Node {
                 }
             }else{
                 value = expressionValue.toString();
-                value = StringEscapeUtils.escapeHtml4(value);
+                if(escaped)
+                    value = StringEscapeUtils.escapeHtml4(value);
             }
-        } else if (attributeValue instanceof String) {
-            value = (String) attributeValue;
-//        } else {
-//            return "";
+        }else if (attributeValue instanceof String) {
+            escaped = attribute.isEscaped();
+            value = getInterpolatedAttributeValue(name, attributeValue, escaped, model, template);
+        } else if (attributeValue instanceof Boolean) {
+            Boolean booleanValue = (Boolean) attributeValue;
+            if (booleanValue) {
+                value = name;
+            } else {
+                return;
+            }
+            if (template.isTerse()) {
+                value = null;
+            }
         }
         newAttributes.put(name,value);
     }
-
 	private Object evaluateExpression(ExpressionString attribute, JadeModel model, ExpressionHandler expressionHandler) throws ExpressionException {
         String expression = ((ExpressionString) attribute).getValue();
         Object result = expressionHandler.evaluateExpression(expression, model);

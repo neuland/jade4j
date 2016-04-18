@@ -604,27 +604,18 @@ public class Parser {
                 continue;
             } else if (incomingToken instanceof AttributeList) {
                 if (seenAttrs) {
+                    throw new JadeParserException(filename,line(),templateLoader,this.filename + ", line " + this.peek().getLineNumber() + ":\nYou should not have jade tags with multiple attributes.");
                     //console.warn(this.filename + ', line ' + this.peek().line + ':\nYou should not have jade tags with multiple attributes.');
                 }
                 seenAttrs = true;
                 AttributeList tok = (AttributeList) advance();
                 List<Attribute> attrs = tok.getAttributes();
                 tagNode.setSelfClosing(tok.isSelfClosing());
+
                 for (Attribute attr : attrs) {
                     String name = attr.getName();
                     Object value = attr.getValue();
-                    if(value instanceof ValueString) {
-                        ValueString valueString = (ValueString) value;
-                        tagNode.setAttribute(name, valueString.getValue(),attr.isEscaped());
-                    }else if(value instanceof ExpressionString) {
-                        ExpressionString expressionString = (ExpressionString) value;
-                        tagNode.setAttribute(name, value, attr.isEscaped());
-                    }else if(value instanceof Boolean){
-                        tagNode.setAttribute(name, value, false);
-                    }else if(value instanceof String){
-                        tagNode.setAttribute(name, value, false);
-                    }
-
+                    tagNode.setAttribute(name, value, attr.isEscaped());
                 }
                 continue;
             } else if (incomingToken instanceof AttributesBlock) {
