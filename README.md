@@ -92,7 +92,7 @@ Just add following dependency definitions to your `pom.xml`.
 <dependency>
   <groupId>de.neuland-bfi</groupId>
   <artifactId>jade4j</artifactId>
-  <version>1.1.4</version>
+  <version>1.2.0</version>
 </dependency>
 ```
 
@@ -306,6 +306,8 @@ In Version 1.0.0 we added a lot of features of JadeJs 1.11. There are also some 
 - Instead of '!!! 5' you must use 'doctype html'
 - Jade Syntax for Conditional Comments is not supported anymore
 - Thanks to rzara for contributing to issue-108
+## Breaking Changes in 1.2.0
+- Breaking change in filter interface: if you use filters outside of the project, they need to be adapted to new interface
 
 <a name="authors"></a>
 ## Authors

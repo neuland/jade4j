@@ -1,5 +1,9 @@
 # History
 
+## 1.2.0 / 2016-04-18
+* Fixing issue 135: Resource loaded using the ClasspathTemplateLoader require *.jade extension before they are copied in (Thanks to nishtahir and crowmagnumb)
+* Fixing issue 129: multiple class attributes per HTML tag are not supported (breaking change in Filter interface, you need to adapt thirdparty filters)
+
 ## 1.1.4 / 2016-01-14
 * set fileName property to TextNode (thx to code4craft)
 
