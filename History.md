@@ -1,8 +1,11 @@
 # History
 
+## 1.2.1 / 2016-04-18
+* Fixing issue #132: class attribute not supported
+
 ## 1.2.0 / 2016-04-18
-* Fixing issue 135: Resource loaded using the ClasspathTemplateLoader require *.jade extension before they are copied in (Thanks to nishtahir and crowmagnumb)
-* Fixing issue 129: multiple class attributes per HTML tag are not supported (breaking change in Filter interface, you need to adapt thirdparty filters)
+* Fixing issue #135: Resource loaded using the ClasspathTemplateLoader require *.jade extension before they are copied in (Thanks to nishtahir and crowmagnumb)
+* Fixing issue #129: multiple class attributes per HTML tag are not supported (breaking change in Filter interface, you need to adapt thirdparty filters)
 
 ## 1.1.4 / 2016-01-14
 * set fileName property to TextNode (thx to code4craft)
@@ -17,48 +20,48 @@
 * Improved error messages
 
 ## 1.1.1 / 2015-12-02
-* Fixing issue 125: NumberFormatException when comparing loop-iterator with a String
+* Fixing issue #125: NumberFormatException when comparing loop-iterator with a String
 
 ## 1.1.0 / 2015-11-29
 * Feature: Add Rest Attributes to Mixins
 
 ## 1.0.10 / 2015-11-27
-* Fixing issue 124: Mixin Merge not working correct
+* Fixing issue #124: Mixin Merge not working correct
 * Some Mixin refinements
 * Fixing include-with-text.jade
 
 ## 1.0.9 / 2015-11-27
 * Fixing jade-Output without doctype
-* Fixing issue 122: Mixin Block after Mixin Call on same Line
-* Fixing issue 123: Block append not working correct.
+* Fixing issue #122: Mixin Block after Mixin Call on same Line
+* Fixing issue #123: Block append not working correct.
 
 ## 1.0.8 / 2015-11-26
-* Fixing issue 120: Terse Mode not working as expected
+* Fixing issue #120: Terse Mode not working as expected
 * Fixed IndexOutOfBoundsException in substring.
 
 ## 1.0.7 / 2015-11-16
-* Fixing issue 101: "}" symbol breaks the template inside of a string (Thanks to moio)
+* Fixing issue #101: "}" symbol breaks the template inside of a string (Thanks to moio)
 
 ## 1.0.6 / 2015-11-12
-* Fixing issue 118: Problems with nested/inherited attributes
-* Fixing issue 117: &attributes() -> String index out of range when mixin called with ()()
+* Fixing issue #118: Problems with nested/inherited attributes
+* Fixing issue #117: &attributes() -> String index out of range when mixin called with ()()
 
 ## 1.0.5 / 2015-11-12
-* Fixing Issue 116: &attributes() -> Classcast Exception with integers as keys in maps, inside of loops
+* Fixing Issue #116: &attributes() -> Classcast Exception with integers as keys in maps, inside of loops
 
 ## 1.0.4 / 2015-11-12
-* Fixing Issue 115: &attributes() -> Classcast Exception with integers as keys in maps
-* Fixing Issue 104: mixin definitions are ignored in extension template (Thanks to rzara)
+* Fixing Issue #115: &attributes() -> Classcast Exception with integers as keys in maps
+* Fixing Issue #104: mixin definitions are ignored in extension template (Thanks to rzara)
 
 ## 1.0.3 / 2015-11-11
-* Fixing Issue 114: Blank strings in brackets being casted to 0
+* Fixing Issue #114: Blank strings in brackets being casted to 0
 
 ## 1.0.2 / 2015-11-10
-* Fixing Issue 113: &attributes on Mixin not working
+* Fixing Issue #113: &attributes on Mixin not working
 
 ## 1.0.1 / 2015-11-10
-* Fixing Issue 112: Fixed ++ and -- recognition
-* Fixing Issue 111: Maven Upgrade auf 3.2.5
+* Fixing Issue #112: Fixed ++ and -- recognition
+* Fixing Issue #111: Maven Upgrade auf 3.2.5
 * Added Testcases for closed Issues
 
 ## 1.0.0 / 2015-11-06
