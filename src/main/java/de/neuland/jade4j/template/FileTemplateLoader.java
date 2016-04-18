@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 public class FileTemplateLoader implements TemplateLoader {
 
     private String encoding = "UTF-8";
-	private String suffix = ".jade";
 	private String basePath = "";
 	
 	public FileTemplateLoader(String basePath, String encoding) {

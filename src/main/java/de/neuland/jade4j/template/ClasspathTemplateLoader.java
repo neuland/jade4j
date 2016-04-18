@@ -13,7 +13,6 @@ import java.io.Reader;
  */
 public class ClasspathTemplateLoader implements TemplateLoader {
 
-    private static final String suffix = ".jade";
     private String encoding = "UTF-8";
 
     public long getLastModified(String name) {
@@ -22,7 +21,6 @@ public class ClasspathTemplateLoader implements TemplateLoader {
 
     @Override
     public Reader getReader(String name) throws IOException {
-        if(!name.endsWith(suffix))name = name + suffix;
         return new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(name), getEncoding());
     }
 

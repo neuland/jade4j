@@ -1,8 +1,5 @@
 package de.neuland.jade4j.parser.node;
 
-/**
- * Created by christoph on 29.10.15.
- */
 public class Attr {
     private String name;
     private Object value;

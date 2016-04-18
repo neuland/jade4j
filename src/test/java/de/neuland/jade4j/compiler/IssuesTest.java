@@ -4,18 +4,19 @@ import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.TestFileHelper;
 import de.neuland.jade4j.filter.*;
+import de.neuland.jade4j.template.ClasspathTemplateLoader;
 import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
+import de.neuland.jade4j.template.TemplateLoader;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,8 +35,23 @@ public class IssuesTest {
 
     @Test
     public void shouldCompileJadeToHtml() throws Exception {
+        FileTemplateLoader templateLoader = new FileTemplateLoader(TestFileHelper.getIssuesResourcePath(""), "UTF-8");
+        String templateName = file;
+
+        compareJade(templateLoader, templateName);
+    }
+
+    @Test
+    public void shouldCompileJadeToHtmlWithClasspathTemplateLoader() throws Exception {
+        ClasspathTemplateLoader templateLoader = new ClasspathTemplateLoader();
+        String templateName = "issues/" + file;
+
+        compareJade(templateLoader, templateName);
+    }
+
+    private void compareJade(TemplateLoader templateLoader, String templateName) throws IOException {
         JadeConfiguration jade = new JadeConfiguration();
-        jade.setTemplateLoader(new FileTemplateLoader(TestFileHelper.getIssuesResourcePath(""),"UTF-8"));
+        jade.setTemplateLoader(templateLoader);
 //        jade.setExpressionHandler(new JsExpressionHandler());
         jade.setMode(Jade4J.Mode.XHTML); // original jade uses xhtml by default
         jade.setFilter("plain", new PlainFilter());
@@ -49,7 +65,8 @@ public class IssuesTest {
 //        jade.setFilter("coffee-script", new CoffeeScriptFilter());
 
         jade.setPrettyPrint(true);
-        JadeTemplate template = jade.getTemplate(file);
+
+        JadeTemplate template = jade.getTemplate(templateName);
         Writer writer = new StringWriter();
         HashMap<String, Object> model = new HashMap<String, Object>();
         model.put("title","Jade");
