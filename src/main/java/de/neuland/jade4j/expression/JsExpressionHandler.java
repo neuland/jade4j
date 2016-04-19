@@ -32,6 +32,12 @@ public class JsExpressionHandler implements ExpressionHandler {
             for (Map.Entry<String, Object> stringObjectEntry : bindings.entrySet()) {
                 model.put(stringObjectEntry.getKey(),stringObjectEntry.getValue());
             }
+            if(eval instanceof Double){
+                String s = String.valueOf(eval);
+                if(s.endsWith(".0")){
+                    return Integer.valueOf(s.substring(0,s.length()-2));
+                }
+            }
             return eval;
         }
         catch (ScriptException ex){
