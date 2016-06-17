@@ -941,7 +941,7 @@ public class Lexer {
 
             for (int i = 0; i <= str.length(); i++) {
                 if (isEndOfAttribute(i, str, key, val, loc, state)) {
-//                    val = val.trim();
+                    val = val.trim();
                     if (!val.isEmpty())
                     try {
                         expressionHandler.assertExpression(val);
