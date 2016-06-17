@@ -10,6 +10,7 @@ import de.neuland.jade4j.util.Options;
 import de.neuland.jade4j.util.StringReplacer;
 import de.neuland.jade4j.util.StringReplacerCallback;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -940,14 +941,14 @@ public class Lexer {
 
             for (int i = 0; i <= str.length(); i++) {
                 if (isEndOfAttribute(i, str, key, val, loc, state)) {
-                    val = val.trim();
+//                    val = val.trim();
                     if (!val.isEmpty())
                     try {
                         expressionHandler.assertExpression(val);
                     } catch (ExpressionException e) {
                         throw new JadeLexerException(e.getMessage(), filename, lineno, templateLoader);
                     }
-
+                    val = StringEscapeUtils.unescapeJson(val);
                     key = key.trim();
                     key = key.replaceAll("^['\"]|['\"]$", "");
                     if ("".equals(val)) {

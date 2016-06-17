@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class IssuesTest {
-    private static String[] ignoredCases = new String[]{"68","78","100","131"};
+    private static String[] ignoredCases = new String[]{"68","100","131"};
 
     private String file;
 
