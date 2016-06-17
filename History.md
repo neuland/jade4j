@@ -1,5 +1,11 @@
 # History
 
+## 1.2.2 / 2016-06-17
+* Fixing issue #106: Filters cannot be set using xml configuration
+* Testcase issue 65
+* Fixing issue #78: Incorrect rendering of backslashes in attribute values
+* Fixing issue #68: Multi-Line Strings include the trailing slash
+
 ## 1.2.1 / 2016-04-18
 * Fixing issue #132: class attribute not supported
 
