@@ -1,5 +1,8 @@
 # History
 
+## 1.2.3 / 2016-06-17
+* Performance improvements
+
 ## 1.2.2 / 2016-06-17
 * Fixing issue #106: Filters cannot be set using xml configuration
 * Testcase issue 65
