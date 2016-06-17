@@ -108,6 +108,14 @@ public class JadeConfiguration {
         filters.remove(name);
     }
 
+    public Map<String, Filter> getFilters() {
+        return filters;
+    }
+
+    public void setFilters(Map<String, Filter> filters) {
+        this.filters = filters;
+    }
+
     public Map<String, Object> getSharedVariables() {
         return sharedVariables;
     }
