@@ -4,7 +4,7 @@
     <groupId>de.neuland-bfi</groupId>
     <artifactId>jade4j</artifactId>
     <version>1.2.4-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>jade4j</name>
     <description>Java implementation of the jade templating language</description>
     <parent>
@@ -13,6 +13,11 @@
         <version>7</version>
     </parent>
     <url>https://github.com/neuland/jade4j</url>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven-bundle-plugin.version>3.0.1</maven-bundle-plugin.version>
+        <osgi.version>6.0.0</osgi.version>
+    </properties>
 
     <issueManagement>
         <url>https://github.com/neuland/jade4j/issues</url>
@@ -56,9 +61,6 @@
         </developer>
     </developers>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <prerequisites>
         <maven>2.2.1</maven>
@@ -110,6 +112,24 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>${maven-bundle-plugin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Version>${project.version}</Bundle-Version>
+                        <Export-Package>
+                            de.neuland.jade4j.*;version=${project.version}
+                        </Export-Package>
+                        <Import-Package>
+                            *
+                        </Import-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.3</version>
@@ -185,6 +205,12 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>${osgi.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-jexl</artifactId>
