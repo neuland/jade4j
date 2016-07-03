@@ -1,5 +1,8 @@
 # History
 
+## 1.2.4
+* Converted in bundle to install Jade4j into OSGI container like karaf
+
 ## 1.2.3 / 2016-06-17
 * Performance improvements
 

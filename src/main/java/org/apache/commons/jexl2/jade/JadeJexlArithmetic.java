@@ -1,6 +1,7 @@
-package org.apache.commons.jexl2;
+package org.apache.commons.jexl2.jade;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.jexl2.JexlArithmetic;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
