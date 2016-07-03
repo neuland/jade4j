@@ -1,5 +1,6 @@
-package org.apache.commons.jexl2;
+package org.apache.commons.jexl2.jade;
 
+import org.apache.commons.jexl2.JexlInfo;
 import org.apache.commons.jexl2.internal.*;
 import org.apache.commons.jexl2.introspection.JexlPropertyGet;
 import org.apache.commons.jexl2.introspection.UberspectImpl;

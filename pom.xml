@@ -4,7 +4,7 @@
     <groupId>de.neuland-bfi</groupId>
     <artifactId>jade4j</artifactId>
     <version>1.2.4-SNAPSHOT</version>
-    <packaging>bundle</packaging>
+    <packaging>pom</packaging>
     <name>jade4j</name>
     <description>Java implementation of the jade templating language</description>
     <parent>
@@ -17,7 +17,18 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven-bundle-plugin.version>3.0.1</maven-bundle-plugin.version>
         <osgi.version>6.0.0</osgi.version>
+        <karaf.version>4.1.0-SNAPSHOT</karaf.version>
+        <commons-jexl.version>2.1.1</commons-jexl.version>
+        <concurrentlinkedhashmap-lru.version>1.4.2</concurrentlinkedhashmap-lru.version>
+        <commons-collections.version>3.2.2</commons-collections.version>
+        <commons-io.version>2.5</commons-io.version>
+        <commons-lang3.version>3.4</commons-lang3.version>
+        <pegdown.version>1.6.0</pegdown.version>
     </properties>
+
+    <modules>
+        <module>jade4j-features</module>
+    </modules>
 
     <issueManagement>
         <url>https://github.com/neuland/jade4j/issues</url>
@@ -122,7 +133,8 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Version>${project.version}</Bundle-Version>
                         <Export-Package>
-                            de.neuland.jade4j.*;version=${project.version}
+                            de.neuland.jade4j.*;version=${project.version},
+                            org.apache.commons.jexl2.jade
                         </Export-Package>
                         <Import-Package>
                             *
@@ -214,27 +226,27 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-jexl</artifactId>
-            <version>2.1.1</version>
+            <version>${commons-jexl.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>3.2.2</version>
+            <version>${commons-collections.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.4</version>
+            <version>${commons-io.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.4</version>
+            <version>${commons-lang3.version}</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.concurrentlinkedhashmap</groupId>
             <artifactId>concurrentlinkedhashmap-lru</artifactId>
-            <version>1.4.2</version>
+            <version>${concurrentlinkedhashmap-lru.version}</version>
         </dependency>
 
         <!-- Testing -->
@@ -265,7 +277,7 @@
         <dependency>
             <groupId>org.pegdown</groupId>
             <artifactId>pegdown</artifactId>
-            <version>1.6.0</version>
+            <version>${pegdown.version}</version>
         </dependency>
     </dependencies>
 </project>

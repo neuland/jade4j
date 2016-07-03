@@ -1,5 +1,9 @@
-package org.apache.commons.jexl2;
+package org.apache.commons.jexl2.jade;
 
+
+import org.apache.commons.jexl2.Interpreter;
+import org.apache.commons.jexl2.JexlContext;
+import org.apache.commons.jexl2.JexlEngine;
 
 public class JadeJexlEngine extends JexlEngine {
 
