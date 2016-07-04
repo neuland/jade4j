@@ -295,9 +295,9 @@ You can read more about this in the [JEXL documentation](http://commons.apache.o
 
 <a name="framework-integrations"></a>
 ## Framework Integrations
-
-[neuland/spring-jade4j](https://github.com/neuland/spring-jade4j) jade4j for Spring.
-[jooby-jade](https://github.com/jooby-project/jooby/tree/master/jooby-jade) jade4j for [Jooby](http://jooby.org).
+- [neuland/spring-jade4j](https://github.com/neuland/spring-jade4j) jade4j for Spring.
+- [jooby-jade](https://github.com/jooby-project/jooby/tree/master/jooby-jade) jade4j for [Jooby](http://jooby.org).
+- [vertx-web](http://vertx.io/docs/vertx-web/js/#_jade_template_engine) jade4j for [Vert.X](http://vertx.io/)
 
 <a name="breaking-changes"></a>
 ## Breaking Changes in 1.0.0
