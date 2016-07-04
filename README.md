@@ -296,7 +296,8 @@ You can read more about this in the [JEXL documentation](http://commons.apache.o
 <a name="framework-integrations"></a>
 ## Framework Integrations
 
-If you want to use jade4j with Spring check out our [neuland/spring-jade4j](https://github.com/neuland/spring-jade4j) project.
+[neuland/spring-jade4j](https://github.com/neuland/spring-jade4j) jade4j for Spring.
+[jooby-jade](https://github.com/jooby-project/jooby/tree/master/jooby-jade) jade4j for [Jooby](http://jooby.org).
 
 <a name="breaking-changes"></a>
 ## Breaking Changes in 1.0.0
