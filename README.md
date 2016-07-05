@@ -299,6 +299,16 @@ You can read more about this in the [JEXL documentation](http://commons.apache.o
 - [jooby-jade](https://github.com/jooby-project/jooby/tree/master/jooby-jade) jade4j for [Jooby](http://jooby.org).
 - [vertx-web](http://vertx.io/docs/vertx-web/js/#_jade_template_engine) jade4j for [Vert.X](http://vertx.io/)
 
+## OSGI Support
+
+If you want to use jade4j with OSGI, some changes was made to support OSGI installation in [karaf-4.1.0-SNAPSHOT](https://karaf.apache.org/download.html), this changes are available from jade4j-1.2.4-SNAPSHOT where it is a bundle, for test this feature you need to do this:
+
+- Download and Install [karaf-4.1.0-SNAPSHOT](https://karaf.apache.org/download.html)
+- Start karaf -> cd ${karaf_home}/bin/; ./karaf
+- Add the repo of this project with this karaf command: feature:repo-add mvn:de.neuland-bfi/jade4j-features/1.2.4-SNAPSHOT/xml/features
+- Install feature: feature:install jade4j-osgi
+
+
 <a name="breaking-changes"></a>
 ## Breaking Changes in 1.0.0
 In Version 1.0.0 we added a lot of features of JadeJs 1.11. There are also some Breaking Changes:

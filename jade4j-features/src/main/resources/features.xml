@@ -1,0 +1,20 @@
+<!--
+  ~ /*
+  ~  * Features OSGI for Jade4j
+  ~  */
+  -->
+<features name="jade4j-osgi" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
+
+    <feature name="jade4j-osgi" version="${project.version}">
+        <details>${project.description}</details>
+        <bundle>mvn:org.apache.commons/commons-jexl/${commons-jexl.version}</bundle>
+        <bundle>mvn:com.googlecode.concurrentlinkedhashmap/concurrentlinkedhashmap-lru/${concurrentlinkedhashmap-lru.version}</bundle>
+        <bundle>mvn:commons-collections/commons-collections/${commons-collections.version}</bundle>
+        <bundle>mvn:commons-io/commons-io/${commons-io.version}</bundle>
+        <bundle>mvn:org.apache.commons/commons-lang3/${commons-lang3.version}</bundle>
+        <bundle>wrap:mvn:org.pegdown/pegdown/${pegdown.version}</bundle>
+
+        <bundle>mvn:de.neuland-bfi/jade4j/${project.version}</bundle>
+    </feature>
+
+</features>

@@ -1,17 +1,12 @@
-package org.apache.commons.jexl2;
-
-import java.lang.reflect.Field;
+package org.apache.commons.jexl2.jade;
 
 import org.apache.commons.jexl2.JexlInfo;
-import org.apache.commons.jexl2.internal.AbstractExecutor;
-import org.apache.commons.jexl2.internal.BooleanGetExecutor;
-import org.apache.commons.jexl2.internal.DuckGetExecutor;
-import org.apache.commons.jexl2.internal.ListGetExecutor;
-import org.apache.commons.jexl2.internal.MapGetExecutor;
-import org.apache.commons.jexl2.internal.PropertyGetExecutor;
+import org.apache.commons.jexl2.internal.*;
 import org.apache.commons.jexl2.introspection.JexlPropertyGet;
 import org.apache.commons.jexl2.introspection.UberspectImpl;
 import org.apache.commons.logging.Log;
+
+import java.lang.reflect.Field;
 
 public class JadeIntrospect extends UberspectImpl {
 
@@ -40,7 +35,10 @@ public class JadeIntrospect extends UberspectImpl {
 
 	/**
 	 * Identical to getGetExecutor, but does check for map first. Mainly to avoid problems with 'class' properties.
-	 */
+	 * @param obj obj
+	 * @param identifier identifier
+     * @return AbstractExecutor.Get
+     */
 	public final AbstractExecutor.Get getJadeGetExecutor(Object obj, Object identifier) {
 		final Class<?> claz = obj.getClass();
 		final String property = toString(identifier);
