@@ -35,7 +35,10 @@ public class JadeIntrospect extends UberspectImpl {
 
 	/**
 	 * Identical to getGetExecutor, but does check for map first. Mainly to avoid problems with 'class' properties.
-	 */
+	 * @param obj obj
+	 * @param identifier identifier
+     * @return AbstractExecutor.Get
+     */
 	public final AbstractExecutor.Get getJadeGetExecutor(Object obj, Object identifier) {
 		final Class<?> claz = obj.getClass();
 		final String property = toString(identifier);
