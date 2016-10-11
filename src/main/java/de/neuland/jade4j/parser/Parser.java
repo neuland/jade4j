@@ -164,7 +164,7 @@ public class Parser {
 
     private Node parseBlockCode(){
       Token tok = this.expect(BlockCode.class);
-      CodeNode node;
+      ExpressionNode node;
       Token body = this.peek();
       String text;
       if (body instanceof PipelessText) {
@@ -173,7 +173,7 @@ public class Parser {
       } else {
         text = "";
       }
-        node = new CodeNode();
+        node = new ExpressionNode();
         node.setValue(text);
         node.setLineNumber(tok.getLineNumber());
         return node;

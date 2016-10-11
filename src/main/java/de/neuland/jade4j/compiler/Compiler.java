@@ -5,7 +5,6 @@ import java.io.Writer;
 
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.expression.ExpressionHandler;
-import de.neuland.jade4j.expression.JexlExpressionHandler;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.parser.node.Node;
 import de.neuland.jade4j.template.JadeTemplate;
