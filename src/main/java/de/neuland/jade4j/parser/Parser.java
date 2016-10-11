@@ -10,6 +10,8 @@ import de.neuland.jade4j.lexer.token.AttributeList;
 import de.neuland.jade4j.parser.node.*;
 import de.neuland.jade4j.template.TemplateLoader;
 import de.neuland.jade4j.util.CharacterParser;
+import org.apache.commons.io.FileSystemUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -17,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.net.URI;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -443,13 +444,25 @@ public class Parser {
     }
 
     private String resolvePath(String templateName) {
-        URI currentUri = URI.create(filename);
-        currentUri.getPath();
-        URI templateUri = currentUri.resolve(templateName);
-        String path = templateUri.toString();
-        if(StringUtils.lastIndexOf(templateUri.toString(),"/") >= StringUtils.lastIndexOf(templateUri.toString(),"."))
-            path += ".jade";
-        return path;
+//        Path currentPath = Paths.get(filename);
+//        Path templatePath = Paths.get(templateName);
+//        Path parent = currentPath.getParent();
+//        String filePath = templatePath.toString();
+//        if(parent!=null)
+//            filePath = parent.resolve(templatePath).toString();
+        String filePath;
+        if(FilenameUtils.indexOfLastSeparator(filename) == -1)
+            filePath = templateName;
+        else {
+            String currentDir = filename.substring(0,FilenameUtils.indexOfLastSeparator(filename)+1);
+            if(templateName.startsWith("/"))
+                filePath = templateName;
+            else
+                filePath = currentDir + templateName;
+        }
+        if(StringUtils.lastIndexOf(filePath,"/") >= StringUtils.lastIndexOf(filePath,"."))
+            filePath += ".jade";
+        return filePath;
     }
 
     private BlockNode parseYield() {
