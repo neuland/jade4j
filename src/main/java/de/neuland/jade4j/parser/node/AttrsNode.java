@@ -118,18 +118,26 @@ public abstract class AttrsNode extends Node {
         if(attributeBlocks.size()>0){
             //Todo: AttributesBlock needs to be evaluated
             for (String attributeBlock : attributeBlocks) {
-                HashMap<String,String> o = null;
+                Object o = null;
                 try {
-                    o = (HashMap<String,String>) template.getExpressionHandler().evaluateExpression(attributeBlock, model);
+                    o = template.getExpressionHandler().evaluateExpression(attributeBlock, model);
                 } catch (ExpressionException e) {
                     e.printStackTrace();
                 }
-                if(o!=null) {
-                    for (Map.Entry<String, String> entry : o.entrySet()) {
+                 if(o instanceof Map) {
+                    Map<String, String> map = (Map<String, String>) o;
+                    for (Map.Entry<String, String> entry : map.entrySet()) {
                         Attr attr = new Attr(String.valueOf(entry.getKey()),entry.getValue(),false);
                         newAttributes.add(attr);
                     }
                 }
+                if(o instanceof ArrayList){
+                    ArrayList<Object> list = (ArrayList<Object>) o;
+                    for (Object o1 : list) {
+
+                    }
+                }
+
             }
             LinkedHashMap<String,String> attrs = attrs(model, template,newAttributes);
             return attrsToString(attrs, template);
@@ -237,8 +245,8 @@ public abstract class AttrsNode extends Node {
                         }
                     }
                     value = s.toString();
-                }else if (expressionValue != null && expressionValue.getClass().isAssignableFrom(HashMap.class)) {
-                    HashMap<String,Object> map = (HashMap<String,Object>) expressionValue;
+                }else if (expressionValue != null && expressionValue instanceof Map) {
+                    Map<String,Object> map = (Map<String,Object>) expressionValue;
                     for (Map.Entry<String,Object> entry : map.entrySet()) {
                         if(entry.getValue() instanceof Boolean){
                             if(((Boolean) entry.getValue()) == true){

@@ -7,6 +7,7 @@ import org.apache.commons.jexl2.MapContext;
 
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.model.JadeModel;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,18 +36,25 @@ public class JexlExpressionHandler implements ExpressionHandler {
 //			if(expression.startsWith("{")) {
 //				return expression;
 //			}else{
-			expression = removeVar(expression);
-			if(isplusplus.matcher(expression).find()) {
-				expression = convertPlusPlusExpression(expression);
+			if(expression.contains("\n")) {
+				String[] split = StringUtils.split(expression,"\n");
+				for (String s : split) {
+					evaluateExpression(s,model);
+				}
+				return null;
+			}else {
+				expression = removeVar(expression);
+				if (isplusplus.matcher(expression).find()) {
+					expression = convertPlusPlusExpression(expression);
+				}
+				if (isminusminus.matcher(expression).find()) {
+					expression = convertMinusMinusExpression(expression);
+				}
+				Expression e = jexl.createExpression(expression);
+				Object evaluate = e.evaluate(new MapContext(model));
+				return evaluate;
 			}
-			if(isminusminus.matcher(expression).find()) {
-				expression = convertMinusMinusExpression(expression);
-			}
-			Expression e = jexl.createExpression(expression);
-			Object evaluate = e.evaluate(new MapContext(model));
-			return evaluate;
 //			}
-
 		} catch (Exception e) {
 			throw new ExpressionException(expression, e);
 		}
@@ -71,9 +79,11 @@ public class JexlExpressionHandler implements ExpressionHandler {
 	}
 
 	private String removeVar(String expression) {
-		if(expression.startsWith("var ")){
-            expression = expression.substring(4);
-        }
+		expression = expression.replace("var ","");
+//		expression = expression.replace("\n",";");
+//		if(expression.startsWith("var ")){
+//            expression = expression.substring(4);
+//        }
 		return expression;
 	}
 
