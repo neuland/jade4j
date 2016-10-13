@@ -2,7 +2,7 @@ package de.neuland.jade4j.expression;
 
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.model.JadeModel;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
+//import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import javax.script.*;
 import java.util.*;
@@ -48,42 +48,42 @@ public class JsExpressionHandler implements ExpressionHandler {
         }
     }
 
-    public static Object[] toArray(ScriptObjectMirror scriptObjectMirror)
-    {
-        if (!scriptObjectMirror.isArray())
-        {
-            throw new IllegalArgumentException("ScriptObjectMirror is no array");
-        }
-
-        if (scriptObjectMirror.isEmpty())
-        {
-            return new Object[0];
-        }
-
-        Object[] array = new Object[scriptObjectMirror.size()];
-
-        int i = 0;
-
-        for (Map.Entry<String, Object> entry : scriptObjectMirror.entrySet())
-        {
-            Object result = entry.getValue();
-
-            System.err.println(result.getClass());
-
-            if (result instanceof ScriptObjectMirror && scriptObjectMirror.isArray())
-            {
-                array[i] = toArray((ScriptObjectMirror) result);
-            }
-            else
-            {
-                array[i] = result;
-            }
-
-            i++;
-        }
-
-        return array;
-    }
+//    public static Object[] toArray(ScriptObjectMirror scriptObjectMirror)
+//    {
+//        if (!scriptObjectMirror.isArray())
+//        {
+//            throw new IllegalArgumentException("ScriptObjectMirror is no array");
+//        }
+//
+//        if (scriptObjectMirror.isEmpty())
+//        {
+//            return new Object[0];
+//        }
+//
+//        Object[] array = new Object[scriptObjectMirror.size()];
+//
+//        int i = 0;
+//
+//        for (Map.Entry<String, Object> entry : scriptObjectMirror.entrySet())
+//        {
+//            Object result = entry.getValue();
+//
+//            System.err.println(result.getClass());
+//
+//            if (result instanceof ScriptObjectMirror && scriptObjectMirror.isArray())
+//            {
+//                array[i] = toArray((ScriptObjectMirror) result);
+//            }
+//            else
+//            {
+//                array[i] = result;
+//            }
+//
+//            i++;
+//        }
+//
+//        return array;
+//    }
 //    private static Object convert(final Object obj) {
 //        if (obj instanceof Bindings) {
 //            try {
