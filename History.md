@@ -1,4 +1,7 @@
 # History
+## 1.2.5 / 2016-10-11
+* Fixing issue #147: Fix for issue #52 broke everything
+
 ## 1.2.4 / 2016-10-11
 * Fixed issue #141: Jade4J does not support unbuffered code blocks
 * Fixing issue #52: Includes in templates in paths with spaces
