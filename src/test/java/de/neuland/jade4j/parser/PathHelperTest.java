@@ -1,5 +1,6 @@
 package de.neuland.jade4j.parser;
 
+import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
@@ -27,7 +28,7 @@ public class PathHelperTest extends ParserTest {
     @Test
     public void shouldResolvePathWindows() throws Exception {
         String result = pathHelper.resolvePath("C:\\kek\\index.jade","../_layout.jade", "");
-        assertEquals("C:/_layout.jade",result);
+        assertEquals(FilenameUtils.separatorsToSystem("C:\\_layout.jade"),result);
 
     }
 }
