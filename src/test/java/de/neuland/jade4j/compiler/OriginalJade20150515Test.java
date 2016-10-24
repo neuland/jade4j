@@ -40,7 +40,8 @@ public class OriginalJade20150515Test {
     @Test
     public void shouldCompileJadeToHtml() throws Exception {
         JadeConfiguration jade = new JadeConfiguration();
-        jade.setTemplateLoader(new FileTemplateLoader(TestFileHelper.getOriginal20150515ResourcePath("cases/"),"UTF-8"));
+        String resourcePath = TestFileHelper.getOriginal20150515ResourcePath("");
+        jade.setTemplateLoader(new FileTemplateLoader(resourcePath,"UTF-8"));
 //        jade.setExpressionHandler(new JsExpressionHandler());
         jade.setMode(Jade4J.Mode.XHTML); // original jade uses xhtml by default
         jade.setFilter("plain", new PlainFilter());
@@ -50,6 +51,7 @@ public class OriginalJade20150515Test {
         jade.setFilter("verbatim", new VerbatimFilter());
         jade.setFilter("js", new JsFilter());
         jade.setFilter("css", new CssFilter());
+        jade.setBasePath("cases");
 //        jade.setFilter("coffee-script", new CoffeeScriptFilter());
 
         jade.setPrettyPrint(true);
@@ -60,13 +62,13 @@ public class OriginalJade20150515Test {
         jade.renderTemplate(template,model, writer);
         String html = writer.toString();
 
-        String expected = readFile(file.replace(".jade", ".html")).trim().replaceAll("\r", "");
+        String expected = readFile(resourcePath+file.replace(".jade", ".html")).trim().replaceAll("\r", "");
 
         assertEquals(file, expected, html.trim());
     }
 
     private String readFile(String fileName) throws IOException {
-        return FileUtils.readFileToString(new File(TestFileHelper.getOriginal20150515ResourcePath("cases/"+fileName)));
+        return FileUtils.readFileToString(new File(fileName));
     }
 
     @Parameterized.Parameters(name="{0}")
@@ -77,7 +79,7 @@ public class OriginalJade20150515Test {
         Collection<String[]> data = new ArrayList<String[]>();
         for (File file : files) {
             if (!ArrayUtils.contains(ignoredCases, file.getName().replace(".jade", ""))) {
-                data.add(new String[]{file.getName()});
+                data.add(new String[]{"cases/"+file.getName()});
             }
 
         }

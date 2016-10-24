@@ -19,7 +19,7 @@ public class ParserTest {
 		try {
 			FileTemplateLoader loader = new FileTemplateLoader(
 					TestFileHelper.getParserResourcePath(""), "UTF-8");
-			parser = new Parser(fileName, loader,new JexlExpressionHandler());
+			parser = new Parser(fileName, "", loader, new JexlExpressionHandler());
 		} catch (IOException e) {
 			e.printStackTrace();
 			Assert.fail("template " + fileName + " was not found");

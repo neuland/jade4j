@@ -10,8 +10,6 @@ import de.neuland.jade4j.lexer.token.AttributeList;
 import de.neuland.jade4j.parser.node.*;
 import de.neuland.jade4j.template.TemplateLoader;
 import de.neuland.jade4j.util.CharacterParser;
-import org.apache.commons.io.FileSystemUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -30,6 +28,7 @@ public class Parser {
     private LinkedHashMap<String, BlockNode> blocks = new LinkedHashMap<String,BlockNode>();
     private String[] textOnlyTags = {"script", "style"};
     private Integer _spaces = null;
+    private String basePath;
     private final TemplateLoader templateLoader;
     private ExpressionHandler expressionHandler;
     private Parser extending;
@@ -39,17 +38,19 @@ public class Parser {
     private int inMixin = 0;
     private HashMap<String,MixinNode> mixins = new HashMap<String,MixinNode>();
     private int inBlock = 0;
-
-    public Parser(String filename, TemplateLoader templateLoader,ExpressionHandler expressionHandler) throws IOException {
+    private PathHelper pathHelper = new PathHelper();
+    public Parser(String filename, String basePath, TemplateLoader templateLoader, ExpressionHandler expressionHandler) throws IOException {
         this.filename = filename;
+        this.basePath = basePath;
         this.templateLoader = templateLoader;
         this.expressionHandler = expressionHandler;
         lexer = new Lexer(filename, templateLoader,expressionHandler);
         characterParser = new CharacterParser();
         getContexts().push(this);
     }
-    public Parser(String src, String filename, TemplateLoader templateLoader,ExpressionHandler expressionHandler) throws IOException {
+    public Parser(String src, String filename, String basePath, TemplateLoader templateLoader, ExpressionHandler expressionHandler) throws IOException {
         this.filename = filename;
+        this.basePath = basePath;
         this.templateLoader = templateLoader;
         this.expressionHandler = expressionHandler;
         lexer = new Lexer(src,filename, templateLoader,expressionHandler);
@@ -355,7 +356,7 @@ public class Parser {
         Token token = expect(Include.class);
         Include includeToken = (Include) token;
         String templateName = includeToken.getValue().trim();
-        String path = resolvePath(templateName);
+        String path = pathHelper.resolvePath(filename,templateName,basePath);
 
         try {
             if (includeToken.getFilter() != null) {
@@ -429,7 +430,7 @@ public class Parser {
     private Parser createParser(String templateName) {
         templateName = ensureJadeExtension(templateName);
         try {
-            return new Parser(resolvePath(templateName), templateLoader,expressionHandler);
+            return new Parser(pathHelper.resolvePath(filename,templateName, basePath), basePath, templateLoader, expressionHandler);
         } catch (IOException e) {
             throw new JadeParserException(filename, lexer.getLineno(), templateLoader, "the template [" + templateName
                     + "] could not be opened\n" + e.getMessage());
@@ -441,28 +442,6 @@ public class Parser {
             return templateName + ".jade";
         }
         return templateName;
-    }
-
-    private String resolvePath(String templateName) {
-//        Path currentPath = Paths.get(filename);
-//        Path templatePath = Paths.get(templateName);
-//        Path parent = currentPath.getParent();
-//        String filePath = templatePath.toString();
-//        if(parent!=null)
-//            filePath = parent.resolve(templatePath).toString();
-        String filePath;
-        if(FilenameUtils.indexOfLastSeparator(filename) == -1)
-            filePath = templateName;
-        else {
-            String currentDir = filename.substring(0,FilenameUtils.indexOfLastSeparator(filename)+1);
-            if(templateName.startsWith("/"))
-                filePath = templateName;
-            else
-                filePath = currentDir + templateName;
-        }
-        if(StringUtils.lastIndexOf(filePath,"/") >= StringUtils.lastIndexOf(filePath,"."))
-            filePath += ".jade";
-        return filePath;
     }
 
     private BlockNode parseYield() {
@@ -742,7 +721,7 @@ public class Parser {
                 }
                 Parser inner = null;
                 try {
-                    inner = new Parser(range.getSrc(), this.filename, this.templateLoader,this.expressionHandler); //Need to be reviewed
+                    inner = new Parser(range.getSrc(), this.filename,this.basePath, this.templateLoader,this.expressionHandler); //Need to be reviewed
                 } catch (IOException e) {
                     throw new JadeParserException(this.filename,line,templateLoader,"Could not parse text");
                 }

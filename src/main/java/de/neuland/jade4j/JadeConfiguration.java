@@ -27,6 +27,7 @@ public class JadeConfiguration {
     private static final String FILTER_SCRIPT = "js";
 
     private boolean prettyPrint = false;
+    private String basePath = "";
     private boolean caching = true;
     private Mode mode = Jade4J.Mode.HTML;
 
@@ -82,7 +83,7 @@ public class JadeConfiguration {
     private JadeTemplate createTemplate(String name) throws JadeException, IOException {
         JadeTemplate template = new JadeTemplate();
 
-        Parser parser = new Parser(name, templateLoader,expressionHandler);
+        Parser parser = new Parser(name, basePath, templateLoader, expressionHandler);
         Node root = parser.parse();
         template.setTemplateLoader(templateLoader);
         template.setExpressionHandler(expressionHandler);
@@ -170,5 +171,13 @@ public class JadeConfiguration {
     public void clearCache() {
         expressionHandler.clearCache();
         cache.clear();
+    }
+
+    public String getBasePath() {
+        return basePath;
+    }
+
+    public void setBasePath(String basePath) {
+        this.basePath = basePath;
     }
 }

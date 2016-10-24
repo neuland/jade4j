@@ -14,6 +14,7 @@ public class JadeParserTest extends ParserTest {
 
     private Node blockNode;
 
+
     @Test
     public void shouldReturnABlockWithTokens2() {
         loadInParser("two_blocks_with_an_outdent.jade");

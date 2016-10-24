@@ -1,23 +1,18 @@
 package de.neuland.jade4j.template;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.regex.Pattern;
 
 public class FileTemplateLoader implements TemplateLoader {
 
     private String encoding = "UTF-8";
-	private String basePath = "";
+	private String folderPath = "";
 	
-	public FileTemplateLoader(String basePath, String encoding) {
-		this.basePath = basePath;
+	public FileTemplateLoader(String folderPath, String encoding) {
+		this.folderPath = folderPath;
 		this.encoding = encoding;
 	}
 
@@ -34,6 +29,6 @@ public class FileTemplateLoader implements TemplateLoader {
 
 	private File getFile(String name) {
 		// TODO Security
-        return new File(basePath + name);
+        return new File(folderPath + name);
 	}
 }

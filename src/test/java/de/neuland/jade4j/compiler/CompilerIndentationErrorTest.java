@@ -17,7 +17,6 @@ import com.google.gson.reflect.TypeToken;
 
 import de.neuland.jade4j.TestFileHelper;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
-import de.neuland.jade4j.exceptions.JadeLexerException;
 import de.neuland.jade4j.filter.MarkdownFilter;
 import de.neuland.jade4j.filter.PlainFilter;
 import de.neuland.jade4j.model.JadeModel;
@@ -46,7 +45,7 @@ public class CompilerIndentationErrorTest {
         try {
             FileTemplateLoader loader = new FileTemplateLoader(TestFileHelper.getCompilerErrorsResourcePath(""),
                     "UTF-8");
-            parser = new Parser(testName, loader,new JexlExpressionHandler());
+            parser = new Parser(testName,"", loader, new JexlExpressionHandler());
         } catch (IOException e) {
             e.printStackTrace();
         }
