@@ -80,7 +80,7 @@ public class IssuesTest {
     }
 
     private String readFile(String fileName) throws IOException {
-        return FileUtils.readFileToString(new File(TestFileHelper.getIssuesResourcePath(fileName)));
+        return FileUtils.readFileToString(new File(TestFileHelper.getIssuesResourcePath(fileName)),"UTF-8");
     }
 
     @Parameterized.Parameters(name="{0}")
