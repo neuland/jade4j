@@ -11,11 +11,11 @@ public class WhileNode extends Node {
 	@Override
 	public void execute(IndentWriter writer, JadeModel model, JadeTemplate template) throws JadeCompilerException {
 		try {
-			model.pushScope();
+			//model.pushScope();
 			while (template.getExpressionHandler().evaluateBooleanExpression(value, model)) {
 				block.execute(writer, model, template);
 			}
-			model.popScope();
+			//model.popScope();
 		} catch (ExpressionException e) {
 			throw new JadeCompilerException(this, template.getTemplateLoader(), e);
 		}
