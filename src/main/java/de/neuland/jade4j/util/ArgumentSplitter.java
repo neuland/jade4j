@@ -51,6 +51,13 @@ public class ArgumentSplitter {
             else if (ch == ')') {
                 bracesBlock--;
             }
+            else if (ch == '[') {
+                bracesBlock++;
+            }
+
+            else if (ch == ']') {
+                bracesBlock--;
+            }
 
             // detect argument delimiter, then push argument
             else if (ch == argumentDelimiter && !insideQuotas && bracesBlock == 0) {
