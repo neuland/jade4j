@@ -356,7 +356,7 @@ public class Parser {
         Token token = expect(Include.class);
         Include includeToken = (Include) token;
         String templateName = includeToken.getValue().trim();
-        String path = pathHelper.resolvePath(filename,templateName,basePath);
+        String path = pathHelper.resolvePath(filename,templateName,basePath,templateLoader.getExtension());
 
         try {
             if (includeToken.getFilter() != null) {
@@ -384,7 +384,7 @@ public class Parser {
 
         // non-jade
         String extension = FilenameUtils.getExtension(path);
-        if (!"jade".equals(extension)) {
+        if (!templateLoader.getExtension().equals(extension)) {
             try {
                 Reader reader = templateLoader.getReader(path);
                 LiteralNode node = new LiteralNode();
@@ -430,7 +430,7 @@ public class Parser {
     private Parser createParser(String templateName) {
         templateName = ensureJadeExtension(templateName);
         try {
-            return new Parser(pathHelper.resolvePath(filename,templateName, basePath), basePath, templateLoader, expressionHandler);
+            return new Parser(pathHelper.resolvePath(filename,templateName, basePath, templateLoader.getExtension()), basePath, templateLoader, expressionHandler);
         } catch (IOException e) {
             throw new JadeParserException(filename, lexer.getLineno(), templateLoader, "the template [" + templateName
                     + "] could not be opened\n" + e.getMessage());
@@ -438,8 +438,8 @@ public class Parser {
     }
 
     private String ensureJadeExtension(String templateName) {
-        if (!"jade".equals(FilenameUtils.getExtension(templateName))) {
-            return templateName + ".jade";
+        if (!templateLoader.getExtension().equals(FilenameUtils.getExtension(templateName))) {
+            return templateName + "."+templateLoader.getExtension();
         }
         return templateName;
     }

@@ -10,10 +10,17 @@ public class FileTemplateLoader implements TemplateLoader {
 
     private String encoding = "UTF-8";
 	private String folderPath = "";
+	private String extension = "jade";
 	
 	public FileTemplateLoader(String folderPath, String encoding) {
 		this.folderPath = folderPath;
 		this.encoding = encoding;
+	}
+
+	public FileTemplateLoader(String folderPath, String encoding, String extension) {
+		this.encoding = encoding;
+		this.folderPath = folderPath;
+		this.extension = extension;
 	}
 
 	public long getLastModified(String name) {
@@ -30,5 +37,9 @@ public class FileTemplateLoader implements TemplateLoader {
 	private File getFile(String name) {
 		// TODO Security
         return new File(folderPath + name);
+	}
+
+	public String getExtension() {
+		return extension;
 	}
 }

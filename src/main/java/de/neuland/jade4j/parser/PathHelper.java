@@ -4,7 +4,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class PathHelper {
-    public String resolvePath(String parentName, String templateName, String basePath) {
+    public String resolvePath(String parentName, String templateName, String basePath, String extension) {
 //        Path currentPath = Paths.get(filename);
 //        Path templatePath = Paths.get(templateName);
 //        Path parent = currentPath.getParent();
@@ -24,7 +24,7 @@ public class PathHelper {
             }
         }
         if(StringUtils.lastIndexOf(filePath,"/") >= StringUtils.lastIndexOf(filePath,"."))
-            filePath += ".jade";
+            filePath += "."+extension;
         filePath = FilenameUtils.normalize(filePath);
         return filePath;
     }

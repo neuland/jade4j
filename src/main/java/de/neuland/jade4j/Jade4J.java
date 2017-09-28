@@ -87,9 +87,15 @@ public class Jade4J {
 	public static JadeTemplate getTemplate(String filename) throws IOException {
 		return createTemplate(filename,"", new FileTemplateLoader("", "UTF-8"), new JexlExpressionHandler());
 	}
+	public static JadeTemplate getTemplate(String filename,String extension) throws IOException {
+		return createTemplate(filename,"", new FileTemplateLoader("", "UTF-8",extension), new JexlExpressionHandler());
+	}
 
 	private static JadeTemplate getTemplate(Reader reader, String name) throws IOException {
 		return createTemplate(name, "",new ReaderTemplateLoader(reader, name), new JexlExpressionHandler());
+	}
+	private static JadeTemplate getTemplate(Reader reader, String name, String extension) throws IOException {
+		return createTemplate(name, "",new ReaderTemplateLoader(reader, name,extension), new JexlExpressionHandler());
 	}
 
 	private static JadeTemplate createTemplate(String filename, String basePath, TemplateLoader loader, ExpressionHandler expressionHandler) throws IOException {

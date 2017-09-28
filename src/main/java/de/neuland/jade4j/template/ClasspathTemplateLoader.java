@@ -14,6 +14,19 @@ import java.io.Reader;
 public class ClasspathTemplateLoader implements TemplateLoader {
 
     private String encoding = "UTF-8";
+    private String extension = "jade";
+
+    public ClasspathTemplateLoader() {
+    }
+
+    public ClasspathTemplateLoader(String encoding) {
+        this.encoding = encoding;
+    }
+
+    public ClasspathTemplateLoader(String encoding, String extension) {
+        this.encoding = encoding;
+        this.extension = extension;
+    }
 
     public long getLastModified(String name) {
         return -1;
@@ -32,4 +45,8 @@ public class ClasspathTemplateLoader implements TemplateLoader {
         this.encoding = encoding;
     }
 
+    @Override
+    public String getExtension() {
+        return extension;
+    }
 }
