@@ -8,6 +8,7 @@ import org.apache.commons.jexl3.MapContext;
 
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.model.JadeModel;
+import org.apache.commons.jexl3.internal.Script;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Matcher;
@@ -79,7 +80,7 @@ public class JexlExpressionHandler implements ExpressionHandler {
 	}
 
 	private String removeVar(String expression) {
-//		expression = expression.replace("var ","");
+		expression = expression.replace("var ","");
 //		expression = expression.replace("\n",";");
 //		if(expression.startsWith("var ")){
 //            expression = expression.substring(4);

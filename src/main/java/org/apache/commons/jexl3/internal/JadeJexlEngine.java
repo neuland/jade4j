@@ -1,12 +1,15 @@
 package org.apache.commons.jexl3.internal;
 
 
-import org.apache.commons.jexl3.JadeJexlArithmetic;
-import org.apache.commons.jexl3.JadeJexlInterpreter;
-import org.apache.commons.jexl3.JexlBuilder;
-import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.*;
+import org.apache.commons.jexl3.internal.introspection.JadeUeberspect;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class JadeJexlEngine extends Engine {
 
@@ -14,8 +17,21 @@ public class JadeJexlEngine extends Engine {
 	 * using a semi strict interpreter and non strict arithmetic
 	 */
 	public JadeJexlEngine(int cacheSize) {
-		super(new JexlBuilder().arithmetic(new JadeJexlArithmetic(true)).uberspect(new Uberspect(null,
-				JexlUberspect.MAP_STRATEGY)).strict(false).silent(false).cache(cacheSize));
+		super(new JexlBuilder().arithmetic(new JadeJexlArithmetic(false)).uberspect(new Uberspect(null,
+				new JexlUberspect.ResolverStrategy() {
+                    public List<JexlUberspect.PropertyResolver> apply(JexlOperator op, Object obj) {
+                        if(obj instanceof Map){
+                            return JexlUberspect.MAP;
+                        }
+                        if (op == JexlOperator.ARRAY_GET) {
+                            return JexlUberspect.MAP;
+                        } else if (op == JexlOperator.ARRAY_SET) {
+                            return JexlUberspect.MAP;
+                        } else {
+                            return op == null && obj instanceof Map ? JexlUberspect.MAP : JexlUberspect.POJO;
+                        }
+                    }
+                })).strict(false).silent(true).cache(cacheSize));
 	}
 
 	@Override
