@@ -1,13 +1,12 @@
-package org.apache.commons.jexl2;
+package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl2.Interpreter;
-import org.apache.commons.jexl2.JexlContext;
-import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl3.internal.Engine;
+import org.apache.commons.jexl3.internal.Interpreter;
+import org.apache.commons.jexl3.internal.Scope;
 
 public class JadeJexlInterpreter extends Interpreter {
-
-	public JadeJexlInterpreter(JexlEngine jexl, JexlContext aContext, boolean strictFlag, boolean silentFlag) {
-		super(jexl, aContext, strictFlag, silentFlag);
+	public JadeJexlInterpreter(Engine engine, JexlContext aContext, Scope.Frame eFrame) {
+		super(engine, aContext, eFrame);
 	}
 
 	/**

@@ -1,22 +1,16 @@
-package org.apache.commons.jexl2;
+package org.apache.commons.jexl3.internal.introspection;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
-import org.apache.commons.jexl2.JexlInfo;
-import org.apache.commons.jexl2.internal.AbstractExecutor;
-import org.apache.commons.jexl2.internal.BooleanGetExecutor;
-import org.apache.commons.jexl2.internal.DuckGetExecutor;
-import org.apache.commons.jexl2.internal.ListGetExecutor;
-import org.apache.commons.jexl2.internal.MapGetExecutor;
-import org.apache.commons.jexl2.internal.PropertyGetExecutor;
-import org.apache.commons.jexl2.introspection.JexlPropertyGet;
-import org.apache.commons.jexl2.introspection.UberspectImpl;
+import org.apache.commons.jexl3.JexlInfo;
+import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.logging.Log;
 
-public class JadeIntrospect extends UberspectImpl {
+public class JadeIntrospect extends Uberspect {
 
-	public JadeIntrospect(Log runtimeLogger) {
-		super(runtimeLogger);
+	public JadeIntrospect(Log runtimeLogger, ResolverStrategy sty) {
+		super(runtimeLogger,sty);
 	}
 
 	/**
@@ -37,29 +31,32 @@ public class JadeIntrospect extends UberspectImpl {
 		}
 		return get;
 	}
+	public JexlPropertyGet getPropertyGet(List<PropertyResolver> resolvers, Object obj, Object identifier) {
 
+	}
 	/**
 	 * Identical to getGetExecutor, but does check for map first. Mainly to avoid problems with 'class' properties.
 	 */
 	public final AbstractExecutor.Get getJadeGetExecutor(Object obj, Object identifier) {
 		final Class<?> claz = obj.getClass();
-		final String property = toString(identifier);
-		AbstractExecutor.Get executor;
+		final String property = AbstractExecutor.castString(identifier);
+		JexlPropertyGet executor = null;
+		Introspector is = this.base();
 		// let's see if we are a map...
-		executor = new MapGetExecutor(this, claz, identifier);
+		executor = MapGetExecutor.discover(is, claz, identifier);
 		if (executor.isAlive()) {
 			return executor;
 		}
 		// first try for a getFoo() type of property (also getfoo() )
 		if (property != null) {
-			executor = new PropertyGetExecutor(this, claz, property);
+			executor = PropertyGetExecutor.discover(is, claz, property);
 			if (executor.isAlive()) {
 				return executor;
 			}
 			// }
 			// look for boolean isFoo()
 			// if (property != null) {
-			executor = new BooleanGetExecutor(this, claz, property);
+			executor = BooleanGetExecutor.discover(is, claz, property);
 			if (executor.isAlive()) {
 				return executor;
 			}
@@ -68,18 +65,18 @@ public class JadeIntrospect extends UberspectImpl {
 		// if obj is an array or a list, we can still do something
 		Integer index = toInteger(identifier);
 		if (index != null) {
-			executor = new ListGetExecutor(this, claz, index);
+			executor = ListGetExecutor.discover(is, claz, index);
 			if (executor.isAlive()) {
 				return executor;
 			}
 		}
 		// if that didn't work, look for set("foo")
-		executor = new DuckGetExecutor(this, claz, identifier);
+		executor = DuckGetExecutor.discover(is, claz, identifier);
 		if (executor.isAlive()) {
 			return executor;
 		}
 		// if that didn't work, look for set("foo")
-		executor = new DuckGetExecutor(this, claz, property);
+		executor = DuckGetExecutor.discover(is, claz, property);
 		if (executor.isAlive()) {
 			return executor;
 		}

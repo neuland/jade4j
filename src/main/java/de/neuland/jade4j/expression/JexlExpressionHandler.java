@@ -1,9 +1,9 @@
 package de.neuland.jade4j.expression;
 
-import org.apache.commons.jexl2.Expression;
-import org.apache.commons.jexl2.JadeJexlEngine;
-import org.apache.commons.jexl2.JexlEngine;
-import org.apache.commons.jexl2.MapContext;
+import org.apache.commons.jexl3.Expression;
+import org.apache.commons.jexl3.internal.JadeJexlEngine;
+import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.MapContext;
 
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.model.JadeModel;
