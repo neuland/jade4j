@@ -1,6 +1,7 @@
 package de.neuland.jade4j.expression;
 
-import org.apache.commons.jexl3.Expression;
+import org.apache.commons.jexl3.JexlExpression;
+import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.internal.JadeJexlEngine;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.MapContext;
@@ -22,8 +23,7 @@ public class JexlExpressionHandler implements ExpressionHandler {
 	private JexlEngine jexl;
 
 	public JexlExpressionHandler() {
-		jexl = new JadeJexlEngine();
-		jexl.setCache(MAX_ENTRIES);
+		jexl = new JadeJexlEngine(MAX_ENTRIES);
 
 	}
 
@@ -50,8 +50,8 @@ public class JexlExpressionHandler implements ExpressionHandler {
 				if (isminusminus.matcher(expression).find()) {
 					expression = convertMinusMinusExpression(expression);
 				}
-				Expression e = jexl.createExpression(expression);
-				Object evaluate = e.evaluate(new MapContext(model));
+				JexlScript e = jexl.createScript(expression);
+				Object evaluate = e.execute(new MapContext(model));
 				return evaluate;
 			}
 //			}
@@ -79,7 +79,7 @@ public class JexlExpressionHandler implements ExpressionHandler {
 	}
 
 	private String removeVar(String expression) {
-		expression = expression.replace("var ","");
+//		expression = expression.replace("var ","");
 //		expression = expression.replace("\n",";");
 //		if(expression.startsWith("var ")){
 //            expression = expression.substring(4);
@@ -89,7 +89,7 @@ public class JexlExpressionHandler implements ExpressionHandler {
 
 	public void assertExpression(String expression) throws ExpressionException {
 		try {
-			jexl.createExpression("return (" + expression + ")");
+			jexl.createScript(expression);
 		} catch (Exception e) {
 			throw new ExpressionException(expression, e);
 		}
@@ -101,7 +101,7 @@ public class JexlExpressionHandler implements ExpressionHandler {
 	}
 	
 	public void setCache(boolean cache) {
-		jexl.setCache(cache ? MAX_ENTRIES : 0);
+		jexl = new JadeJexlEngine(cache ? MAX_ENTRIES : 0);
 	}
 
     public void clearCache() {

@@ -5,18 +5,17 @@ import org.apache.commons.jexl3.JadeJexlArithmetic;
 import org.apache.commons.jexl3.JadeJexlInterpreter;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
-import org.apache.commons.jexl3.internal.Engine;
-import org.apache.commons.jexl3.internal.Interpreter;
-import org.apache.commons.jexl3.internal.Scope;
-import org.apache.commons.jexl3.internal.introspection.JadeIntrospect;
+import org.apache.commons.jexl3.internal.introspection.Uberspect;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
 
 public class JadeJexlEngine extends Engine {
 
 	/*
 	 * using a semi strict interpreter and non strict arithmetic
 	 */
-	public JadeJexlEngine() {
-		super(new JexlBuilder().arithmetic(new JadeJexlArithmetic(true)).uberspect(new JadeIntrospect(null,null)).strict(false));
+	public JadeJexlEngine(int cacheSize) {
+		super(new JexlBuilder().arithmetic(new JadeJexlArithmetic(true)).uberspect(new Uberspect(null,
+				JexlUberspect.MAP_STRATEGY)).strict(false).silent(false).cache(cacheSize));
 	}
 
 	@Override

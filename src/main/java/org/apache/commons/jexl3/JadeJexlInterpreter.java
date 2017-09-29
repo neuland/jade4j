@@ -16,11 +16,11 @@ public class JadeJexlInterpreter extends Interpreter {
 	 *            the JexlException ("undefined variable " + variable)
 	 * @return throws JexlException if strict, null otherwise
 	 */
-	protected Object unknownVariable(JexlException xjexl) {
-		// don't throw the exception
-		if (!silent) {
-			logger.trace(xjexl.getMessage());
-		}
-		return null;
-	}
+//	protected Object unknownVariable(JexlException xjexl) {
+//		// don't throw the exception
+//		if (!silent) {
+//			logger.trace(xjexl.getMessage());
+//		}
+//		return null;
+//	}
 }
