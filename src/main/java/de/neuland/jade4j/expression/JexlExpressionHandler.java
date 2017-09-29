@@ -52,7 +52,8 @@ public class JexlExpressionHandler implements ExpressionHandler {
 					expression = convertMinusMinusExpression(expression);
 				}
 				JexlScript e = jexl.createScript(expression);
-				Object evaluate = e.execute(new MapContext(model));
+				MapContext jexlContext = new MapContext(model);
+				Object evaluate = e.execute(jexlContext);
 				return evaluate;
 			}
 //			}
@@ -90,7 +91,7 @@ public class JexlExpressionHandler implements ExpressionHandler {
 
 	public void assertExpression(String expression) throws ExpressionException {
 		try {
-			jexl.createScript(expression);
+			jexl.createExpression(expression);
 		} catch (Exception e) {
 			throw new ExpressionException(expression, e);
 		}

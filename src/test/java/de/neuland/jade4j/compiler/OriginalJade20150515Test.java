@@ -26,8 +26,8 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class OriginalJade20150515Test {
     private static String[] ignoredCases = new String[]{"attrs", "attrs.js", "code.conditionals", "code.iteration",
-             "filters.coffeescript", "filters.less", "filters.markdown", "filters.stylus",
-             "mixin.merge",  "styles","regression.784","mixin.attrs","include-filter-stylus",
+            "filters.coffeescript", "filters.less", "filters.markdown", "filters.stylus",
+            "mixin.merge",  "styles","regression.784","mixin.attrs","include-filter-stylus",
             "include-filter","filters-empty","each.else","classes","blocks-in-if","filters.cdata","block-code",
             "attrs-data","attrs.interpolation"};
 //    "mixins.rest-args"
