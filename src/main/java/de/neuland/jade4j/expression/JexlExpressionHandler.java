@@ -8,6 +8,8 @@ import org.apache.commons.jexl3.MapContext;
 
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.model.JadeModel;
+import org.apache.commons.jexl3.JexlScript;
+import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.internal.Script;
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,29 +36,17 @@ public class JexlExpressionHandler implements ExpressionHandler {
 
 	public Object evaluateExpression(String expression, JadeModel model) throws ExpressionException {
 		try {
-//			if(expression.startsWith("{")) {
-//				return expression;
-//			}else{
-			if(expression.contains("\n")) {
-				String[] split = StringUtils.split(expression,"\n");
-				for (String s : split) {
-					evaluateExpression(s,model);
-				}
-				return null;
-			}else {
-				expression = removeVar(expression);
-				if (isplusplus.matcher(expression).find()) {
-					expression = convertPlusPlusExpression(expression);
-				}
-				if (isminusminus.matcher(expression).find()) {
-					expression = convertMinusMinusExpression(expression);
-				}
-				JexlScript e = jexl.createScript(expression);
-				MapContext jexlContext = new MapContext(model);
-				Object evaluate = e.execute(jexlContext);
-				return evaluate;
+			expression = removeVar(expression);
+			if (isplusplus.matcher(expression).find()) {
+				expression = convertPlusPlusExpression(expression);
 			}
-//			}
+			if (isminusminus.matcher(expression).find()) {
+				expression = convertMinusMinusExpression(expression);
+			}
+			JexlScript e = jexl.createScript(expression);
+            MapContext jexlContext = new MapContext(model);
+			Object evaluate = e.execute(jexlContext);
+			return evaluate;
 		} catch (Exception e) {
 			throw new ExpressionException(expression, e);
 		}
@@ -81,11 +71,7 @@ public class JexlExpressionHandler implements ExpressionHandler {
 	}
 
 	private String removeVar(String expression) {
-		expression = expression.replace("var ","");
-//		expression = expression.replace("\n",";");
-//		if(expression.startsWith("var ")){
-//            expression = expression.substring(4);
-//        }
+		expression = expression.replace("var ",";");
 		return expression;
 	}
 

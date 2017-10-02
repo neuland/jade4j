@@ -24,7 +24,7 @@ public class CaseNode extends Node {
 		try {
 			boolean skip = false;
 			for (Node when : block.getNodes()) {
-				if (skip || checkCondition(model, when,template.getExpressionHandler()) || "default".equals(when.getValue())) {
+				if (skip || "default".equals(when.getValue()) || checkCondition(model, when,template.getExpressionHandler())) {
 					skip = false;
 					if(when.getBlock()!=null) {
 						when.execute(writer, model, template);
