@@ -1,5 +1,12 @@
 # History
-## 1.2.5 / 2016-10-11
+## 1.2.6 / 2017-11-01
+* Fixing issue #154: using .pug extension
+* Fixing issue #157: array constructing in mixin parameters don't work
+* Testcase #155: case with default not working (at least using JsExpressionHandler)
+* Fixing multiline Code Blocks
+* Syncronize template creation when cache is enabled
+
+## 1.2.5 / 2016-10-24
 * Fixing issue #147: Fix for issue #52 broke everything
 
 ## 1.2.4 / 2016-10-11
