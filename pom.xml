@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.neuland-bfi</groupId>
     <artifactId>jade4j</artifactId>
-    <version>1.2.6-SNAPSHOT</version>
+    <version>1.2.6</version>
     <packaging>jar</packaging>
     <name>jade4j</name>
     <description>Java implementation of the jade templating language</description>
@@ -30,7 +30,7 @@
         <url>https://github.com/neuland/jade4j</url>
         <connection>scm:git:git://github.com/neuland/jade4j.git</connection>
         <developerConnection>scm:git:git@github.com:neuland/jade4j.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>jade4j-1.2.6</tag>
   </scm>
 
     <developers>
