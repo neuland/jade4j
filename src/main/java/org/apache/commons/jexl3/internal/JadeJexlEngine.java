@@ -31,7 +31,7 @@ public class JadeJexlEngine extends Engine {
                             return op == null && obj instanceof Map ? JexlUberspect.MAP : JexlUberspect.POJO;
                         }
                     }
-                })).strict(false).silent(true).cache(cacheSize));
+                })).strict(false).silent(false).cache(cacheSize));
 	}
 
 	@Override
