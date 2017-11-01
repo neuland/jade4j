@@ -30,7 +30,7 @@
         <url>https://github.com/neuland/jade4j</url>
         <connection>scm:git:git://github.com/neuland/jade4j.git</connection>
         <developerConnection>scm:git:git@github.com:neuland/jade4j.git</developerConnection>
-      <tag>jade4j-1.2.6</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <developers>
