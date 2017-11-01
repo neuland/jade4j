@@ -56,9 +56,11 @@ public class JadeConfiguration {
             if (template != null) {
                 return template;
             } else {
-                JadeTemplate newTemplate = createTemplate(name);
-                cache.put(key, newTemplate);
-                return newTemplate;
+                synchronized (key) {
+                    JadeTemplate newTemplate = createTemplate(name);
+                    cache.put(key, newTemplate);
+                    return newTemplate;
+                }
             }
         }
 
