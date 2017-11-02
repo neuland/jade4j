@@ -1,4 +1,7 @@
 # History
+## 1.2.7 / 2017-11-02
+* Improving cache syncronisation
+
 ## 1.2.6 / 2017-11-01
 * Fixing issue #154: using .pug extension
 * Fixing issue #157: array constructing in mixin parameters don't work
