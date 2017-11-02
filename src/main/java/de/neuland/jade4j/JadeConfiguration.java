@@ -45,26 +45,42 @@ public class JadeConfiguration {
 
     private Map<String, JadeTemplate> cache = new ConcurrentLinkedHashMap.Builder<String, JadeTemplate>().maximumWeightedCapacity(
             MAX_ENTRIES + 1).build();
+    private Map<String, String> lockCache = new ConcurrentLinkedHashMap.Builder<String, String>().maximumWeightedCapacity(
+            MAX_ENTRIES + 1).build();
 
     public JadeTemplate getTemplate(String name) throws IOException, JadeException {
         if (caching) {
             long lastModified = templateLoader.getLastModified(name);
-            String key = name + "-" + lastModified;
-
-            JadeTemplate template = cache.get(key);
-
+            JadeTemplate template = cache.get(getKeyValue(name, lastModified));
             if (template != null) {
                 return template;
-            } else {
-                synchronized (key) {
-                    JadeTemplate newTemplate = createTemplate(name);
-                    cache.put(key, newTemplate);
-                    return newTemplate;
-                }
+            }
+
+            String key = getCachedKey(name, lastModified);
+            synchronized (key) {
+                JadeTemplate newTemplate = createTemplate(name);
+                cache.put(key, newTemplate);
+                return newTemplate;
             }
         }
 
         return createTemplate(name);
+    }
+
+    private synchronized String getCachedKey(String name, long lastModified) {
+        String key = getKeyValue(name, lastModified);
+        String cachedKey= lockCache.get(name);
+        if(key.equals(cachedKey)){
+            return cachedKey;
+        }else if(cachedKey!= null){
+            cache.remove(cachedKey);
+        }
+        lockCache.put(name,key);
+        return key;
+    }
+
+    private String getKeyValue(String name, long lastModified) {
+        return name + "-" + lastModified;
     }
 
     public void renderTemplate(JadeTemplate template, Map<String, Object> model, Writer writer) throws JadeCompilerException {
