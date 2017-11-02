@@ -4,8 +4,5 @@ sudo: required
 jdk:
   - oraclejdk9
   - oraclejdk8
-  - oraclejdk7
-  - openjdk9
   - openjdk8
   - openjdk7
-  - openjdk6
