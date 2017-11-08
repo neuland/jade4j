@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 import static org.junit.Assert.*;
 
@@ -41,7 +42,7 @@ public class JadeConfigurationTest {
     	try {
     		template = config.getTemplate("UNKNOWN_PATH");
     		fail("Did expect TemplatException!");
-    	} catch (IOException ignore) {
+    	} catch (IOException | UncheckedIOException ignore) {
     		
     	}
     	assertNull(template);
