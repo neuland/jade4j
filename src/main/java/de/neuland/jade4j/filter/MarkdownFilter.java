@@ -1,17 +1,19 @@
 package de.neuland.jade4j.filter;
 
-import java.util.List;
-
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
 import de.neuland.jade4j.parser.node.Attr;
-import org.pegdown.PegDownProcessor;
+
+import java.util.List;
 
 public class MarkdownFilter extends CachingFilter {
 
-	private PegDownProcessor pegdown = new PegDownProcessor();
+    Parser parser = Parser.builder().build();
+    HtmlRenderer renderer = HtmlRenderer.builder().build();
 
 	@Override
 	protected String convert(String source, List<Attr> attributes) {
-		return pegdown.markdownToHtml(source);
+		return renderer.render(parser.parse(source));
 	}
 
 }
