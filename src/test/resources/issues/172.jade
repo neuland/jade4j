@@ -1,0 +1,19 @@
+mixin foo(data)
+  .test!= data.text
+  .test2!= data.image
+  .test3!= data.button.text
+  ul
+    for element in data.list
+      li!= element
+
+
++foo(
+{
+  'text': 'text',
+  'image': 'image.jpg',
+  'button' : {
+  'text': 'textbutton'
+  },
+  "list": [1,2,3,4]
+}
+)

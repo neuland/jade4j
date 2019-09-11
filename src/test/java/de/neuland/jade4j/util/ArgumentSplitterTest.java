@@ -102,6 +102,12 @@ public class ArgumentSplitterTest {
         thenParametersAtIndexShouldBe(1, "'blub'");
     }
 
+    @Test
+    public void shouldRecognizeBlocksInCurlyBraces() {
+        whenSplitting("{'a', 'b', 'c' }");
+        thenParametersAtIndexShouldBe(0, "{'a', 'b', 'c' }");
+    }
+
     private void whenSplitting(String parameterStringToSplit) {
         parameters = split(parameterStringToSplit);
     }
