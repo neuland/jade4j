@@ -7,8 +7,8 @@ import org.apache.commons.logging.Log;
 import java.util.List;
 import java.util.Map;
 
-public class JadeUeberspect extends Uberspect {
-    public JadeUeberspect(Log runtimeLogger, ResolverStrategy sty) {
+public class JadeUberspect extends Uberspect {
+    public JadeUberspect(Log runtimeLogger, ResolverStrategy sty) {
         super(runtimeLogger, sty);
     }
 }
