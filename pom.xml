@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.neuland-bfi</groupId>
     <artifactId>jade4j</artifactId>
-    <version>1.2.6-SNAPSHOT</version>
+    <version>1.2.8-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>jade4j</name>
     <description>Java implementation of the jade templating language</description>
@@ -112,7 +112,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.3</version>
+                <version>3.7.0</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
@@ -121,11 +121,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19</version>
+                <version>2.20.1</version>
             </plugin>
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.4</version>
+                <version>3.0.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -139,7 +139,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
+                <version>2.10.4</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -148,6 +148,13 @@
                         </goals>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>commons-lang</groupId>
+                        <artifactId>commons-lang</artifactId>
+                        <version>2.6</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <!-- explicitly define maven-deploy-plugin after other to force exec order -->
@@ -171,15 +178,15 @@
             </plugin>
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.0.2</version>
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.7</version>
+                <version>3.0.2</version>
             </plugin>
             <plugin>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.4</version>
+                <version>3.6</version>
             </plugin>
         </plugins>
     </build>
@@ -210,6 +217,11 @@
             <artifactId>concurrentlinkedhashmap-lru</artifactId>
             <version>1.4.2</version>
         </dependency>
+        <dependency>
+          <groupId>com.vladsch.flexmark</groupId>
+          <artifactId>flexmark-all</artifactId>
+          <version>0.28.2</version>
+        </dependency>
 
         <!-- Testing -->
         <dependency>
@@ -235,11 +247,6 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.pegdown</groupId>
-            <artifactId>pegdown</artifactId>
-            <version>1.6.0</version>
         </dependency>
     </dependencies>
 </project>
