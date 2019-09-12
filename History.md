@@ -1,4 +1,7 @@
 # History
+## 1.2.8 / 2019-09-12
+* Fixing issue #172: json als mixin argument (quoted keys)
+
 ## 1.2.7 / 2017-11-02
 * Improving cache syncronisation
 
