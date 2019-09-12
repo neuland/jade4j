@@ -1,10 +1,8 @@
 package de.neuland.jade4j.parser.node;
 
-import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.compiler.IndentWriter;
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
-import de.neuland.jade4j.lexer.token.Doctypes;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.JadeTemplate;
 import org.apache.commons.lang3.ArrayUtils;
@@ -92,11 +90,8 @@ public class TagNode extends AttrsNode {
             writer.append("<");
             writer.append(bufferName(template, model));
             writer.append(visitAttributes(model, template));
-            if (isTerse(template)) {
-                writer.append(">");
-            }else {
-                writer.append("/>");
-            }
+            writer.append("/>");
+
             if (hasBlock()) {
                 //Fehlerbehandlung
             }

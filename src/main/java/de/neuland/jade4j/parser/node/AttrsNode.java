@@ -308,8 +308,7 @@ public abstract class AttrsNode extends Node {
         newAttributes.put(name,value);
     }
 	private Object evaluateExpression(ExpressionString attribute, JadeModel model, ExpressionHandler expressionHandler) throws ExpressionException {
-        String expression = ((ExpressionString) attribute).getValue();
-        Object result = expressionHandler.evaluateExpression(expression, model);
+        Object result = expressionHandler.evaluateExpression(attribute.getValue(), model);
         if (result instanceof ExpressionString) {
             return evaluateExpression((ExpressionString) result, model, expressionHandler);
         }
@@ -327,10 +326,6 @@ public abstract class AttrsNode extends Node {
         } catch (ExpressionException e) {
             throw new JadeCompilerException(this, template.getTemplateLoader(), e);
         }
-    }
-
-    public boolean isTerse(JadeTemplate template) {
-        return isSelfClosing(template) && template.isTerse();
     }
 
     public boolean isSelfClosing(JadeTemplate template) {

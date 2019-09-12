@@ -24,33 +24,6 @@ public class TagNodeTest {
 	}
 
 	@Test
-	public void testThatTagNodeIsTerse() {
-		template.setMode(Jade4J.Mode.HTML);
-		for (int i = 0; i < selfClosing.length; i++) {
-			tagNode.setName(selfClosing[i]);
-			assertTrue(tagNode.isTerse(template));
-		}
-	}
-
-	@Test
-	public void testThatTagNodeIsNotSelfclosingIfTheTagIsNotSelfclosing() {
-		template.setMode(Jade4J.Mode.HTML);
-		for (int i = 0; i < notSelfClosing.length; i++) {
-			tagNode.setName(notSelfClosing[i]);
-			assertFalse(tagNode.isTerse(template));
-		}
-	}
-
-	@Test
-	public void testThatTagNodeIsNotTerseIfTempalteSettingIsNotTerse() {
-		template.setMode(Jade4J.Mode.XHTML);
-		for (int i = 0; i < selfClosing.length; i++) {
-			tagNode.setName(selfClosing[i]);
-			assertFalse(tagNode.isTerse(template));
-		}
-	}
-
-	@Test
 	public void testThatTagNodeIsSelfClosing() {
 		for (int i = 0; i < selfClosing.length; i++) {
 			tagNode.setName(selfClosing[i]);
