@@ -6,7 +6,10 @@ import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.exceptions.JadeException;
 import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.expression.JexlExpressionHandler;
-import de.neuland.jade4j.filter.*;
+import de.neuland.jade4j.filter.CDATAFilter;
+import de.neuland.jade4j.filter.CssFilter;
+import de.neuland.jade4j.filter.Filter;
+import de.neuland.jade4j.filter.JsFilter;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.parser.Parser;
 import de.neuland.jade4j.parser.node.Node;
@@ -14,6 +17,7 @@ import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.template.TemplateLoader;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -69,13 +73,13 @@ public class JadeConfiguration {
 
     private synchronized String getCachedKey(String name, long lastModified) {
         String key = getKeyValue(name, lastModified);
-        String cachedKey= lockCache.get(name);
-        if(key.equals(cachedKey)){
+        String cachedKey = lockCache.get(name);
+        if (key.equals(cachedKey)) {
             return cachedKey;
-        }else if(cachedKey!= null){
+        } else if (cachedKey != null) {
             cache.remove(cachedKey);
         }
-        lockCache.put(name,key);
+        lockCache.put(name, key);
         return key;
     }
 
@@ -196,6 +200,11 @@ public class JadeConfiguration {
     }
 
     public void setBasePath(String basePath) {
-        this.basePath = basePath;
+        File file = new File(basePath);
+        if (!file.exists() || !file.isDirectory()) {
+            throw new IllegalArgumentException("The base path '" + basePath + "' does not exist");
+        }
+        this.basePath = file.getAbsolutePath() + File.separator;
+        this.templateLoader = new FileTemplateLoader(this.basePath, "UTF-8");
     }
 }

@@ -15,12 +15,13 @@ public class JadeConfigurationTest {
     protected Parser parser;
     protected Node root;
 
-    private final String templateLocation = TestFileHelper.getParserResourcePath("assignment.jade");
+    private final static String BASE_PATH = TestFileHelper.getParserResourcePath("");
+    private final static String TEMPLATE_PATH = TestFileHelper.getParserResourcePath("assignment.jade");
 
     @Test
     public void testGetTemplate() throws IOException {
         JadeConfiguration config = new JadeConfiguration();
-        JadeTemplate template = config.getTemplate(templateLocation);
+        JadeTemplate template = config.getTemplate(TEMPLATE_PATH);
         assertNotNull(template);
     }
 
@@ -28,15 +29,15 @@ public class JadeConfigurationTest {
     public void testCache() throws IOException {
         JadeConfiguration config = new JadeConfiguration();
         config.setCaching(true);
-        JadeTemplate template = config.getTemplate(templateLocation);
+        JadeTemplate template = config.getTemplate(TEMPLATE_PATH);
         assertNotNull(template);
-        JadeTemplate template2 = config.getTemplate(templateLocation);
+        JadeTemplate template2 = config.getTemplate(TEMPLATE_PATH);
         assertNotNull(template2);
         assertSame(template, template2);
     }
 
     @Test
-    public void testExceptionOnUnknowwTemplate() throws IOException {
+    public void testExceptionOnUnknowwTemplate() {
         JadeConfiguration config = new JadeConfiguration();
         JadeTemplate template = null;
         try {
@@ -52,14 +53,14 @@ public class JadeConfigurationTest {
     public void testPrettyPrint() throws IOException {
         JadeConfiguration config = new JadeConfiguration();
         config.setPrettyPrint(true);
-        JadeTemplate template = config.getTemplate(templateLocation);
+        JadeTemplate template = config.getTemplate(TEMPLATE_PATH);
         assertTrue(template.isPrettyPrint());
     }
 
     @Test
     public void testRootNode() throws IOException {
         JadeConfiguration config = new JadeConfiguration();
-        JadeTemplate template = config.getTemplate(templateLocation);
+        JadeTemplate template = config.getTemplate(TEMPLATE_PATH);
         assertNotNull(template.getRootNode());
     }
 
