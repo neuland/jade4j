@@ -68,13 +68,13 @@ public class IssuesTest {
         jade.setPrettyPrint(true);
 
         JadeTemplate template = jade.getTemplate(templateName);
-        Writer writer = new StringWriter();
         HashMap<String, Object> model = new HashMap<String, Object>();
         model.put("title","Jade");
-        jade.renderTemplate(template,model, writer);
-        String html = writer.toString();
+        String html = jade.renderTemplate(template, model);
 
-        String expected = readFile(file.replace(".jade", ".html")).trim().replaceAll("\r", "");
+        String expected = readFile(file.replace(".jade", ".html"))
+            .trim()
+            .replaceAll("\r", "");
 
         assertEquals(file, expected, html.trim());
     }
