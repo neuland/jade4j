@@ -1,5 +1,6 @@
 language: java
 
+dist: trusty
 sudo: required
 jdk:
   - oraclejdk9
