@@ -6,6 +6,7 @@ import de.neuland.jade4j.parser.Parser;
 import de.neuland.jade4j.parser.node.Node;
 import org.junit.Test;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import static org.junit.Assert.*;
@@ -23,6 +24,25 @@ public class JadeConfigurationTest {
         JadeConfiguration config = new JadeConfiguration();
         JadeTemplate template = config.getTemplate(TEMPLATE_PATH);
         assertNotNull(template);
+    }
+
+    @Test
+    public void testGetTemplateWithBasepath() throws IOException {
+        JadeConfiguration config = new JadeConfiguration();
+        config.setBasePath(TestFileHelper.getRootResourcePath() + "/parser/");
+        JadeTemplate template = config.getTemplate("assignment");
+        assertNotNull(template);
+    }
+
+    @Test
+    public void testConfigurationWithNonExistingBasePath() throws FileNotFoundException {
+        JadeConfiguration config = new JadeConfiguration();
+        try {
+            config.setBasePath(TestFileHelper.getRootResourcePath() + "/does/not/exist");
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException ignored) {
+
+        }
     }
 
     @Test
