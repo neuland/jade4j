@@ -175,10 +175,10 @@ public abstract class AttrsNode extends Node {
             }
         }
         LinkedHashMap<String,String> finalAttributes = new LinkedHashMap<String,String>();
-        finalAttributes.putAll(newAttributes);
         if(!classes.isEmpty()){
             finalAttributes.put("class", StringUtils.join(classes," "));
         }
+        finalAttributes.putAll(newAttributes);
         return finalAttributes;
     }
 
