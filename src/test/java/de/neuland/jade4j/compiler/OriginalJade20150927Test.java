@@ -40,31 +40,32 @@ public class OriginalJade20150927Test {
     @Test
     public void shouldCompileJadeToHtml() throws Exception {
         JadeConfiguration jade = new JadeConfiguration();
-        jade.setTemplateLoader(new FileTemplateLoader(TestFileHelper.getOriginal20150927ResourcePath("cases/"),"UTF-8"));
-        //		jade.setExpressionHandler(new JsExpressionHandler());
+        String basePath = TestFileHelper.getOriginal20150515ResourcePath("");
         jade.setMode(Jade4J.Mode.XHTML); // original jade uses xhtml by default
         jade.setFilter("plain", new PlainFilter());
         jade.setFilter("cdata", new CDATAFilter());
         jade.setPrettyPrint(true);
-        JadeTemplate template = jade.getTemplate(file);
+        jade.setBasePath(basePath);
+        JadeTemplate template = jade.getTemplate("/cases/" + file);
         Writer writer = new StringWriter();
         HashMap<String, Object> model = new HashMap<String, Object>();
         model.put("title","Jade");
         jade.renderTemplate(template,model, writer);
         String html = writer.toString();
 
-        String expected = readFile(file.replace(".jade", ".html")).trim().replaceAll("\r", "");
+        String pathToExpectedHtml = basePath + "/cases/" + file.replace(".jade", ".html");
+        String expected = readFile(pathToExpectedHtml).trim().replaceAll("\r", "");
 
         assertEquals(file, expected, html.trim());
     }
 
     private String readFile(String fileName) throws IOException {
-        return FileUtils.readFileToString(new File(TestFileHelper.getOriginal20150927ResourcePath("cases/" + fileName)));
+        return FileUtils.readFileToString(new File(fileName));
     }
 
     @Parameterized.Parameters(name="{0}")
     public static Collection<String[]> data() {
-        File folder = new File(TestFileHelper.getOriginal20150927ResourcePath("/cases"));
+        File folder = new File(TestFileHelper.getOriginal20150927ResourcePath("/cases/"));
         Collection<File> files = FileUtils.listFiles(folder, new String[]{"jade"}, false);
 
         Collection<String[]> data = new ArrayList<String[]>();
