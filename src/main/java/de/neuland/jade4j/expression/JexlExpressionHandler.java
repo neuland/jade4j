@@ -1,9 +1,16 @@
 package de.neuland.jade4j.expression;
 
-import org.apache.commons.jexl2.*;
+import org.apache.commons.jexl3.JexlExpression;
+import org.apache.commons.jexl3.JexlScript;
+import org.apache.commons.jexl3.internal.JadeJexlEngine;
+import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.MapContext;
 
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.model.JadeModel;
+import org.apache.commons.jexl3.JexlScript;
+import org.apache.commons.jexl3.MapContext;
+import org.apache.commons.jexl3.internal.Script;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Matcher;
@@ -19,8 +26,7 @@ public class JexlExpressionHandler implements ExpressionHandler {
 	private JexlEngine jexl;
 
 	public JexlExpressionHandler() {
-		jexl = new JadeJexlEngine();
-		jexl.setCache(MAX_ENTRIES);
+		jexl = new JadeJexlEngine(MAX_ENTRIES);
 
 	}
 
@@ -37,8 +43,9 @@ public class JexlExpressionHandler implements ExpressionHandler {
 			if (isminusminus.matcher(expression).find()) {
 				expression = convertMinusMinusExpression(expression);
 			}
-			Script e = jexl.createScript(expression);
-			Object evaluate = e.execute(new MapContext(model));
+			JexlScript e = jexl.createScript(expression);
+            MapContext jexlContext = new MapContext(model);
+			Object evaluate = e.execute(jexlContext);
 			return evaluate;
 		} catch (Exception e) {
 			throw new ExpressionException(expression, e);
@@ -70,7 +77,7 @@ public class JexlExpressionHandler implements ExpressionHandler {
 
 	public void assertExpression(String expression) throws ExpressionException {
 		try {
-			jexl.createExpression("return (" + expression + ")");
+			jexl.createExpression(expression);
 		} catch (Exception e) {
 			throw new ExpressionException(expression, e);
 		}
@@ -82,7 +89,7 @@ public class JexlExpressionHandler implements ExpressionHandler {
 	}
 	
 	public void setCache(boolean cache) {
-		jexl.setCache(cache ? MAX_ENTRIES : 0);
+		jexl = new JadeJexlEngine(cache ? MAX_ENTRIES : 0);
 	}
 
     public void clearCache() {

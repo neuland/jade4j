@@ -1,7 +1,9 @@
+
 package de.neuland.jade4j.util;
 
-import java.util.ArrayList;
-import java.util.List;
+    import java.util.ArrayList;
+    import java.util.Collections;
+    import java.util.List;
 
 /**
  * Split arguments passed as single String into list of strings, preserve quotes when argument is not simple string constant.
@@ -11,17 +13,20 @@ import java.util.List;
  * @author dusan.zatkovsky, 2/5/15
  */
 public class ArgumentSplitter {
+    private static final char ARGUMENT_DELIMITER = ',';
 
-    private static final char argumentDelimiter = ',';
     private final String arguments;
     private List<String> argList = new ArrayList<String>();
 
     /**
      * Split arguments passed as single String into list
      * @param arguments
-     * @return  Parsed arguments
+     * @return Parsed arguments
      */
     public static List<String> split(String arguments) {
+        if(arguments == null) {
+            return Collections.emptyList();
+        }
         return new ArgumentSplitter(arguments).splitArguments();
     }
 
@@ -32,47 +37,50 @@ public class ArgumentSplitter {
     private List<String> splitArguments() {
 
         final int argLength = arguments.length();
-        StringBuilder sb = new StringBuilder(argLength);
+        StringBuilder builder = new StringBuilder(argLength);
         boolean insideQuotas = false;
         int bracesBlock = 0;
 
         for (int i = 0; i < argLength; i++) {
             char ch = arguments.charAt(i);
 
-            // detect when pointer is inside quoted text
-            if (ch == '"' || ch == '\'') {
+            if (isQuoted(ch)) {
                 insideQuotas = !insideQuotas;
             }
 
-            else if (ch == '(') {
+            else if (isOpeningBraces(ch)) {
                 bracesBlock++;
             }
 
-            else if (ch == ')') {
-                bracesBlock--;
-            }
-            else if (ch == '[') {
-                bracesBlock++;
-            }
-
-            else if (ch == ']') {
+            else if (isClosingBraces(ch)) {
                 bracesBlock--;
             }
 
             // detect argument delimiter, then push argument
-            else if (ch == argumentDelimiter && !insideQuotas && bracesBlock == 0) {
-                pushArg(sb);
-                sb = new StringBuilder(argLength);
+            else if (ch == ARGUMENT_DELIMITER && !insideQuotas && bracesBlock == 0) {
+                addArgument(builder.toString());
+                builder = new StringBuilder(argLength - i);
             }
-            sb.append(ch);
+            builder.append(ch);
         }
-        pushArg(sb);
+        addArgument(builder.toString());
         return argList;
     }
 
-    private void pushArg(StringBuilder sb) {
-        argList.add(sb.toString().trim().replaceAll("^,", "").trim());
-        sb = new StringBuilder(arguments.length());
+    private boolean isClosingBraces(char ch) {
+        return ch == ')' || ch == ']' || ch == '}';
+    }
+
+    private boolean isOpeningBraces(char ch) {
+        return ch == '(' || ch == '[' || ch == '{';
+    }
+
+    private boolean isQuoted(char ch) {
+        return ch == '"' || ch == '\'';
+    }
+
+    private void addArgument(String argument) {
+        argList.add(argument.trim().replaceAll("^,", "").trim());
     }
 
 }
