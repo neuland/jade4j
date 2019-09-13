@@ -1,4 +1,4 @@
-package org.apache.commons.jexl2;
+package org.apache.commons.jexl3;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -8,8 +8,8 @@ import java.util.Collection;
 
 public class JadeJexlArithmetic extends JexlArithmetic {
 
-    public JadeJexlArithmetic(boolean lenient) {
-        super(lenient);
+    public JadeJexlArithmetic(boolean astrict) {
+        super(astrict);
     }
 
     protected int compare(Object left, Object right, String operator) {
