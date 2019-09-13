@@ -1,4 +1,9 @@
 # History
+## 2.0.0 / 2019
+* Upgrading Flexmark lib to latest version
+* Changed compiler level to 1.8 and above
+* Upgraded to jexl 3
+
 ## 1.2.8 / 2019-09-12
 * Fixing issue #172: json als mixin argument (quoted keys)
 
