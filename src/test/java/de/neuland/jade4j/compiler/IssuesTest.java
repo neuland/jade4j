@@ -3,21 +3,19 @@ package de.neuland.jade4j.compiler;
 import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.TestFileHelper;
-import de.neuland.jade4j.expression.JsExpressionHandler;
 import de.neuland.jade4j.filter.*;
 import de.neuland.jade4j.template.ClasspathTemplateLoader;
 import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.template.TemplateLoader;
-import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class IssuesTest {
-    private static String[] ignoredCases = new String[]{"131","153"};
+    private static String[] ignoredCases = new String[]{"131", "153"};
 
     private String file;
 
@@ -53,7 +51,6 @@ public class IssuesTest {
     private void compareJade(TemplateLoader templateLoader, String templateName) throws IOException {
         JadeConfiguration jade = new JadeConfiguration();
         jade.setTemplateLoader(templateLoader);
-//        jade.setExpressionHandler(new JsExpressionHandler());
         jade.setMode(Jade4J.Mode.XHTML); // original jade uses xhtml by default
         jade.setFilter("plain", new PlainFilter());
         jade.setFilter("cdata", new CDATAFilter());
@@ -63,27 +60,26 @@ public class IssuesTest {
         jade.setFilter("verbatim", new VerbatimFilter());
         jade.setFilter("js", new JsFilter());
         jade.setFilter("css", new CssFilter());
-//        jade.setFilter("coffee-script", new CoffeeScriptFilter());
 
         jade.setPrettyPrint(true);
 
         JadeTemplate template = jade.getTemplate(templateName);
         HashMap<String, Object> model = new HashMap<String, Object>();
-        model.put("title","Jade");
+        model.put("title", "Jade");
         String html = jade.renderTemplate(template, model);
 
         String expected = readFile(file.replace(".jade", ".html"))
-            .trim()
-            .replaceAll("\r", "");
+                .trim()
+                .replaceAll("\r", "");
 
         assertEquals(file, expected, html.trim());
     }
 
     private String readFile(String fileName) throws IOException {
-        return FileUtils.readFileToString(new File(TestFileHelper.getIssuesResourcePath(fileName)),"UTF-8");
+        return FileUtils.readFileToString(new File(TestFileHelper.getIssuesResourcePath(fileName)), "UTF-8");
     }
 
-    @Parameterized.Parameters(name="{0}")
+    @Parameterized.Parameters(name = "{0}")
     public static Collection<String[]> data() {
         File folder = new File(TestFileHelper.getIssuesResourcePath(""));
         Collection<File> files = FileUtils.listFiles(folder, new String[]{"jade"}, false);
