@@ -17,6 +17,7 @@ import de.neuland.jade4j.parser.node.MixinNode;
 public class JadeModel implements Map<String, Object> {
 
 	private static final String LOCALS = "locals";
+	public static final String NON_LOCAL_VARS = "nonLocalVars";
 
 	private Deque<Map<String, Object>> scopes = new LinkedList<Map<String, Object>>();
 	private Map<String, MixinNode> mixins = new HashMap<String, MixinNode>();
@@ -39,6 +40,26 @@ public class JadeModel implements Map<String, Object> {
 	}
 
 	public void popScope() {
+		// first copy non local vars in first matching scope
+		Map<String, Object> lastScope = scopes.getLast();
+		if (lastScope.containsKey(NON_LOCAL_VARS)) {
+			Set<String> nonLocalVars = (Set<String>) lastScope.get(NON_LOCAL_VARS);
+			Iterator<Map<String, Object>> scopesIterator = scopes.descendingIterator();
+			scopesIterator.next();
+			int countFoundNonLocalVars = 0;
+			for (Iterator<Map<String, Object>> i = scopesIterator; i.hasNext();) {
+				Map<String, Object> scope = i.next();
+				for(String nonLocalVar : nonLocalVars) {
+					if (scope.containsKey(nonLocalVar)) {
+						scope.put(nonLocalVar, lastScope.get(nonLocalVar));
+						countFoundNonLocalVars++;
+					}
+				}
+				if (nonLocalVars.size() == countFoundNonLocalVars) {
+					break;
+				}
+			}
+		}
 		scopes.removeLast();
 	}
 
