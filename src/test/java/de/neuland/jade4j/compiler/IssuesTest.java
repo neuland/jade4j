@@ -3,30 +3,33 @@ package de.neuland.jade4j.compiler;
 import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.TestFileHelper;
-import de.neuland.jade4j.expression.JsExpressionHandler;
-import de.neuland.jade4j.filter.*;
+import de.neuland.jade4j.filter.CDATAFilter;
+import de.neuland.jade4j.filter.CssFilter;
+import de.neuland.jade4j.filter.CustomTestFilter;
+import de.neuland.jade4j.filter.JsFilter;
+import de.neuland.jade4j.filter.MarkdownFilter;
+import de.neuland.jade4j.filter.PlainFilter;
+import de.neuland.jade4j.filter.VerbatimFilter;
 import de.neuland.jade4j.template.ClasspathTemplateLoader;
 import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.template.TemplateLoader;
-import org.apache.commons.io.Charsets;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class IssuesTest {
-    private static String[] ignoredCases = new String[]{"100","131","153"};
+    private static String[] ignoredCases = new String[]{"100","131"};
 
     private String file;
 
