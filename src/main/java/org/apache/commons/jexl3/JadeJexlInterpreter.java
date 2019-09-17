@@ -3,10 +3,7 @@ package org.apache.commons.jexl3;
 import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.internal.Interpreter;
 import org.apache.commons.jexl3.internal.Scope;
-import org.apache.commons.jexl3.parser.ASTMethodNode;
-import org.apache.commons.jexl3.parser.ASTReference;
-import org.apache.commons.jexl3.parser.JexlNode;
-import org.apache.commons.jexl3.parser.Token;
+import org.apache.commons.jexl3.parser.*;
 
 public class JadeJexlInterpreter extends Interpreter {
 	public JadeJexlInterpreter(Engine engine, JexlContext aContext, Scope.Frame eFrame) {
@@ -17,13 +14,14 @@ public class JadeJexlInterpreter extends Interpreter {
 
 	@Override
 	protected Object visit(ASTReference node, Object data) {
+		//return super.visit(node, data);
 		int numChildren = node.jjtGetNumChildren();
 		if (data != null) {
 			return super.visit(node, data);
 		}
 		for (int c = 0; c < numChildren; ++c) {
 			JexlNode childNode = node.jjtGetChild(c);
-			if (childNode instanceof ASTMethodNode && node.jjtGetChild(0) != childNode) {
+			if (childNode instanceof ASTMethodNode && childNode.jjtGetParent().jjtGetChild(0) instanceof ASTArrayLiteral &&childNode.jjtGetParent().jjtGetChild(0) != childNode) {
 				// correct info where exception took place
 				addExceptionInfoTo(childNode);
 				throw new JexlException(childNode, "attempting to call method on null");
