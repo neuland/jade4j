@@ -1,5 +1,6 @@
 package de.neuland.jade4j.benchmark;
 
+import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.JadeConfigurationCaffeine;
 import de.neuland.jade4j.template.ClasspathTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
@@ -30,7 +31,7 @@ public class TemplateBenchmark {
 
     JadeConfigurationCaffeine jadeCaffeine = new JadeConfigurationCaffeine();
 
-    JadeConfigurationCaffeine jade = new JadeConfigurationCaffeine();
+    JadeConfiguration jade = new JadeConfiguration();
 
     @Setup(Level.Invocation)
     public void setUp() {
