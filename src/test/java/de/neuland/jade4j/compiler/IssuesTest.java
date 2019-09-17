@@ -3,23 +3,32 @@ package de.neuland.jade4j.compiler;
 import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.TestFileHelper;
-import de.neuland.jade4j.filter.*;
+import de.neuland.jade4j.filter.CDATAFilter;
+import de.neuland.jade4j.filter.CssFilter;
+import de.neuland.jade4j.filter.CustomTestFilter;
+import de.neuland.jade4j.filter.JsFilter;
+import de.neuland.jade4j.filter.MarkdownFilter;
+import de.neuland.jade4j.filter.PlainFilter;
+import de.neuland.jade4j.filter.VerbatimFilter;
 import de.neuland.jade4j.helper.FormatHelper;
 import de.neuland.jade4j.template.ClasspathTemplateLoader;
 import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
+import de.neuland.jade4j.template.ReaderTemplateLoader;
 import de.neuland.jade4j.template.TemplateLoader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 
@@ -45,6 +54,20 @@ public class IssuesTest {
     public void shouldCompileJadeToHtmlWithClasspathTemplateLoader() throws Exception {
         ClasspathTemplateLoader templateLoader = new ClasspathTemplateLoader();
         String templateName = "issues/" + file;
+
+        compareJade(templateLoader, templateName);
+    }
+
+    @Test
+    public void shouldCompileJadeToHtmlWithReaderTemplateLoader() throws Exception {
+        List<String> additionalIgnoredCases = Arrays.asList("52", "74", "100", "104a", "104b", "123", "135");
+        if (additionalIgnoredCases.contains(file.replace(".jade", ""))) {
+            return;
+        }
+        String issuesResourcePath = TestFileHelper.getIssuesResourcePath("");
+        FileReader fileReader = new FileReader(issuesResourcePath + File.separator + file);
+        String templateName = file;
+        ReaderTemplateLoader templateLoader = new ReaderTemplateLoader(fileReader, templateName);
 
         compareJade(templateLoader, templateName);
     }
