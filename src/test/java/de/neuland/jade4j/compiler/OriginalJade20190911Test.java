@@ -40,7 +40,19 @@ public class OriginalJade20190911Test {
         "mixin-hoist",          // global variable `title = "Pug"` not present
         "mixin-block-with-space",  //piped text does not appear
         "inline-tag",              // fails to treat pipes as new lines
-        "includes"                 // different line breaks
+        "includes",                 // different line breaks
+
+
+        "styles",               // JSON representation compiles to Objects, not CSS !
+
+
+        // try to read files in ../
+        "mixin-via-include",
+        "layout.append.without-block",
+        "layout.prepend.without-block",
+        "layout.multi.append.prepend.block",
+        "include-extends-relative",
+        "layout.prepend",
 
     };
 
