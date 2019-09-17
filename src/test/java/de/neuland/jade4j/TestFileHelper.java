@@ -73,7 +73,7 @@ public class TestFileHelper {
 
 	public static String getOriginal20190911ResourcePath(String fileName) {
 		try {
-			return getResourcePath(TESTFILE_20190911_ORIGINAL_FOLDER + fileName);
+			return getResourcePath(TESTFILE_20190911_ORIGINAL_FOLDER + "/cases/" + fileName);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
