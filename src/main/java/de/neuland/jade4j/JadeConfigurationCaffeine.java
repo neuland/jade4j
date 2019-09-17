@@ -1,6 +1,7 @@
 package de.neuland.jade4j;
 
-import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import de.neuland.jade4j.Jade4J.Mode;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.exceptions.JadeException;
@@ -17,14 +18,14 @@ import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.template.TemplateLoader;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JadeConfiguration {
+public class JadeConfigurationCaffeine {
 
     private static final String FILTER_CDATA = "cdata";
     private static final String FILTER_STYLE = "css";
@@ -39,48 +40,34 @@ public class JadeConfiguration {
     private Map<String, Object> sharedVariables = new HashMap<String, Object>();
     private TemplateLoader templateLoader = new FileTemplateLoader("", "UTF-8");
     private ExpressionHandler expressionHandler = new JexlExpressionHandler();
-    protected static final int MAX_ENTRIES = 1000;
+    protected static final long MAX_ENTRIES = 1000l;
 
-    public JadeConfiguration() {
+    public JadeConfigurationCaffeine() {
         setFilter(FILTER_CDATA, new CDATAFilter());
         setFilter(FILTER_SCRIPT, new JsFilter());
         setFilter(FILTER_STYLE, new CssFilter());
     }
 
-    private Map<String, JadeTemplate> cache = new ConcurrentLinkedHashMap.Builder<String, JadeTemplate>().maximumWeightedCapacity(
-            MAX_ENTRIES + 1).build();
-    private Map<String, String> lockCache = new ConcurrentLinkedHashMap.Builder<String, String>().maximumWeightedCapacity(
-            MAX_ENTRIES + 1).build();
+    private Cache<String, JadeTemplate> cache = Caffeine.newBuilder().maximumSize(MAX_ENTRIES).build();
 
     public JadeTemplate getTemplate(String name) throws IOException, JadeException {
-        if (caching) {
-            long lastModified = templateLoader.getLastModified(name);
-            JadeTemplate template = cache.get(getKeyValue(name, lastModified));
-            if (template != null) {
-                return template;
-            }
 
-            String key = getCachedKey(name, lastModified);
-            synchronized (key) {
-                JadeTemplate newTemplate = createTemplate(name);
-                cache.put(key, newTemplate);
-                return newTemplate;
-            }
+        if (caching) {
+
+            long lastModified = templateLoader.getLastModified(name);
+            return cache.get(getKeyValue(name, lastModified), value -> {
+
+                try {
+                    return createTemplate(name);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+
+            });
+
         }
 
         return createTemplate(name);
-    }
-
-    private synchronized String getCachedKey(String name, long lastModified) {
-        String key = getKeyValue(name, lastModified);
-        String cachedKey = lockCache.get(name);
-        if (key.equals(cachedKey)) {
-            return cachedKey;
-        } else if (cachedKey != null) {
-            cache.remove(cachedKey);
-        }
-        lockCache.put(name, key);
-        return key;
     }
 
     private String getKeyValue(String name, long lastModified) {
@@ -192,7 +179,7 @@ public class JadeConfiguration {
 
     public void clearCache() {
         expressionHandler.clearCache();
-        cache.clear();
+        cache.invalidateAll();
     }
 
     public String getBasePath() {
@@ -200,11 +187,6 @@ public class JadeConfiguration {
     }
 
     public void setBasePath(String basePath) {
-        File file = new File(basePath);
-        if (!file.exists() || !file.isDirectory()) {
-            throw new IllegalArgumentException("The base path '" + basePath + "' does not exist");
-        }
-        this.basePath = file.getAbsolutePath() + File.separator;
-        this.templateLoader = new FileTemplateLoader(this.basePath, "UTF-8");
+        this.basePath = basePath;
     }
 }

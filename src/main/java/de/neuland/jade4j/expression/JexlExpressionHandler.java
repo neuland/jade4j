@@ -1,13 +1,20 @@
 package de.neuland.jade4j.expression;
 
-import org.apache.commons.jexl2.*;
+import org.apache.commons.jexl3.JexlScript;
+import org.apache.commons.jexl3.internal.JadeJexlEngine;
+import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.MapContext;
 
 import de.neuland.jade4j.exceptions.ExpressionException;
 import de.neuland.jade4j.model.JadeModel;
-import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+
+import static de.neuland.jade4j.model.JadeModel.NON_LOCAL_VARS;
 
 public class JexlExpressionHandler implements ExpressionHandler {
 
@@ -16,11 +23,11 @@ public class JexlExpressionHandler implements ExpressionHandler {
 	public static Pattern isplusplus = Pattern.compile("\\+\\+\\s*;{0,1}\\s*$");
 	public static Pattern minusminus = Pattern.compile("([a-zA-Z0-9-_]*[a-zA-Z0-9])--\\s*;{0,1}\\s*$");
 	public static Pattern isminusminus = Pattern.compile("--\\s*;{0,1}\\s*$");
+	public static Pattern isAssignment = Pattern.compile("^([a-zA-Z0-9-_]+)[\\s]?={1}[\\s]?[^=]+$");
 	private JexlEngine jexl;
 
 	public JexlExpressionHandler() {
-		jexl = new JadeJexlEngine();
-		jexl.setCache(MAX_ENTRIES);
+		jexl = new JadeJexlEngine(MAX_ENTRIES);
 
 	}
 
@@ -30,6 +37,7 @@ public class JexlExpressionHandler implements ExpressionHandler {
 
 	public Object evaluateExpression(String expression, JadeModel model) throws ExpressionException {
 		try {
+			saveNonLocalVarAssignmentInModel(expression, model);
 			expression = removeVar(expression);
 			if (isplusplus.matcher(expression).find()) {
 				expression = convertPlusPlusExpression(expression);
@@ -37,11 +45,29 @@ public class JexlExpressionHandler implements ExpressionHandler {
 			if (isminusminus.matcher(expression).find()) {
 				expression = convertMinusMinusExpression(expression);
 			}
-			Script e = jexl.createScript(expression);
-			Object evaluate = e.execute(new MapContext(model));
+			JexlScript e = jexl.createScript(expression);
+            MapContext jexlContext = new MapContext(model);
+			Object evaluate = e.execute(jexlContext);
 			return evaluate;
 		} catch (Exception e) {
 			throw new ExpressionException(expression, e);
+		}
+	}
+
+	private void saveNonLocalVarAssignmentInModel(String expression, JadeModel model) {
+		if (expression.startsWith("var ")) {
+			return;
+		}
+		Matcher matcher = isAssignment.matcher(expression);
+		if (matcher.matches()) {
+			Set<String> nonLocalVars;
+			if (model.containsKey(NON_LOCAL_VARS)) {
+				nonLocalVars = (HashSet<String>) model.get(NON_LOCAL_VARS);
+			} else {
+				nonLocalVars = new HashSet<String>();
+				model.put(NON_LOCAL_VARS, nonLocalVars);
+			}
+			nonLocalVars.add(matcher.group(1));
 		}
 	}
 
@@ -70,7 +96,7 @@ public class JexlExpressionHandler implements ExpressionHandler {
 
 	public void assertExpression(String expression) throws ExpressionException {
 		try {
-			jexl.createExpression("return (" + expression + ")");
+			jexl.createExpression(expression);
 		} catch (Exception e) {
 			throw new ExpressionException(expression, e);
 		}
@@ -82,7 +108,7 @@ public class JexlExpressionHandler implements ExpressionHandler {
 	}
 	
 	public void setCache(boolean cache) {
-		jexl.setCache(cache ? MAX_ENTRIES : 0);
+		jexl = new JadeJexlEngine(cache ? MAX_ENTRIES : 0);
 	}
 
     public void clearCache() {
