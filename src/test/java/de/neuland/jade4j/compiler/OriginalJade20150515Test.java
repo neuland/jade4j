@@ -3,9 +3,7 @@ package de.neuland.jade4j.compiler;
 import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.TestFileHelper;
-import de.neuland.jade4j.expression.JsExpressionHandler;
 import de.neuland.jade4j.filter.*;
-import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -27,10 +25,10 @@ import static org.junit.Assert.assertEquals;
 public class OriginalJade20150515Test {
     private static String[] ignoredCases = new String[]{"attrs", "attrs.js", "code.conditionals", "code.iteration",
             "filters.coffeescript", "filters.less", "filters.markdown", "filters.stylus",
-            "mixin.merge",  "styles","regression.784","mixin.attrs","include-filter-stylus",
-            "include-filter","filters-empty","each.else","classes","blocks-in-if","filters.cdata","block-code",
-            "attrs-data","attrs.interpolation"};
-//    "mixins.rest-args"
+            "mixin.merge", "styles", "regression.784", "mixin.attrs", "include-filter-stylus",
+            "include-filter", "filters-empty", "each.else", "classes", "blocks-in-if", "filters.cdata", "block-code",
+            "attrs-data", "attrs.interpolation"};
+
     private String file;
 
     public OriginalJade20150515Test(String file) {
@@ -40,9 +38,7 @@ public class OriginalJade20150515Test {
     @Test
     public void shouldCompileJadeToHtml() throws Exception {
         JadeConfiguration jade = new JadeConfiguration();
-        String resourcePath = TestFileHelper.getOriginal20150515ResourcePath("");
-        jade.setTemplateLoader(new FileTemplateLoader(resourcePath,"UTF-8"));
-//        jade.setExpressionHandler(new JsExpressionHandler());
+        String basePath = TestFileHelper.getOriginal20150515ResourcePath("");
         jade.setMode(Jade4J.Mode.XHTML); // original jade uses xhtml by default
         jade.setFilter("plain", new PlainFilter());
         jade.setFilter("cdata", new CDATAFilter());
@@ -51,18 +47,18 @@ public class OriginalJade20150515Test {
         jade.setFilter("verbatim", new VerbatimFilter());
         jade.setFilter("js", new JsFilter());
         jade.setFilter("css", new CssFilter());
-        jade.setBasePath("cases");
-//        jade.setFilter("coffee-script", new CoffeeScriptFilter());
-
+        jade.setBasePath(basePath);
         jade.setPrettyPrint(true);
-        JadeTemplate template = jade.getTemplate(file);
+
+        JadeTemplate template = jade.getTemplate("/cases/" + file);
         Writer writer = new StringWriter();
         HashMap<String, Object> model = new HashMap<String, Object>();
-        model.put("title","Jade");
-        jade.renderTemplate(template,model, writer);
+        model.put("title", "Jade");
+        jade.renderTemplate(template, model, writer);
         String html = writer.toString();
 
-        String expected = readFile(resourcePath+file.replace(".jade", ".html")).trim().replaceAll("\r", "");
+        String pathToExpectedHtml = basePath + "/cases/" + file.replace(".jade", ".html");
+        String expected = readFile(pathToExpectedHtml).trim().replaceAll("\r", "");
 
         assertEquals(file, expected, html.trim());
     }
@@ -71,15 +67,15 @@ public class OriginalJade20150515Test {
         return FileUtils.readFileToString(new File(fileName));
     }
 
-    @Parameterized.Parameters(name="{0}")
+    @Parameterized.Parameters(name = "{0}")
     public static Collection<String[]> data() {
-        File folder = new File(TestFileHelper.getOriginal20150515ResourcePath("/cases"));
+        File folder = new File(TestFileHelper.getOriginal20150515ResourcePath("/cases/"));
         Collection<File> files = FileUtils.listFiles(folder, new String[]{"jade"}, false);
 
         Collection<String[]> data = new ArrayList<String[]>();
         for (File file : files) {
             if (!ArrayUtils.contains(ignoredCases, file.getName().replace(".jade", ""))) {
-                data.add(new String[]{"cases/"+file.getName()});
+                data.add(new String[]{file.getName()});
             }
 
         }

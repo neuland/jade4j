@@ -493,7 +493,7 @@ public class CompilerTest {
     private String readFile(String fileName) {
         try {
             return FileUtils.readFileToString(new File(TestFileHelper
-                    .getCompilerResourcePath(fileName)));
+                    .getCompilerResourcePath(fileName)),"UTF-8");
         } catch (Exception e) {
             // e.printStackTrace();
         }
