@@ -4,6 +4,7 @@ import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.TestFileHelper;
 import de.neuland.jade4j.filter.*;
+import de.neuland.jade4j.helper.FormatHelper;
 import de.neuland.jade4j.template.ClasspathTemplateLoader;
 import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
@@ -66,6 +67,7 @@ public class IssuesTest {
         JadeTemplate template = jade.getTemplate(templateName);
         HashMap<String, Object> model = new HashMap<String, Object>();
         model.put("title", "Jade");
+        model.put("format", new FormatHelper());
         String html = jade.renderTemplate(template, model);
 
         String expected = readFile(file.replace(".jade", ".html"))
