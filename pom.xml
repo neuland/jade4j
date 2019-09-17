@@ -93,7 +93,7 @@
             </build>
         </profile>
     </profiles>
-    
+
     <build>
         <pluginManagement>
             <plugins>
@@ -213,9 +213,14 @@
             <version>3.4</version>
         </dependency>
         <dependency>
-            <groupId>com.googlecode.concurrentlinkedhashmap</groupId>
-            <artifactId>concurrentlinkedhashmap-lru</artifactId>
-            <version>1.4.2</version>
+          <groupId>com.googlecode.concurrentlinkedhashmap</groupId>
+          <artifactId>concurrentlinkedhashmap-lru</artifactId>
+          <version>1.4.2</version>
+        </dependency>
+        <dependency>
+          <groupId>com.github.ben-manes.caffeine</groupId>
+          <artifactId>caffeine</artifactId>
+          <version>2.6.0</version>
         </dependency>
         <dependency>
           <groupId>com.vladsch.flexmark</groupId>
@@ -247,6 +252,18 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.openjdk.jmh</groupId>
+          <artifactId>jmh-core</artifactId>
+          <version>1.19</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.openjdk.jmh</groupId>
+          <artifactId>jmh-generator-annprocess</artifactId>
+          <version>1.19</version>
+          <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
