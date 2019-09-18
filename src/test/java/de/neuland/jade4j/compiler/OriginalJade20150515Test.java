@@ -3,6 +3,7 @@ package de.neuland.jade4j.compiler;
 import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.TestFileHelper;
+import de.neuland.jade4j.expression.JsExpressionHandler;
 import de.neuland.jade4j.filter.*;
 import de.neuland.jade4j.template.JadeTemplate;
 import org.apache.commons.io.FileUtils;
@@ -39,6 +40,7 @@ public class OriginalJade20150515Test {
     public void shouldCompileJadeToHtml() throws Exception {
         JadeConfiguration jade = new JadeConfiguration();
         String basePath = TestFileHelper.getOriginal20150515ResourcePath("");
+        //jade.setExpressionHandler(new JsExpressionHandler());
         jade.setMode(Jade4J.Mode.XHTML); // original jade uses xhtml by default
         jade.setFilter("plain", new PlainFilter());
         jade.setFilter("cdata", new CDATAFilter());

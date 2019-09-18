@@ -6,6 +6,7 @@ import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.exceptions.JadeException;
 import de.neuland.jade4j.expression.ExpressionHandler;
 import de.neuland.jade4j.expression.JexlExpressionHandler;
+import de.neuland.jade4j.expression.JsExpressionHandler;
 import de.neuland.jade4j.filter.CDATAFilter;
 import de.neuland.jade4j.filter.CssFilter;
 import de.neuland.jade4j.filter.Filter;
@@ -38,7 +39,7 @@ public class JadeConfiguration {
     private Map<String, Filter> filters = new HashMap<String, Filter>();
     private Map<String, Object> sharedVariables = new HashMap<String, Object>();
     private TemplateLoader templateLoader = new FileTemplateLoader("", "UTF-8");
-    private ExpressionHandler expressionHandler = new JexlExpressionHandler();
+    private ExpressionHandler expressionHandler = new JsExpressionHandler();
     protected static final int MAX_ENTRIES = 1000;
 
     public JadeConfiguration() {
