@@ -20,7 +20,7 @@ public class ArgumentSplitter {
 
     /**
      * Split arguments passed as single String into list
-     * @param arguments
+     * @param arguments Argument string
      * @return Parsed arguments
      */
     public static List<String> split(String arguments) {
