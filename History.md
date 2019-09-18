@@ -1,6 +1,9 @@
 # History
-## 1.2.8 / 2019-09-12
-* Fixing issue #172: json als mixin argument (quoted keys)
+## 1.2.8 / 2019-09-18
+* Fixed issue #172: json als mixin argument (quoted keys)
+* Fixed issue #170: Bug with configuring base path
+* Fixed issue #153: Variable assignments in for/each loops
+* Improvements to issue #150: Caused by: java.lang.RuntimeException this reader only responds to
 
 ## 1.2.7 / 2017-11-02
 * Improving cache syncronisation
