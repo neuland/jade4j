@@ -3,6 +3,7 @@
 * Upgrading Flexmark lib to latest version
 * Changed compiler level to 1.8 and above
 * Upgraded to jexl 3
+* Renaming to Pug4J
 
 ## 1.2.8 / 2019-09-18
 * Fixed issue #172: json als mixin argument (quoted keys)

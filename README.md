@@ -1,7 +1,7 @@
 [![Build Status](https://secure.travis-ci.org/neuland/jade4j.png?branch=master)](http://travis-ci.org/neuland/jade4j)
 
-# jade4j - a jade implementation written in Java
-jade4j's intention is to be able to process jade templates in Java without the need of a JavaScript environment, while being **fully compatible** with the original jade syntax.
+# pug4j (formerly known as jade4j) - a jade implementation written in Java
+pug4j's intention is to be able to process jade templates in Java without the need of a JavaScript environment, while being **fully compatible** with the original jade syntax.
 
 ## Contents
 
@@ -19,6 +19,7 @@ jade4j's intention is to be able to process jade templates in Java without the n
 - [Expressions](#expressions)
 - [Reserved Words](#reserved-words)
 - [Framework Integrations](#framework-integrations)
+- [Breaking Changes in 2.0.0](#breaking-changes)
 - [Breaking Changes in 1.0.0](#breaking-changes)
 - [Authors](#authors)
 - [License](#license)
@@ -26,7 +27,7 @@ jade4j's intention is to be able to process jade templates in Java without the n
 
 ## Example
 
-index.jade
+index.pug
 
 ```
 doctype html
@@ -53,7 +54,7 @@ model.put("books", books);
 model.put("pageName", "My Bookshelf");
 ```
 
-Running the above code through `String html = Jade4J.render("./index.jade", model)` will result in the following output:
+Running the above code through `String html = Pug4J.render("./index.pug", model)` will result in the following output:
 
 ```html
 <!DOCTYPE html>
@@ -91,8 +92,8 @@ Just add following dependency definitions to your `pom.xml`.
 ```xml
 <dependency>
   <groupId>de.neuland-bfi</groupId>
-  <artifactId>jade4j</artifactId>
-  <version>1.2.7</version>
+  <artifactId>pug4j</artifactId>
+  <version>2.0.0</version>
 </dependency>
 ```
 
@@ -101,17 +102,17 @@ Just add following dependency definitions to your `pom.xml`.
 Clone this repository ...
 
 ```bash
-git clone https://github.com/neuland/jade4j.git
+git clone https://github.com/neuland/pug4j.git
 ```
 
 ... build it using `maven` ...
 
 ```bash
-cd jade4j
+cd pug4j
 mvn install
 ```
 
-... and use the `jade4j-0.x.x.jar` located in your target directory.
+... and use the `pug4j-2.x.x.jar` located in your target directory.
 
 <a name="simple-api"></a>
 ## Simple static API
@@ -119,31 +120,31 @@ mvn install
 Parsing template and generating template in one step.
 
 ```java
-String html = Jade4J.render("./index.jade", model);
+String html = Pug4J.render("./index.pug", model);
 ```
 
 If you use this in production you would probably do the template parsing only once per template and call the render method with different models.
 
 ```java
-JadeTemplate template = Jade4J.getTemplate("./index.jade");
-String html = Jade4J.render(template, model);
+JadeTemplate template = Pug4J.getTemplate("./index.pug");
+String html = Pug4J.render(template, model);
 ```
 
 Streaming output using a `java.io.Writer`
 
 ```java
-Jade4J.render(template, model, writer);
+Pug4J.render(template, model, writer);
 ```
 
 <a name="api"></a>
 ## Full API
 
-If you need more control you can instantiate a `JadeConfiguration` object.
+If you need more control you can instantiate a `PugConfiguration` object.
 
 ```java
-JadeConfiguration config = new JadeConfiguration();
+PugConfiguration config = new PugConfiguration();
 
-JadeTemplate template = config.getTemplate("index");
+PugTemplate template = config.getTemplate("index");
 
 Map<String, Object> model = new HashMap<String, Object>();
 model.put("company", "neuland");
@@ -154,11 +155,11 @@ config.renderTemplate(template, model);
 <a name="api-caching"></a>
 ### Caching
 
-The `JadeConfiguration` handles template caching for you. If you request the same unmodified template twice you'll get the same instance and avoid unnecessary parsing.
+The `PugConfiguration` handles template caching for you. If you request the same unmodified template twice you'll get the same instance and avoid unnecessary parsing.
 
 ```java
-JadeTemplate t1 = config.getTemplate("index.jade");
-JadeTemplate t2 = config.getTemplate("index.jade");
+PugTemplate t1 = config.getTemplate("index.pug");
+PugTemplate t2 = config.getTemplate("index.pug");
 t1.equals(t2) // true
 ```
 
@@ -177,20 +178,20 @@ config.setCaching(false);
 <a name="api-output"></a>
 ### Output Formatting
 
-By default, Jade4J produces compressed HTML without unneeded whitespace. You can change this behaviour by enabling PrettyPrint:
+By default, Pug4J produces compressed HTML without unneeded whitespace. You can change this behaviour by enabling PrettyPrint:
 
 ```java
 config.setPrettyPrint(true);
 ```
 
-Jade detects if it has to generate (X)HTML or XML code by your specified [doctype](https://github.com/visionmedia/jade#a6-11).
+Pug detects if it has to generate (X)HTML or XML code by your specified [doctype](https://github.com/visionmedia/jade#a6-11).
 
-If you are rendering partial templates that don't include a doctype jade4j generates HTML code. You can also set the `mode` manually:
+If you are rendering partial templates that don't include a doctype pug4j generates HTML code. You can also set the `mode` manually:
 
 ```
-config.setMode(Jade4J.Mode.HTML);   // <input checked>
-config.setMode(Jade4J.Mode.XHTML);  // <input checked="true" />
-config.setMode(Jade4J.Mode.XML);    // <input checked="true"></input>
+config.setMode(Pug4J.Mode.HTML);   // <input checked>
+config.setMode(Pug4J.Mode.XHTML);  // <input checked="true" />
+config.setMode(Pug4J.Mode.XML);    // <input checked="true"></input>
 ```
 
 <a name="api-filters"></a>
@@ -210,7 +211,7 @@ will generate
       });
     </script>
 
-jade4j comes with a `plain` and `cdata` filter. `plain` takes your input to pass it directly through, `cdata` wraps your content in `<![CDATA[...]]>`. You can add your custom filters to your configuration.
+pug4j comes with a `plain` and `cdata` filter. `plain` takes your input to pass it directly through, `cdata` wraps your content in `<![CDATA[...]]>`. You can add your custom filters to your configuration.
 
     config.setFilter("coffeescript", new CoffeeScriptFilter());
 
@@ -255,7 +256,7 @@ config.setSharedVariables(defaults);
 <a name="api-template-loader"></a>
 ### Template Loader
 
-By default, jade4j searches for template files in your work directory. By specifying your own `FileTemplateLoader`, you can alter that behavior. You can also implement the `TemplateLoader` interface to create your own.
+By default, pug4j searches for template files in your work directory. By specifying your own `FileTemplateLoader`, you can alter that behavior. You can also implement the `TemplateLoader` interface to create your own.
 
 ```java
 TemplateLoader loader = new FileTemplateLoader("/templates/", "UTF-8");
@@ -265,7 +266,7 @@ config.setTemplateLoader(loader);
 <a name="expressions"></a>
 ## Expressions
 
-The original jade implementation uses JavaScript for expression handling in `if`, `unless`, `for`, `case` commands, like this
+The original pug implementation uses JavaScript for expression handling in `if`, `unless`, `for`, `case` commands, like this
 
     - var book = {"price": 4.99, "title": "The Book"}
     if book.price < 5.50 && !book.soldOut
@@ -275,10 +276,10 @@ The original jade implementation uses JavaScript for expression handling in `if`
       h2= author
 
 As of version 0.3.0, jade4j uses [JEXL](http://commons.apache.org/jexl/) instead of [OGNL](http://en.wikipedia.org/wiki/OGNL) for parsing and executing these expressions.
+As of version 2.0.0, pug4j uses JEXL3
+We decided to switch to JEXL because its syntax and behavior is more similar to ECMAScript/JavaScript and so closer to the original pug.js implementation. JEXL runs also much faster than OGNL. In our benchmark, it showed a **performance increase by factor 3 to 4**.
 
-We decided to switch to JEXL because its syntax and behavior is more similar to ECMAScript/JavaScript and so closer to the original jade.js implementation. JEXL runs also much faster than OGNL. In our benchmark, it showed a **performance increase by factor 3 to 4**.
-
-We are using a slightly modified JEXL version which to have better control of the exception handling. JEXL now runs in a semi-strict mode, where non existing values and properties silently evaluate to `null`/`false` where as invalid method calls lead to a `JadeCompilerException`.
+We are using a slightly modified JEXL version which to have better control of the exception handling. JEXL now runs in a semi-strict mode, where non existing values and properties silently evaluate to `null`/`false` where as invalid method calls lead to a `PugCompilerException`.
 
 <a name="reserved-words"></a>
 ## Reserved Words
@@ -300,6 +301,12 @@ You can read more about this in the [JEXL documentation](http://commons.apache.o
 - [vertx-web](http://vertx.io/docs/vertx-web/js/#_jade_template_engine) jade4j for [Vert.X](http://vertx.io/)
 
 <a name="breaking-changes"></a>
+## Breaking Changes in 2.0.0
+- Classes are renamed to pug4j.
+- Default file extension is now .pug
+- Compiler Level has been raised to Java 8+
+- Syntax has been adapted to the most current pug version. (2.0.4)
+
 ## Breaking Changes in 1.0.0
 In Version 1.0.0 we added a lot of features of JadeJs 1.11. There are also some Breaking Changes:
 - Instead of 'id = 5' you must use '- var id = 5'
