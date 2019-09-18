@@ -34,12 +34,21 @@ public class ReaderTemplateLoader implements TemplateLoader {
 	}
 
 	private void checkName(String name) {
-		if (!name.equals(this.name)) {
-			throw new RuntimeException("this reader only responds to [" + name + "] templates");
+	    String nameOfParamWithoutExtension = getNameWithoutExtension(name);
+		String nameOfObjectWithoutExtension = getNameWithoutExtension(this.name);
+		if (!nameOfObjectWithoutExtension.equals(nameOfParamWithoutExtension)) {
+			throw new RuntimeException("This reader only responds to [" + this.name + "] template. " +
+                                           "You should not reference other templates if using ReaderTemplateLoader, " +
+                                           "because multiple template loaders are currently not supported. " +
+                                           "Maybe you could use a FileTemplateLoader?");
 		}
 	}
 
-	@Override
+    private String getNameWithoutExtension(String name) {
+        return name.endsWith("." + extension)? name.substring(0, name.lastIndexOf("." + extension)) : name;
+    }
+
+    @Override
 	public String getExtension() {
 		return extension;
 	}
