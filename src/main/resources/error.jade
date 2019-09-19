@@ -148,7 +148,7 @@ html
 
         $pretty.textContent = style_html($raw.textContent);
 
-        if (window.localStorage && localStorage.jadeExceptionOutput == 'raw') {
+        if (window.localStorage && localStorage.pugExceptionOutput == 'raw') {
           $pretty.style.display = 'none';
           $rawLink.style.textDecoration = 'underline';
         } else {
@@ -161,7 +161,7 @@ html
           $pretty.style.display = 'block';
           $rawLink.style.textDecoration = 'none';
           $prettyLink.style.textDecoration = 'underline';
-          localStorage.jadeExceptionOutput = 'pretty';
+          localStorage.pugExceptionOutput = 'pretty';
         });
 
         $rawLink.addEventListener('click', function() {
@@ -169,5 +169,5 @@ html
           $pretty.style.display = 'none';
           $rawLink.style.textDecoration = 'underline';
           $prettyLink.style.textDecoration = 'none';
-          localStorage.jadeExceptionOutput = 'raw';
+          localStorage.pugExceptionOutput = 'raw';
         });
