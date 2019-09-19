@@ -5,6 +5,7 @@ import de.neuland.pug4j.PugConfiguration;
 import de.neuland.pug4j.TestFileHelper;
 import de.neuland.pug4j.filter.CDATAFilter;
 import de.neuland.pug4j.filter.PlainFilter;
+import de.neuland.pug4j.template.FileTemplateLoader;
 import de.neuland.pug4j.template.PugTemplate;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -40,11 +41,11 @@ public class OriginalJade20150927Test {
     public void shouldCompileJadeToHtml() throws Exception {
         PugConfiguration jade = new PugConfiguration();
         String basePath = TestFileHelper.getOriginal20150515ResourcePath("");
+        jade.setTemplateLoader(new FileTemplateLoader(basePath,"UTF-8","jade"));
         jade.setMode(Pug4J.Mode.XHTML); // original jade uses xhtml by default
         jade.setFilter("plain", new PlainFilter());
         jade.setFilter("cdata", new CDATAFilter());
         jade.setPrettyPrint(true);
-        jade.setBasePath(basePath);
         PugTemplate template = jade.getTemplate("/cases/" + file);
         Writer writer = new StringWriter();
         HashMap<String, Object> model = new HashMap<String, Object>();

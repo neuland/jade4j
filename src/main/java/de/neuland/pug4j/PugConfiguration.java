@@ -31,9 +31,8 @@ public class PugConfiguration {
     private static final String FILTER_SCRIPT = "js";
 
     private boolean prettyPrint = false;
-    private String basePath = "";
     private boolean caching = true;
-    private Mode mode = Pug4J.Mode.HTML;
+    private Mode mode = Pug4J.Mode.XHTML;
 
     private Map<String, Filter> filters = new HashMap<String, Filter>();
     private Map<String, Object> sharedVariables = new HashMap<String, Object>();
@@ -193,14 +192,5 @@ public class PugConfiguration {
     public void clearCache() {
         expressionHandler.clearCache();
         cache.clear();
-    }
-
-    public void setBasePath(String basePath) {
-        File file = new File(basePath);
-        if (!file.exists() || !file.isDirectory()) {
-            throw new IllegalArgumentException("The base path '" + basePath + "' does not exist");
-        }
-        this.basePath = file.getAbsolutePath() + File.separator;
-        this.templateLoader = new FileTemplateLoader(this.basePath, "UTF-8");
     }
 }

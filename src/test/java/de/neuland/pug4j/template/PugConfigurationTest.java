@@ -35,16 +35,6 @@ public class PugConfigurationTest {
         assertNotNull(template);
     }
 
-    @Test
-    public void testConfigurationWithNonExistingBasePath() throws FileNotFoundException {
-        PugConfiguration config = new PugConfiguration();
-        try {
-            config.setBasePath(TestFileHelper.getRootResourcePath() + "/does/not/exist");
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException ignored) {
-
-        }
-    }
 
     @Test
     public void testCache() throws IOException {
