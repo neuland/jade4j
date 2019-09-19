@@ -8,7 +8,7 @@
 		</layout>
 	</appender>
 	
-	<logger name="de.neuland.jade4j">
+	<logger name="de.neuland.pug4j">
 		<level value="WARN" />
 	</logger>
 

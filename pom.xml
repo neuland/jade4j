@@ -12,10 +12,10 @@
         <artifactId>oss-parent</artifactId>
         <version>7</version>
     </parent>
-    <url>https://github.com/neuland/jade4j</url>
+    <url>https://github.com/neuland/pug4j</url>
 
     <issueManagement>
-        <url>https://github.com/neuland/jade4j/issues</url>
+        <url>https://github.com/neuland/pug4j/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
     <licenses>
@@ -27,9 +27,9 @@
     </licenses>
 
     <scm>
-        <url>https://github.com/neuland/jade4j</url>
-        <connection>scm:git:git://github.com/neuland/jade4j.git</connection>
-        <developerConnection>scm:git:git@github.com:neuland/jade4j.git</developerConnection>
+        <url>https://github.com/neuland/pug4j</url>
+        <connection>scm:git:git://github.com/neuland/pug4j.git</connection>
+        <developerConnection>scm:git:git@github.com:neuland/pug4j.git</developerConnection>
       <tag>HEAD</tag>
   </scm>
 
