@@ -22,7 +22,7 @@ public class ReaderTemplateLoaderTest {
     @Test
     public void getReaderShouldReturnReaderIfNameOfParameterIsWithoutExtension() throws IOException {
         Reader reader = new StringReader("Hello #{foo}!");
-        ReaderTemplateLoader templateLoader = new ReaderTemplateLoader(reader, "template.jade");
+        ReaderTemplateLoader templateLoader = new ReaderTemplateLoader(reader, "template.pug");
 
         Reader readerResult = templateLoader.getReader("template");
 
@@ -34,7 +34,7 @@ public class ReaderTemplateLoaderTest {
         Reader reader = new StringReader("Hello #{foo}!");
         ReaderTemplateLoader templateLoader = new ReaderTemplateLoader(reader, "template");
 
-        Reader readerResult = templateLoader.getReader("template.jade");
+        Reader readerResult = templateLoader.getReader("template.pug");
 
         assertEquals(reader, readerResult);
     }

@@ -59,7 +59,6 @@ public class Lexer {
         this.expressionHandler = expressionHandler;
         this.templateLoader = templateLoader;
         this.filename = ensurePugExtension(filename);
-        Reader reader = templateLoader.getReader(this.filename);
         options = new LinkedList<String>();
         scanner = new Scanner(input);
         deferredTokens = new LinkedList<Token>();

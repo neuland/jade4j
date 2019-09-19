@@ -105,7 +105,7 @@ public class PugConfiguration {
     private PugTemplate createTemplate(String name) throws PugException, IOException {
         PugTemplate template = new PugTemplate();
 
-        Parser parser = new Parser(name, basePath, templateLoader, expressionHandler);
+        Parser parser = new Parser(name, templateLoader, expressionHandler);
         Node root = parser.parse();
         template.setTemplateLoader(templateLoader);
         template.setExpressionHandler(expressionHandler);
@@ -193,10 +193,6 @@ public class PugConfiguration {
     public void clearCache() {
         expressionHandler.clearCache();
         cache.clear();
-    }
-
-    public String getBasePath() {
-        return basePath;
     }
 
     public void setBasePath(String basePath) {

@@ -39,8 +39,8 @@ public class OriginalJade20150515Test {
     @Test
     public void shouldCompileJadeToHtml() throws Exception {
         PugConfiguration jade = new PugConfiguration();
-        jade.setTemplateLoader(new FileTemplateLoader("UTF-8","jade"));
         String basePath = TestFileHelper.getOriginal20150515ResourcePath("");
+        jade.setTemplateLoader(new FileTemplateLoader(basePath,"UTF-8","jade"));
         jade.setMode(Pug4J.Mode.XHTML); // original jade uses xhtml by default
         jade.setFilter("plain", new PlainFilter());
         jade.setFilter("cdata", new CDATAFilter());
@@ -49,9 +49,8 @@ public class OriginalJade20150515Test {
         jade.setFilter("verbatim", new VerbatimFilter());
         jade.setFilter("js", new JsFilter());
         jade.setFilter("css", new CssFilter());
-        jade.setBasePath(basePath);
         jade.setPrettyPrint(true);
-        PugTemplate template = jade.getTemplate("/cases/" + file,"jade");
+        PugTemplate template = jade.getTemplate("/cases/" + file);
         Writer writer = new StringWriter();
         HashMap<String, Object> model = new HashMap<String, Object>();
         model.put("title", "Jade");

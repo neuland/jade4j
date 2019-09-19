@@ -1,5 +1,8 @@
 package de.neuland.pug4j.template;
 
+import de.neuland.pug4j.exceptions.PugException;
+import de.neuland.pug4j.exceptions.PugTemplateLoaderException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -35,7 +38,9 @@ public class FileTemplateLoader implements TemplateLoader {
 	}
 
 	private File getFile(String name) {
-		// TODO Security
+		if(name.startsWith("../")){
+			throw new PugTemplateLoaderException("relative Path is not allowed");
+		}
         return new File(folderPath + name);
 	}
 

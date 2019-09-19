@@ -4,7 +4,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class PathHelper {
-    public String resolvePath(String parentName, String templateName, String basePath, String extension) {
+    public String resolvePath(String parentName, String templateName, String extension) {
 //        Path currentPath = Paths.get(filename);
 //        Path templatePath = Paths.get(templateName);
 //        Path parent = currentPath.getParent();
@@ -13,7 +13,8 @@ public class PathHelper {
 //            filePath = parent.resolve(templatePath).toString();
         String filePath;
         if(templateName.startsWith("/")) {
-            filePath = basePath + templateName;
+            //ignore parentName
+            filePath = templateName.substring(1);
         }else {
             if (FilenameUtils.indexOfLastSeparator(parentName) == -1)
                 filePath = templateName;

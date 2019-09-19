@@ -85,21 +85,21 @@ public class Pug4J {
     }
 
 	public static PugTemplate getTemplate(String filename) throws IOException {
-		return createTemplate(filename,"", new FileTemplateLoader("", "UTF-8"), new JexlExpressionHandler());
+		return createTemplate(filename, new FileTemplateLoader("", "UTF-8"), new JexlExpressionHandler());
 	}
 	public static PugTemplate getTemplate(String filename, String extension) throws IOException {
-		return createTemplate(filename,"", new FileTemplateLoader("", "UTF-8",extension), new JexlExpressionHandler());
+		return createTemplate(filename, new FileTemplateLoader("", "UTF-8",extension), new JexlExpressionHandler());
 	}
 
 	private static PugTemplate getTemplate(Reader reader, String name) throws IOException {
-		return createTemplate(name, "",new ReaderTemplateLoader(reader, name), new JexlExpressionHandler());
+		return createTemplate(name, new ReaderTemplateLoader(reader, name), new JexlExpressionHandler());
 	}
 	private static PugTemplate getTemplate(Reader reader, String name, String extension) throws IOException {
-		return createTemplate(name, "",new ReaderTemplateLoader(reader, name,extension), new JexlExpressionHandler());
+		return createTemplate(name, new ReaderTemplateLoader(reader, name,extension), new JexlExpressionHandler());
 	}
 
-	private static PugTemplate createTemplate(String filename, String basePath, TemplateLoader loader, ExpressionHandler expressionHandler) throws IOException {
-		Parser parser = new Parser(filename, basePath, loader, expressionHandler);
+	private static PugTemplate createTemplate(String filename, TemplateLoader loader, ExpressionHandler expressionHandler) throws IOException {
+		Parser parser = new Parser(filename, loader, expressionHandler);
 		Node root = parser.parse();
 		PugTemplate template = new PugTemplate();
 		template.setExpressionHandler(expressionHandler);

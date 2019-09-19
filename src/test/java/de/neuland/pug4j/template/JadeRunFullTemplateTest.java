@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.neuland.pug4j.helper.beans.IterableMap;
+import org.junit.Before;
 import org.junit.Test;
 
 import de.neuland.pug4j.PugConfiguration;
@@ -20,6 +21,12 @@ import de.neuland.pug4j.model.PugModel;
 public class JadeRunFullTemplateTest {
 
     private PugConfiguration cfg = new PugConfiguration();
+
+
+    @Before
+    public void setUp() throws Exception {
+        cfg.setTemplateLoader(new FileTemplateLoader("", "UTF-8","jade"));
+    }
 
     @Test
     public void testFullRun() throws IOException {

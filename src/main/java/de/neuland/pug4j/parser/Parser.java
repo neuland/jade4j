@@ -27,7 +27,6 @@ public class Parser {
     private LinkedHashMap<String, BlockNode> blocks = new LinkedHashMap<String, BlockNode>();
     private String[] textOnlyTags = {"script", "style"};
     private Integer _spaces = null;
-    private String basePath;
     private final TemplateLoader templateLoader;
     private ExpressionHandler expressionHandler;
     private Parser extending;
@@ -39,9 +38,8 @@ public class Parser {
     private int inBlock = 0;
     private PathHelper pathHelper = new PathHelper();
 
-    public Parser(String filename, String basePath, TemplateLoader templateLoader, ExpressionHandler expressionHandler) throws IOException {
+    public Parser(String filename, TemplateLoader templateLoader, ExpressionHandler expressionHandler) throws IOException {
         this.filename = filename;
-        this.basePath = basePath;
         this.templateLoader = templateLoader;
         this.expressionHandler = expressionHandler;
         lexer = new Lexer(filename, templateLoader, expressionHandler);
@@ -49,9 +47,8 @@ public class Parser {
         getContexts().push(this);
     }
 
-    public Parser(String src, String filename, String basePath, TemplateLoader templateLoader, ExpressionHandler expressionHandler) throws IOException {
+    public Parser(String src, String filename, TemplateLoader templateLoader, ExpressionHandler expressionHandler) throws IOException {
         this.filename = filename;
-        this.basePath = basePath;
         this.templateLoader = templateLoader;
         this.expressionHandler = expressionHandler;
         lexer = new Lexer(src, filename, templateLoader, expressionHandler);
@@ -359,7 +356,7 @@ public class Parser {
         Token token = expect(Include.class);
         Include includeToken = (Include) token;
         String templateName = includeToken.getValue().trim();
-        String path = pathHelper.resolvePath(filename, templateName, basePath, templateLoader.getExtension());
+        String path = pathHelper.resolvePath(filename, templateName, templateLoader.getExtension());
 
         try {
             if (includeToken.getFilter() != null) {
@@ -433,8 +430,8 @@ public class Parser {
     private Parser createParser(String templateName) {
         templateName = ensurePugExtension(templateName);
         try {
-            String resolvedPath = pathHelper.resolvePath(this.filename, templateName, basePath, templateLoader.getExtension());
-            return new Parser(resolvedPath, basePath, templateLoader, expressionHandler);
+            String resolvedPath = pathHelper.resolvePath(this.filename, templateName, templateLoader.getExtension());
+            return new Parser(resolvedPath, templateLoader, expressionHandler);
         } catch (IOException e) {
             throw new PugParserException(
                     this.filename,
@@ -731,7 +728,7 @@ public class Parser {
                 }
                 Parser inner = null;
                 try {
-                    inner = new Parser(range.getSrc(), this.filename, this.basePath, this.templateLoader, this.expressionHandler); //Need to be reviewed
+                    inner = new Parser(range.getSrc(), this.filename, this.templateLoader, this.expressionHandler); //Need to be reviewed
                 } catch (IOException e) {
                     throw new PugParserException(this.filename, line, templateLoader, "Could not parse text");
                 }
