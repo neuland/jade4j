@@ -142,7 +142,7 @@ public class TagNode extends AttrsNode {
         writer.decrement();
     }
 
-    private void openTag(IndentWriter writer, JadeModel model, JadeTemplate template, boolean selfClosing) {
+    private void openTag(IndentWriter writer, PugModel model, PugTemplate template, boolean selfClosing) {
         writer.append("<")
             .append(bufferName(template, model))
             .append(visitAttributes(model, template));
@@ -158,7 +158,7 @@ public class TagNode extends AttrsNode {
     }
 
 
-    private String bufferName(PugTemplate template, JadeModel model) {
+    private String bufferName(PugTemplate template, PugModel model) {
         if (isBuffer()) {
             try {
                 return template.getExpressionHandler().evaluateStringExpression(name, model);

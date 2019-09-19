@@ -1,9 +1,9 @@
 package de.neuland.pug4j.parser.node;
 
 
-import de.neuland.jade4j.Jade4J;
-import de.neuland.jade4j.JadeConfiguration;
-import de.neuland.jade4j.template.JadeTemplate;
+import de.neuland.pug4j.Pug4J;
+import de.neuland.pug4j.PugConfiguration;
+import de.neuland.pug4j.template.PugTemplate;
 import java.util.Collections;
 import java.util.LinkedList;
 import org.junit.Before;
@@ -18,18 +18,18 @@ public class TagNodeTest {
 
     private String[] bodylessTags = { "meta", "img", "link", "input", "area", "base", "col", "br", "hr", "source" };
     private String[] normalTags = { "div", "table", "span" };
-    private JadeConfiguration jade;
+    private PugConfiguration jade;
 
 
     @Before
     public void init() {
-        jade = new JadeConfiguration();
+        jade = new PugConfiguration();
     }
 
     @Test
     public void shouldCloseBodylessTagsWithSlashAndIgnoreBlockWhenCompilingToXhtml() {
-        JadeTemplate template = new JadeTemplate();
-        template.setMode(Jade4J.Mode.XHTML);
+        PugTemplate template = new PugTemplate();
+        template.setMode(Pug4J.Mode.XHTML);
 
         TagNode tagNode = new TagNode();
 
@@ -46,8 +46,8 @@ public class TagNodeTest {
 
     @Test
     public void shouldCloseBodylessTagsWithoutSlashAndIgnoreBlockWhenCompilingToHtml() {
-        JadeTemplate template = new JadeTemplate();
-        template.setMode(Jade4J.Mode.HTML);
+        PugTemplate template = new PugTemplate();
+        template.setMode(Pug4J.Mode.HTML);
 
         TagNode tagNode = new TagNode();
 
@@ -64,8 +64,8 @@ public class TagNodeTest {
 
     @Test
     public void shouldCloseBodylessTagsWithEndTagWhenCompilingToXml() {
-        JadeTemplate template = new JadeTemplate();
-        template.setMode(Jade4J.Mode.XML);
+        PugTemplate template = new PugTemplate();
+        template.setMode(Pug4J.Mode.XML);
 
         TagNode tagNode = new TagNode();
 
@@ -82,8 +82,8 @@ public class TagNodeTest {
 
     @Test
     public void shouldCloseSelfClosingBodylessTagsWithSlashAndIgnoreBlockWhenCompilingToXhtml() {
-        JadeTemplate template = new JadeTemplate();
-        template.setMode(Jade4J.Mode.XHTML);
+        PugTemplate template = new PugTemplate();
+        template.setMode(Pug4J.Mode.XHTML);
 
         TagNode tagNode = new TagNode();
 
@@ -101,8 +101,8 @@ public class TagNodeTest {
 
     @Test
     public void shouldCloseSelfClosingBodylessTagsWithSlashAndIgnoreBlockWhenCompilingToHtml() {
-        JadeTemplate template = new JadeTemplate();
-        template.setMode(Jade4J.Mode.HTML);
+        PugTemplate template = new PugTemplate();
+        template.setMode(Pug4J.Mode.HTML);
 
         TagNode tagNode = new TagNode();
 
@@ -120,8 +120,8 @@ public class TagNodeTest {
 
     @Test
     public void shouldCloseSelfClosingBodylessTagsWithSlashAndIgnoreBlockWhenCompilingToXml() {
-        JadeTemplate template = new JadeTemplate();
-        template.setMode(Jade4J.Mode.XML);
+        PugTemplate template = new PugTemplate();
+        template.setMode(Pug4J.Mode.XML);
 
         TagNode tagNode = new TagNode();
 
@@ -139,8 +139,8 @@ public class TagNodeTest {
 
     @Test
     public void shouldCloseNormalTagsWithEndTagWhenCompilingToXhtml() {
-        JadeTemplate template = new JadeTemplate();
-        template.setMode(Jade4J.Mode.XHTML);
+        PugTemplate template = new PugTemplate();
+        template.setMode(Pug4J.Mode.XHTML);
 
         TagNode tagNode = new TagNode();
 
@@ -158,8 +158,8 @@ public class TagNodeTest {
 
     @Test
     public void shouldCloseNormalTagsWithEndTagWhenCompilingToHtml() {
-        JadeTemplate template = new JadeTemplate();
-        template.setMode(Jade4J.Mode.HTML);
+        PugTemplate template = new PugTemplate();
+        template.setMode(Pug4J.Mode.HTML);
 
         TagNode tagNode = new TagNode();
 
@@ -177,8 +177,8 @@ public class TagNodeTest {
 
     @Test
     public void shouldCloseNormalTagsWithEndTagWhenCompilingToXml() {
-        JadeTemplate template = new JadeTemplate();
-        template.setMode(Jade4J.Mode.XML);
+        PugTemplate template = new PugTemplate();
+        template.setMode(Pug4J.Mode.XML);
 
         TagNode tagNode = new TagNode();
 
@@ -197,8 +197,8 @@ public class TagNodeTest {
 
     @Test
     public void shouldCloseSelfClosingNormalTagsWithSlashAndIgnoreBlockWhenCompilingToXhtml() {
-        JadeTemplate template = new JadeTemplate();
-        template.setMode(Jade4J.Mode.XHTML);
+        PugTemplate template = new PugTemplate();
+        template.setMode(Pug4J.Mode.XHTML);
 
         TagNode tagNode = new TagNode();
 
@@ -216,8 +216,8 @@ public class TagNodeTest {
 
     @Test
     public void shouldCloseSelfClosingNormalTagsWithSlashAndIgnoreBlockWhenCompilingToHtml() {
-        JadeTemplate template = new JadeTemplate();
-        template.setMode(Jade4J.Mode.HTML);
+        PugTemplate template = new PugTemplate();
+        template.setMode(Pug4J.Mode.HTML);
 
         TagNode tagNode = new TagNode();
 
@@ -235,8 +235,8 @@ public class TagNodeTest {
 
     @Test
     public void shouldCloseSelfClosingNormalTagsWithSlashAndIgnoreBlockWhenCompilingToXml() {
-        JadeTemplate template = new JadeTemplate();
-        template.setMode(Jade4J.Mode.XML);
+        PugTemplate template = new PugTemplate();
+        template.setMode(Pug4J.Mode.XML);
 
         TagNode tagNode = new TagNode();
 

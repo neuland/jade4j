@@ -1,24 +1,25 @@
-package de.neuland.jade4j.compiler;
+package de.neuland.pug4j.compiler;
 
-import de.neuland.jade4j.Jade4J;
-import de.neuland.jade4j.JadeConfiguration;
-import de.neuland.jade4j.filter.CDATAFilter;
-import de.neuland.jade4j.filter.MarkdownFilter;
-import de.neuland.jade4j.filter.PlainFilter;
-import de.neuland.jade4j.template.FileTemplateLoader;
-import de.neuland.jade4j.template.JadeTemplate;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+
+import de.neuland.pug4j.Pug4J;
+import de.neuland.pug4j.PugConfiguration;
+import de.neuland.pug4j.TestFileHelper;
+import de.neuland.pug4j.filter.CDATAFilter;
+import de.neuland.pug4j.filter.MarkdownFilter;
+import de.neuland.pug4j.filter.PlainFilter;
+import de.neuland.pug4j.template.FileTemplateLoader;
+import de.neuland.pug4j.template.PugTemplate;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import static de.neuland.jade4j.TestFileHelper.getOriginal20190911ResourcePath;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
@@ -66,7 +67,7 @@ public class OriginalJade20190911Test {
 
 
     private File file;
-    private static final String RESOURCE_PATH = getOriginal20190911ResourcePath("");
+    private static final String RESOURCE_PATH = TestFileHelper.getOriginal20190911ResourcePath("");
 
     public OriginalJade20190911Test(String file) {
         this.file = new File(file);
@@ -74,8 +75,8 @@ public class OriginalJade20190911Test {
 
     @Test
     public void shouldCompileJadeToHtml() throws Exception {
-        JadeConfiguration jade = new JadeConfiguration();
-        jade.setMode(Jade4J.Mode.XHTML); // original jade uses xhtml by default
+        PugConfiguration jade = new PugConfiguration();
+        jade.setMode(Pug4J.Mode.XHTML); // original jade uses xhtml by default
         jade.setTemplateLoader(new FileTemplateLoader(RESOURCE_PATH, "UTF-8", "pug"));
 
         jade.setFilter("plain", new PlainFilter());
@@ -84,7 +85,7 @@ public class OriginalJade20190911Test {
 
         jade.setPrettyPrint(true);
 
-        JadeTemplate template = jade.getTemplate(file.getPath());
+        PugTemplate template = jade.getTemplate(file.getPath());
 
         String html = jade.renderTemplate(template, new HashMap<String, Object>());
 
