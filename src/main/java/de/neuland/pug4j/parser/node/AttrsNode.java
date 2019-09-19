@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public abstract class AttrsNode extends Node {
 
-    private static final String[] selfClosingTags = {"area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"};
+    private static final String[] bodylessTags = {"area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"};
     protected LinkedList<Attr> attributes = new LinkedList<Attr>();
 	protected LinkedList<String> attributeBlocks = new LinkedList<String>();
 	protected List<String> attributeNames = new LinkedList<String>();
@@ -175,10 +175,10 @@ public abstract class AttrsNode extends Node {
             }
         }
         LinkedHashMap<String,String> finalAttributes = new LinkedHashMap<String,String>();
-        finalAttributes.putAll(newAttributes);
         if(!classes.isEmpty()){
             finalAttributes.put("class", StringUtils.join(classes," "));
         }
+        finalAttributes.putAll(newAttributes);
         return finalAttributes;
     }
 
@@ -309,7 +309,7 @@ public abstract class AttrsNode extends Node {
     }
 	private Object evaluateExpression(ExpressionString attribute, PugModel model, ExpressionHandler expressionHandler) throws ExpressionException {
         String expression = ((ExpressionString) attribute).getValue();
-        Object result = expressionHandler.evaluateExpression(expression, model);
+	    Object result = expressionHandler.evaluateExpression(expression, model);
         if (result instanceof ExpressionString) {
             return evaluateExpression((ExpressionString) result, model, expressionHandler);
         }
@@ -329,11 +329,8 @@ public abstract class AttrsNode extends Node {
         }
     }
 
-    public boolean isTerse(PugTemplate template) {
-        return isSelfClosing(template) && template.isTerse();
+    protected boolean isBodyless() {
+        return ArrayUtils.contains(bodylessTags, name);
     }
 
-    public boolean isSelfClosing(PugTemplate template) {
-        return !template.isXml() && ArrayUtils.contains(selfClosingTags, name);
-    }
 }

@@ -1150,52 +1150,58 @@ public class Lexer {
         }
         return null;
     }
-    private Token pipelessText(){
+
+    private Token pipelessText() {
         if (!this.pipeless) return null;
         Matcher matcher;
-        String re;
 
         // established regexp
         if (this.indentRe != null) {
             matcher = scanner.getMatcherForPattern(indentRe);
-            // determine regexp
         } else {
             // tabs
-            re = "^\\n(\\t*) *";
+            String re = "^\\n(\\t*) *";
             matcher = scanner.getMatcherForPattern(re);
+            indentType = "tabs";
 
             // spaces
             if (matcher.find(0) && matcher.group(1).length() == 0) {
                 re = "^\\n( *)";
                 matcher = scanner.getMatcherForPattern(re);
+                indentType = "spaces";
             }
             // established
-            if (matcher.find(0) && matcher.group(1).length() > 0)
+            if (matcher.find(0) && matcher.group(1).length() > 0) {
                 this.indentRe = re;
+            }
         }
+
         if (matcher.find(0) && matcher.group(1).length() > 0) {
-            int indents = matcher.group(1).length();
+            int indents = calculateIndents(matcher);
+
             if (indents > 0 && (this.indentStack.size() == 0 || indents > this.indentStack.get(0))) {
-                String indent = matcher.group(1);
+                String indent = scanner.getInput().substring(1, indents + 1);
                 ArrayList<String> tokens = new ArrayList<String>();
                 boolean isMatch = false;
 
                 do {
                     // text has `\n` as a prefix
-                    int i = scanner.getInput().substring(1).indexOf('\n');
-                    if (-1 == i)
-                        i = scanner.getInput().length() - 1;
-                    String str;
-                    str = scanner.getInput().substring(1,i+1);
-                    int indentLength = indent.length();
-                    if(str.length()<=indentLength)
-                        indentLength = str.length();
-                    isMatch = str.substring(0, indentLength).equals(indent) || !(str.trim().length() > 0);
+                    int nextLineBreak = scanner.getInput().substring(1).indexOf('\n');
+                    if (-1 == nextLineBreak)
+                        nextLineBreak = scanner.getInput().length() - 1;
+
+                    String line = scanner.getInput().substring(1,nextLineBreak+1);
+
+                    if(line.length() <= indents) {
+                        indents = line.length();
+                    }
+
+                    isMatch = line.substring(0, indents).equals(indent) || !(line.trim().length() > 0);
                     if (isMatch) {
                         // consume test along with `\n` prefix if match
-                        this.consume(str.length() + 1);
+                        this.consume(line.length() + 1);
                         lineno++;
-                        tokens.add(str.substring(indentLength));
+                        tokens.add(line.substring(indents));
                     }
                 } while (scanner.getInput().length() > 0 && isMatch);
                 while (scanner.getInput().length() == 0 && tokens.get(tokens.size() - 1).equals(""))
@@ -1206,6 +1212,22 @@ public class Lexer {
             }
         }
         return null;
+    }
+
+    private int calculateIndents(Matcher matcher) {
+        int indents;
+        int groupLength = matcher.group(1).length();
+        int stackSize = this.indentStack.size();
+
+        if(indentType.equals("tabs")) {
+            indents = Math.min(stackSize + 1, groupLength);
+
+        } else if(groupLength > 1) {
+            indents = Math.min((stackSize +1) * 2,  groupLength);
+        } else {
+            indents = -1;    // invalid indentation
+        }
+        return indents;
     }
 
     private Token colon() {

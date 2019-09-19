@@ -6,6 +6,7 @@ import de.neuland.pug4j.model.PugModel;
 
 import javax.script.*;
 import java.util.*;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 
 /**
@@ -31,11 +32,13 @@ public class JsExpressionHandler implements ExpressionHandler {
             Bindings bindings = jsEngine.createBindings();
             bindings.putAll(model);
             Object eval;
-            if(expression.startsWith("{")){
-                eval = ((Map)jsEngine.eval("["+expression+"]", bindings)).get("0");
-            }else{
+            if(expression.startsWith("{")) {
+                eval = ((Map) jsEngine.eval("[" + expression + "]", bindings)).get("0");
+            } else {
                 eval = jsEngine.eval(expression, bindings);
+
             }
+
 
             for (Map.Entry<String, Object> stringObjectEntry : bindings.entrySet()) {
                 model.put(stringObjectEntry.getKey(), convertToPugModelValue(stringObjectEntry.getValue()));
@@ -43,81 +46,30 @@ public class JsExpressionHandler implements ExpressionHandler {
             return convertToPugModelValue(eval);
         }
         catch (ScriptException ex){
-//            return expression;
             throw new ExpressionException(expression, ex);
         }
     }
 
-//    public static Object[] toArray(ScriptObjectMirror scriptObjectMirror)
-//    {
-//        if (!scriptObjectMirror.isArray())
-//        {
-//            throw new IllegalArgumentException("ScriptObjectMirror is no array");
-//        }
-//
-//        if (scriptObjectMirror.isEmpty())
-//        {
-//            return new Object[0];
-//        }
-//
-//        Object[] array = new Object[scriptObjectMirror.size()];
-//
-//        int i = 0;
-//
-//        for (Map.Entry<String, Object> entry : scriptObjectMirror.entrySet())
-//        {
-//            Object result = entry.getValue();
-//
-//            System.err.println(result.getClass());
-//
-//            if (result instanceof ScriptObjectMirror && scriptObjectMirror.isArray())
-//            {
-//                array[i] = toArray((ScriptObjectMirror) result);
-//            }
-//            else
-//            {
-//                array[i] = result;
-//            }
-//
-//            i++;
-//        }
-//
-//        return array;
-//    }
-//    private static Object convert(final Object obj) {
-//        if (obj instanceof Bindings) {
-//            try {
-//                final Class<?> cls = Class.forName("jdk.nashorn.api.scripting.ScriptObjectMirror");
-//                if (cls.isAssignableFrom(obj.getClass())) {
-//                    final Method isArray = cls.getMethod("isArray");
-//                    final Object result = isArray.invoke(obj);
-//                    if (result != null && result.equals(true)) {
-//                        final Method values = cls.getMethod("values");
-//                        final Object vals = values.invoke(obj);
-//                        if (vals instanceof Collection<?>) {
-//                            final Collection<?> coll = (Collection<?>) vals;
-//                            return toArray((ScriptObjectMirror) obj);
-//                        }
-//                    }
-//                }
-//            } catch(ClassNotFoundException | NoSuchMethodException | SecurityException
-//                    | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-//
-//            }
-//        }
-//        if (obj instanceof List<?>) {
-//            final List<?> list = (List<?>) obj;
-//            return list.toArray(new Object[0]);
-//        }
-//        return obj;
-//    }
     private Object convertToPugModelValue(Object eval) {
+        if(eval == null) {
+            return null;
+        }
+
         if(eval instanceof Double){
             String s = String.valueOf(eval);
             if(s.endsWith(".0")){
                 return Integer.valueOf(s.substring(0,s.length()-2));
             }
         }
+
+        if(eval instanceof ScriptObjectMirror) {
+            ScriptObjectMirror mirror = (ScriptObjectMirror) eval;
+
+            if(mirror.isArray()) {
+                return toArray(mirror);
+            }
+        }
+
 //        eval = convert(eval);
         //        if(eval instanceof NativeArray){
 //            NativeArray n = (NativeArray) eval;
@@ -126,6 +78,32 @@ public class JsExpressionHandler implements ExpressionHandler {
 //            }
 //        }
         return eval;
+    }
+
+    private Object toArray(ScriptObjectMirror mirror) {
+        Object[] array = new Object[mirror.size()];
+
+        if(mirror.isEmpty()) {
+            return array;
+        }
+
+        boolean multiDimensional = false;
+        if(mirror.get("0") instanceof ScriptObjectMirror) {
+            ScriptObjectMirror innerMirror = (ScriptObjectMirror) mirror.get("0");
+            if(innerMirror.isArray()) {
+                multiDimensional = true;
+            }
+        }
+
+        for (int i = 0; i < mirror.size(); i++) {
+            Object value = mirror.get(i + "");
+            if(multiDimensional) {
+                array[i] = toArray((ScriptObjectMirror) value);
+            } else {
+                array[i] = value;
+            }
+        }
+        return array;
     }
 
     @Override
