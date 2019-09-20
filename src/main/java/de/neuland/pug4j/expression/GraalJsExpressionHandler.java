@@ -1,9 +1,11 @@
 package de.neuland.pug4j.expression;
 
+import de.neuland.pug4j.AbstractExpressionHandler;
 import de.neuland.pug4j.exceptions.ExpressionException;
 import de.neuland.pug4j.expression.ExpressionHandler;
 import de.neuland.pug4j.model.PugModel;
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
 
 import javax.script.*;
@@ -13,9 +15,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public class GraalJsExpressionHandler implements ExpressionHandler {
+public class GraalJsExpressionHandler extends AbstractExpressionHandler {
     JexlExpressionHandler jexlExpressionHandler = new JexlExpressionHandler();
-    Context jsContext = Context.create("js");
+    Context jsContext = Context.newBuilder("js").allowHostAccess(HostAccess.ALL)
+            .allowHostClassLookup(s -> true).build();
 
     @Override
     public Boolean evaluateBooleanExpression(String expression, PugModel model) throws ExpressionException {
@@ -25,10 +28,13 @@ public class GraalJsExpressionHandler implements ExpressionHandler {
     @Override
     public Object evaluateExpression(String expression, PugModel model) throws ExpressionException {
         try{
-
+            saveNonLocalVarAssignmentInModel(expression, model);
             Value jsContextBindings = jsContext.getBindings("js");
             for (Map.Entry<String, Object> objectEntry : model.entrySet()) {
-                jsContextBindings.putMember(objectEntry.getKey(),objectEntry.getValue());
+                String key = objectEntry.getKey();
+                if(!"locals".equals(key)&&!"nonLocalVars".equals(key)) {
+                    jsContextBindings.putMember(key, objectEntry.getValue());
+                }
             }
 
             Value eval;
@@ -42,10 +48,8 @@ public class GraalJsExpressionHandler implements ExpressionHandler {
 
             Set<String> memberKeys = jsContextBindings.getMemberKeys();
             for (String memberKey : memberKeys) {
-                if(!"locals".equals(memberKey)) {
-                    Value member = jsContextBindings.getMember(memberKey);
-                    model.put(memberKey, convertToPugModelValue(member));
-                }
+                Value member = jsContextBindings.getMember(memberKey);
+                model.put(memberKey, convertToPugModelValue(member));
             }
             return convertToPugModelValue(eval);
         }

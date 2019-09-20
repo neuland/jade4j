@@ -11,12 +11,12 @@ import java.util.*;
 /**
  * Work In Progress - Using ScriptEngineManager
  */
-public class JsExpressionHandler implements ExpressionHandler {
+public class NashornExpressionHandler implements ExpressionHandler {
     JexlExpressionHandler jexlExpressionHandler = new JexlExpressionHandler();
     ScriptEngineManager mgr = new ScriptEngineManager();
-    ScriptEngine jsEngine = mgr.getEngineByName("JavaScript");
+    ScriptEngine jsEngine = mgr.getEngineByName("Nashorn");
 
-    public JsExpressionHandler() {
+    public NashornExpressionHandler() {
 
     }
 

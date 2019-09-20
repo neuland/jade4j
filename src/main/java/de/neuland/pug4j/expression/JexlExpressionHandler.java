@@ -1,5 +1,6 @@
 package de.neuland.pug4j.expression;
 
+import de.neuland.pug4j.AbstractExpressionHandler;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.internal.PugJexlEngine;
 import org.apache.commons.jexl3.JexlEngine;
@@ -16,14 +17,13 @@ import java.util.regex.Pattern;
 
 import static de.neuland.pug4j.model.PugModel.NON_LOCAL_VARS;
 
-public class JexlExpressionHandler implements ExpressionHandler {
+public class JexlExpressionHandler extends AbstractExpressionHandler {
 
 	private static final int MAX_ENTRIES = 5000;
 	public static Pattern plusplus = Pattern.compile("([a-zA-Z0-9-_]*[a-zA-Z0-9])\\+\\+\\s*;{0,1}\\s*$");
 	public static Pattern isplusplus = Pattern.compile("\\+\\+\\s*;{0,1}\\s*$");
 	public static Pattern minusminus = Pattern.compile("([a-zA-Z0-9-_]*[a-zA-Z0-9])--\\s*;{0,1}\\s*$");
 	public static Pattern isminusminus = Pattern.compile("--\\s*;{0,1}\\s*$");
-	public static Pattern isAssignment = Pattern.compile("^([a-zA-Z0-9-_]+)[\\s]?={1}[\\s]?[^=]+$");
 	private JexlEngine jexl;
 
 	public JexlExpressionHandler() {
@@ -51,23 +51,6 @@ public class JexlExpressionHandler implements ExpressionHandler {
 			return evaluate;
 		} catch (Exception e) {
 			throw new ExpressionException(expression, e);
-		}
-	}
-
-	private void saveNonLocalVarAssignmentInModel(String expression, PugModel model) {
-		if (expression.startsWith("var ")) {
-			return;
-		}
-		Matcher matcher = isAssignment.matcher(expression);
-		if (matcher.matches()) {
-			Set<String> nonLocalVars;
-			if (model.containsKey(NON_LOCAL_VARS)) {
-				nonLocalVars = (HashSet<String>) model.get(NON_LOCAL_VARS);
-			} else {
-				nonLocalVars = new HashSet<String>();
-				model.put(NON_LOCAL_VARS, nonLocalVars);
-			}
-			nonLocalVars.add(matcher.group(1));
 		}
 	}
 
