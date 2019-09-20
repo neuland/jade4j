@@ -1,5 +1,6 @@
 package de.neuland.pug4j.lexer;
 
+import de.neuland.pug4j.AttributeFinder;
 import de.neuland.pug4j.exceptions.ExpressionException;
 import de.neuland.pug4j.exceptions.PugLexerException;
 import de.neuland.pug4j.expression.ExpressionHandler;
@@ -920,6 +921,7 @@ public class Lexer {
 
     private Token attrs() {
         if ('(' == scanner.getInput().charAt(0)) {
+//            AttributeList tok = new AttributeFinder(scanner,lineno).find(); //TODO: Attribute Finder führt aktuell zur endlosschleife bei einigen tests.
             int index = this.bracketExpression().getEnd();
             String str = scanner.getInput().substring(1, index);
             AttributeList tok = new AttributeList(getLineno());
