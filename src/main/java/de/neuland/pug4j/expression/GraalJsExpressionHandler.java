@@ -68,10 +68,6 @@ public class GraalJsExpressionHandler implements ExpressionHandler {
         }
         if(eval.fitsInDouble() && !eval.fitsInInt()){
             return eval.asDouble();
-//            String s = String.valueOf(eval);
-//            if(s.endsWith(".0")){
-//                return Integer.valueOf(s.substring(0,s.length()-2));
-//            }
         }
         if(eval.isString()){
             return eval.asString();

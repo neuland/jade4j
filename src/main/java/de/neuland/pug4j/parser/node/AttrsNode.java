@@ -225,8 +225,23 @@ public abstract class AttrsNode extends Node {
             } else if (attributeValue instanceof ExpressionString) {
                 escaped = ((ExpressionString) attributeValue).isEscape();
                 Object expressionValue = evaluateExpression((ExpressionString) attributeValue, model,template.getExpressionHandler());
+
+                //List to String
+                if (expressionValue != null && expressionValue instanceof List){
+                    StringBuffer s = new StringBuffer("");
+                    List list = (List) expressionValue;
+
+                    boolean first = true;
+                    for (Object o : list) {
+                        if (!first)
+                            s.append(" ");
+                        s.append(o.toString());
+                        first = false;
+                    }
+                    value = s.toString();
+                }
                 //Array to String
-                if (expressionValue != null && expressionValue.getClass().isArray()) {
+                else if (expressionValue != null && expressionValue.getClass().isArray()) {
                     StringBuffer s = new StringBuffer("");
                     boolean first = true;
                     if (expressionValue instanceof int[]) {
