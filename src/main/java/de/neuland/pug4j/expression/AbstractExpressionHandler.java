@@ -1,4 +1,4 @@
-package de.neuland.pug4j;
+package de.neuland.pug4j.expression;
 
 import de.neuland.pug4j.expression.ExpressionHandler;
 import de.neuland.pug4j.model.PugModel;

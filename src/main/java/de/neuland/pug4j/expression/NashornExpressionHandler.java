@@ -12,7 +12,7 @@ import jdk.nashorn.api.scripting.ScriptObjectMirror;
 /**
  * Work In Progress - Using ScriptEngineManager
  */
-public class NashornExpressionHandler implements ExpressionHandler {
+public class NashornExpressionHandler extends AbstractExpressionHandler {
     JexlExpressionHandler jexlExpressionHandler = new JexlExpressionHandler();
     ScriptEngineManager mgr = new ScriptEngineManager();
     ScriptEngine jsEngine = mgr.getEngineByName("Nashorn");
@@ -29,6 +29,7 @@ public class NashornExpressionHandler implements ExpressionHandler {
     @Override
     public Object evaluateExpression(String expression, PugModel model) throws ExpressionException {
         try{
+            saveNonLocalVarAssignmentInModel(expression,model);
             Bindings bindings = jsEngine.createBindings();
             bindings.putAll(model);
             Object eval;
@@ -41,7 +42,10 @@ public class NashornExpressionHandler implements ExpressionHandler {
 
 
             for (Map.Entry<String, Object> stringObjectEntry : bindings.entrySet()) {
-                model.put(stringObjectEntry.getKey(), convertToPugModelValue(stringObjectEntry.getValue()));
+                String key = stringObjectEntry.getKey();
+                if(!"locals".equals(key)&&!"nonLocalVars".equals(key)) {
+                    model.put(key, convertToPugModelValue(stringObjectEntry.getValue()));
+                }
             }
             return convertToPugModelValue(eval);
         }

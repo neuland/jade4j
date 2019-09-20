@@ -1,6 +1,5 @@
 package de.neuland.pug4j.expression;
 
-import de.neuland.pug4j.AbstractExpressionHandler;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.internal.PugJexlEngine;
 import org.apache.commons.jexl3.JexlEngine;
@@ -9,13 +8,8 @@ import org.apache.commons.jexl3.MapContext;
 import de.neuland.pug4j.exceptions.ExpressionException;
 import de.neuland.pug4j.model.PugModel;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-
-import static de.neuland.pug4j.model.PugModel.NON_LOCAL_VARS;
 
 public class JexlExpressionHandler extends AbstractExpressionHandler {
 
