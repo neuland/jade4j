@@ -26,7 +26,7 @@ public class GraalJsExpressionHandler extends AbstractExpressionHandler {
     {
         HostAccess all = newBuilder().allowPublicAccess(true).allowAllImplementations(true).allowArrayAccess(true).allowListAccess(true).build();
         jsContext = Context.newBuilder("js").allowHostAccess(all).allowAllAccess(true).allowExperimentalOptions(true)
-                    .allowHostClassLookup(s -> true).allowPolyglotAccess(PolyglotAccess.ALL).option("js.ecmascript-version","9").build();
+                    .allowHostClassLookup(s -> true).allowPolyglotAccess(PolyglotAccess.ALL).build();
     }
 
     @Override
@@ -39,7 +39,6 @@ public class GraalJsExpressionHandler extends AbstractExpressionHandler {
         try{
             saveNonLocalVarAssignmentInModel(expression, model);
             Value jsContextBindings = jsContext.getBindings("js");
-
             for (Map.Entry<String, Object> objectEntry : model.entrySet()) {
                 String key = objectEntry.getKey();
                 if(!"locals".equals(key)&&!"nonLocalVars".equals(key)) {
