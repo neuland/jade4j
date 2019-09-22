@@ -6,19 +6,28 @@ import de.neuland.pug4j.expression.ExpressionHandler;
 import de.neuland.pug4j.model.PugModel;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.HostAccess;
+import org.graalvm.polyglot.PolyglotAccess;
 import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.proxy.Proxy;
+import org.graalvm.polyglot.proxy.ProxyArray;
+import org.graalvm.polyglot.proxy.ProxyObject;
 
-import javax.script.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import static org.graalvm.polyglot.HostAccess.newBuilder;
+
 public class GraalJsExpressionHandler extends AbstractExpressionHandler {
     JexlExpressionHandler jexlExpressionHandler = new JexlExpressionHandler();
-    Context jsContext = Context.newBuilder("js").allowHostAccess(HostAccess.ALL)
-            .allowHostClassLookup(s -> true).build();
+    Context jsContext;
+
+    {
+        HostAccess all = newBuilder().allowPublicAccess(true).allowAllImplementations(true).allowArrayAccess(true).allowListAccess(true).build();
+        jsContext = Context.newBuilder("js").allowHostAccess(all).allowAllAccess(true).allowExperimentalOptions(true)
+                    .allowHostClassLookup(s -> true).allowPolyglotAccess(PolyglotAccess.ALL).option("js.ecmascript-version","9").build();
+    }
 
     @Override
     public Boolean evaluateBooleanExpression(String expression, PugModel model) throws ExpressionException {
@@ -30,17 +39,23 @@ public class GraalJsExpressionHandler extends AbstractExpressionHandler {
         try{
             saveNonLocalVarAssignmentInModel(expression, model);
             Value jsContextBindings = jsContext.getBindings("js");
+
             for (Map.Entry<String, Object> objectEntry : model.entrySet()) {
                 String key = objectEntry.getKey();
                 if(!"locals".equals(key)&&!"nonLocalVars".equals(key)) {
-                    jsContextBindings.putMember(key, objectEntry.getValue());
+                    Object value = objectEntry.getValue();
+                    if(value instanceof Map)
+                        value = ProxyObject.fromMap((Map)value);
+                    if(value instanceof List)
+                        value = ProxyArray.fromList((List)value);
+                    jsContextBindings.putMember(key, value);
                 }
             }
 
             Value eval;
             if(expression.startsWith("{")){
-                eval = jsContext.eval("js", "["+expression+"];");
-                eval = jsContext.asValue(eval.as(List.class).get(0));
+                eval = jsContext.eval("js", "("+expression+");");
+                //eval = jsContext.asValue(eval.as(List.class).get(0));
             }else{
                 eval = jsContext.eval("js", expression);
             }

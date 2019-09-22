@@ -9,11 +9,11 @@ import java.util.HashMap;
 
 import de.neuland.pug4j.template.FileTemplateLoader;
 import org.apache.commons.io.FileUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.neuland.pug4j.Pug4J;
 import de.neuland.pug4j.TestFileHelper;
-
 public class PugExceptionTest {
 
 	@Test

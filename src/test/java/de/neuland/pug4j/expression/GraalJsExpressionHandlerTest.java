@@ -2,9 +2,13 @@ package de.neuland.pug4j.expression;
 
 import de.neuland.pug4j.exceptions.ExpressionException;
 import de.neuland.pug4j.model.PugModel;
+import org.graalvm.polyglot.proxy.ProxyArray;
+import org.graalvm.polyglot.proxy.ProxyObject;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,5 +101,23 @@ public class GraalJsExpressionHandlerTest {
         boolean what = (boolean) pugModel.get("what");
         assertTrue(what);
     }
+    @Test
+    public void testArray() throws ExpressionException  {
+        List o = (List) graalJsExpressionHandler.evaluateExpression("([])", pugModel);
+        assertTrue(o.isEmpty());
+    }
+    @Test
+    public void testArrayAccess() throws ExpressionException  {
+        HashMap<String, Object> product = new HashMap<>();
+        List images = new ArrayList();
+        images.add("Image 1");
+        images.add("Image 2");
+        product.put("images", images);
+        pugModel.put("product", product);
+        Object o = graalJsExpressionHandler.evaluateExpression("(product.images[0])", pugModel);
+
+        Object what = pugModel.get("x");
+    }
+
 
 }
