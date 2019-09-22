@@ -6,7 +6,6 @@ import de.neuland.pug4j.exceptions.PugCompilerException;
 import de.neuland.pug4j.exceptions.PugException;
 import de.neuland.pug4j.expression.ExpressionHandler;
 import de.neuland.pug4j.expression.GraalJsExpressionHandler;
-import de.neuland.pug4j.expression.JexlExpressionHandler;
 import de.neuland.pug4j.expression.NashornExpressionHandler;
 import de.neuland.pug4j.filter.CDATAFilter;
 import de.neuland.pug4j.filter.CssFilter;
