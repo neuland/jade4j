@@ -37,7 +37,7 @@ public class JadeConfigurationTest {
     @Test
     public void testConfigurationWithNonExistingBasePath() throws FileNotFoundException {
         try {
-            FileTemplateLoader fileTemplateLoader = new FileTemplateLoader(TestFileHelper.getRootResourcePath() + "/parser/", "UTF-8");
+            FileTemplateLoader fileTemplateLoader = new FileTemplateLoader(TestFileHelper.getRootResourcePath() + "/does/not/exist", "UTF-8");
             JadeConfiguration config = new JadeConfiguration();
             config.setTemplateLoader(fileTemplateLoader);
             fail("Expected IllegalArgumentException");
