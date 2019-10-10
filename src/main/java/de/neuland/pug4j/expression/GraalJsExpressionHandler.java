@@ -4,10 +4,7 @@ import de.neuland.pug4j.AbstractExpressionHandler;
 import de.neuland.pug4j.exceptions.ExpressionException;
 import de.neuland.pug4j.expression.ExpressionHandler;
 import de.neuland.pug4j.model.PugModel;
-import org.graalvm.polyglot.Context;
-import org.graalvm.polyglot.HostAccess;
-import org.graalvm.polyglot.PolyglotAccess;
-import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.*;
 import org.graalvm.polyglot.proxy.Proxy;
 import org.graalvm.polyglot.proxy.ProxyArray;
 import org.graalvm.polyglot.proxy.ProxyObject;
@@ -52,12 +49,13 @@ public class GraalJsExpressionHandler extends AbstractExpressionHandler {
             }
 
             Value eval;
+            Source js;
             if(expression.startsWith("{")){
-                eval = jsContext.eval("js", "("+expression+");");
-                //eval = jsContext.asValue(eval.as(List.class).get(0));
+                 js = Source.create("js", "(" + expression + ")");
             }else{
-                eval = jsContext.eval("js", expression);
+                 js = Source.create("js", expression);
             }
+            eval = jsContext.eval(js);
 
 
             Set<String> memberKeys = jsContextBindings.getMemberKeys();
