@@ -39,8 +39,10 @@ public class OriginalJade20150927Test {
 
     @Test
     public void shouldCompileJadeToHtml() throws Exception {
-        JadeConfiguration jade = new JadeConfiguration();
         String basePath = TestFileHelper.getOriginal20150515ResourcePath("");
+        JadeConfiguration jade = new JadeConfiguration();
+        FileTemplateLoader fileTemplateLoader = new FileTemplateLoader(basePath, "UTF-8");
+        jade.setTemplateLoader(fileTemplateLoader);
         jade.setMode(Jade4J.Mode.XHTML); // original jade uses xhtml by default
         jade.setFilter("plain", new PlainFilter());
         jade.setFilter("cdata", new CDATAFilter());

@@ -43,8 +43,8 @@ public class Lexer {
 
     public Lexer(String filename, TemplateLoader templateLoader,ExpressionHandler expressionHandler) throws IOException {
         this.expressionHandler = expressionHandler;
-        this.filename = ensureJadeExtension(filename);
         this.templateLoader = templateLoader;
+        this.filename = ensureJadeExtension(filename,templateLoader);
         Reader reader = templateLoader.getReader(this.filename);
         options = new LinkedList<String>();
         scanner = new Scanner(reader);
@@ -57,9 +57,8 @@ public class Lexer {
     }
     public Lexer(String input,String filename, TemplateLoader templateLoader,ExpressionHandler expressionHandler) throws IOException {
         this.expressionHandler = expressionHandler;
-        this.filename = ensureJadeExtension(filename);
         this.templateLoader = templateLoader;
-        Reader reader = templateLoader.getReader(this.filename);
+        this.filename = ensureJadeExtension(filename,templateLoader);
         options = new LinkedList<String>();
         scanner = new Scanner(input);
         deferredTokens = new LinkedList<Token>();
@@ -1217,9 +1216,9 @@ public class Lexer {
         return null;
     }
 
-    private String ensureJadeExtension(String templateName) {
+    private String ensureJadeExtension(String templateName,TemplateLoader templateLoader) {
         if ( StringUtils.isBlank(FilenameUtils.getExtension(templateName))) {
-            return templateName + ".jade";
+            return templateName + "." + templateLoader.getExtension();
         }
         return templateName;
     }

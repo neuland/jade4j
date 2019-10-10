@@ -45,7 +45,7 @@ public class CompilerTagErrorTest {
         try {
             FileTemplateLoader loader = new FileTemplateLoader(TestFileHelper.getCompilerErrorsResourcePath(""),
                     "UTF-8");
-            parser = new Parser(testName, "", loader, new JexlExpressionHandler());
+            parser = new Parser(testName, loader, new JexlExpressionHandler());
         } catch (IOException e) {
             e.printStackTrace();
         }

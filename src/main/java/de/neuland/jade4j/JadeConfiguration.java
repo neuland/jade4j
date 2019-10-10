@@ -17,7 +17,6 @@ import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.template.TemplateLoader;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -31,7 +30,6 @@ public class JadeConfiguration {
     private static final String FILTER_SCRIPT = "js";
 
     private boolean prettyPrint = false;
-    private String basePath = "";
     private boolean caching = true;
     private Mode mode = Jade4J.Mode.HTML;
 
@@ -105,7 +103,7 @@ public class JadeConfiguration {
     private JadeTemplate createTemplate(String name) throws JadeException, IOException {
         JadeTemplate template = new JadeTemplate();
 
-        Parser parser = new Parser(name, basePath, templateLoader, expressionHandler);
+        Parser parser = new Parser(name, templateLoader, expressionHandler);
         Node root = parser.parse();
         template.setTemplateLoader(templateLoader);
         template.setExpressionHandler(expressionHandler);
@@ -194,17 +192,22 @@ public class JadeConfiguration {
         expressionHandler.clearCache();
         cache.clear();
     }
-
+    /**
+     *
+     * Will be removed in 2.0.0
+     * @param basePath
+     */
+    @Deprecated
     public String getBasePath() {
-        return basePath;
+        return "";
     }
 
+    /**
+     * Deprecated: use folderPath on FileTemplateLoader to restrict Jade to a folder.
+     * Will be removed in 2.0.0
+     * @param basePath
+     */
+    @Deprecated
     public void setBasePath(String basePath) {
-        File file = new File(basePath);
-        if (!file.exists() || !file.isDirectory()) {
-            throw new IllegalArgumentException("The base path '" + basePath + "' does not exist");
-        }
-        this.basePath = file.getAbsolutePath() + File.separator;
-        this.templateLoader = new FileTemplateLoader(this.basePath, "UTF-8");
     }
 }

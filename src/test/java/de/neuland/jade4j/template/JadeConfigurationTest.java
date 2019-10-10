@@ -28,17 +28,18 @@ public class JadeConfigurationTest {
 
     @Test
     public void testGetTemplateWithBasepath() throws IOException {
+        FileTemplateLoader fileTemplateLoader = new FileTemplateLoader(TestFileHelper.getRootResourcePath() + "/parser/", "UTF-8");
         JadeConfiguration config = new JadeConfiguration();
-        config.setBasePath(TestFileHelper.getRootResourcePath() + "/parser/");
+        config.setTemplateLoader(fileTemplateLoader);
         JadeTemplate template = config.getTemplate("assignment");
         assertNotNull(template);
     }
-
     @Test
     public void testConfigurationWithNonExistingBasePath() throws FileNotFoundException {
-        JadeConfiguration config = new JadeConfiguration();
         try {
-            config.setBasePath(TestFileHelper.getRootResourcePath() + "/does/not/exist");
+            FileTemplateLoader fileTemplateLoader = new FileTemplateLoader(TestFileHelper.getRootResourcePath() + "/parser/", "UTF-8");
+            JadeConfiguration config = new JadeConfiguration();
+            config.setTemplateLoader(fileTemplateLoader);
             fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException ignored) {
 

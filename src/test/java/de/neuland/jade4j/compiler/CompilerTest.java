@@ -440,7 +440,7 @@ public class CompilerTest {
         try {
             FileTemplateLoader loader = new FileTemplateLoader(
                     TestFileHelper.getCompilerResourcePath(""), "UTF-8");
-            parser = new Parser(testName, "", loader, expressionHandler);
+            parser = new Parser(testName, loader, expressionHandler);
         } catch (IOException e) {
             e.printStackTrace();
         }

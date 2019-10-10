@@ -1,5 +1,8 @@
 package de.neuland.jade4j.template;
 
+import de.neuland.jade4j.exceptions.JadeTemplateLoaderException;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,14 +16,25 @@ public class FileTemplateLoader implements TemplateLoader {
 	private String extension = "jade";
 	
 	public FileTemplateLoader(String folderPath, String encoding) {
+		validateFolderPath(folderPath);
 		this.folderPath = folderPath;
 		this.encoding = encoding;
 	}
 
 	public FileTemplateLoader(String folderPath, String encoding, String extension) {
+		validateFolderPath(folderPath);
 		this.encoding = encoding;
 		this.folderPath = folderPath;
 		this.extension = extension;
+	}
+
+	private void validateFolderPath(String folderPath) {
+		if(StringUtils.isNotEmpty(folderPath)) {
+            File file = new File(folderPath);
+            if (!file.exists() || !file.isDirectory()) {
+                throw new IllegalArgumentException("The folder path '" + folderPath + "' does not exist");
+            }
+        }
 	}
 
 	public long getLastModified(String name) {
@@ -35,7 +49,9 @@ public class FileTemplateLoader implements TemplateLoader {
 	}
 
 	private File getFile(String name) {
-		// TODO Security
+		if(name.startsWith("../")){
+			throw new JadeTemplateLoaderException("relative Path is not allowed");
+		}
         return new File(folderPath + name);
 	}
 

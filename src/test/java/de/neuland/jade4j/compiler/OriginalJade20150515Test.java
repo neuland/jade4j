@@ -4,6 +4,7 @@ import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.TestFileHelper;
 import de.neuland.jade4j.filter.*;
+import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -37,8 +38,10 @@ public class OriginalJade20150515Test {
 
     @Test
     public void shouldCompileJadeToHtml() throws Exception {
-        JadeConfiguration jade = new JadeConfiguration();
         String basePath = TestFileHelper.getOriginal20150515ResourcePath("");
+        FileTemplateLoader fileTemplateLoader = new FileTemplateLoader(basePath, "UTF-8");
+        JadeConfiguration jade = new JadeConfiguration();
+        jade.setTemplateLoader(fileTemplateLoader);
         jade.setMode(Jade4J.Mode.XHTML); // original jade uses xhtml by default
         jade.setFilter("plain", new PlainFilter());
         jade.setFilter("cdata", new CDATAFilter());
@@ -47,7 +50,6 @@ public class OriginalJade20150515Test {
         jade.setFilter("verbatim", new VerbatimFilter());
         jade.setFilter("js", new JsFilter());
         jade.setFilter("css", new CssFilter());
-        jade.setBasePath(basePath);
         jade.setPrettyPrint(true);
 
         JadeTemplate template = jade.getTemplate("/cases/" + file);
