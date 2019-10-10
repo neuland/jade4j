@@ -47,7 +47,6 @@ public class OriginalJade20150927Test {
         jade.setFilter("plain", new PlainFilter());
         jade.setFilter("cdata", new CDATAFilter());
         jade.setPrettyPrint(true);
-        jade.setBasePath(basePath);
         JadeTemplate template = jade.getTemplate("/cases/" + file);
         Writer writer = new StringWriter();
         HashMap<String, Object> model = new HashMap<String, Object>();

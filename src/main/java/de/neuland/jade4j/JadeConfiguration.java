@@ -192,22 +192,4 @@ public class JadeConfiguration {
         expressionHandler.clearCache();
         cache.clear();
     }
-    /**
-     *
-     * Will be removed in 2.0.0
-     * @param basePath
-     */
-    @Deprecated
-    public String getBasePath() {
-        return "";
-    }
-
-    /**
-     * Deprecated: use folderPath on FileTemplateLoader to restrict Jade to a folder.
-     * Will be removed in 2.0.0
-     * @param basePath
-     */
-    @Deprecated
-    public void setBasePath(String basePath) {
-    }
 }

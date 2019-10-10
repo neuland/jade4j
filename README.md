@@ -19,7 +19,7 @@ jade4j's intention is to be able to process jade templates in Java without the n
 - [Expressions](#expressions)
 - [Reserved Words](#reserved-words)
 - [Framework Integrations](#framework-integrations)
-- [Breaking Changes in 1.0.0](#breaking-changes)
+- [Breaking Changes](#breaking-changes)
 - [Authors](#authors)
 - [License](#license)
 
@@ -92,7 +92,7 @@ Just add following dependency definitions to your `pom.xml`.
 <dependency>
   <groupId>de.neuland-bfi</groupId>
   <artifactId>jade4j</artifactId>
-  <version>1.2.7</version>
+  <version>1.3.0</version>
 </dependency>
 ```
 
@@ -111,7 +111,7 @@ cd jade4j
 mvn install
 ```
 
-... and use the `jade4j-0.x.x.jar` located in your target directory.
+... and use the `jade4j-1.x.x.jar` located in your target directory.
 
 <a name="simple-api"></a>
 ## Simple static API
@@ -300,16 +300,22 @@ You can read more about this in the [JEXL documentation](http://commons.apache.o
 - [vertx-web](http://vertx.io/docs/vertx-web/js/#_jade_template_engine) jade4j for [Vert.X](http://vertx.io/)
 
 <a name="breaking-changes"></a>
-## Breaking Changes in 1.0.0
+## Breaking Changes
+
+### 1.3.0
+- setBasePath has been removed from JadeConfiguration. Set folderPath on FileTemplateLoader instead.
+- Scoping of variables in loops changed, so its more in line with jade. This could break your template.
+
+### 1.2.0
+- Breaking change in filter interface: if you use filters outside of the project, they need to be adapted to new interface
+
+### 1.0.0
 In Version 1.0.0 we added a lot of features of JadeJs 1.11. There are also some Breaking Changes:
 - Instead of 'id = 5' you must use '- var id = 5'
 - Instead of 'h1(attributes, class = "test")' you must use 'h1(class= "test")&attributes(attributes)'
 - Instead of '!!! 5' you must use 'doctype html'
 - Jade Syntax for Conditional Comments is not supported anymore
 - Thanks to rzara for contributing to issue-108
-
-## Breaking Changes in 1.2.0
-- Breaking change in filter interface: if you use filters outside of the project, they need to be adapted to new interface
 
 <a name="authors"></a>
 ## Authors
@@ -326,7 +332,7 @@ Special thanks to [TJ Holowaychuk](https://github.com/visionmedia) the creator o
 
 The MIT License
 
-Copyright (C) 2011-2016 [neuland Büro für Informatik](http://www.neuland-bfi.de/), Bremen, Germany
+Copyright (C) 2011-2019 [neuland Büro für Informatik](http://www.neuland-bfi.de/), Bremen, Germany
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
