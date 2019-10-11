@@ -11,14 +11,12 @@ import static de.neuland.pug4j.AttributeFinder.State.DOUBLE_QUOTED;
 import static de.neuland.pug4j.AttributeFinder.State.EDGY_BRACES;
 import static de.neuland.pug4j.AttributeFinder.State.EQUALS;
 import static de.neuland.pug4j.AttributeFinder.State.KEY;
+import static de.neuland.pug4j.AttributeFinder.State.LITERAL;
 import static de.neuland.pug4j.AttributeFinder.State.NORMAL_BRACES;
 import static de.neuland.pug4j.AttributeFinder.State.SINGLE_QUOTED;
 import static de.neuland.pug4j.AttributeFinder.State.VALUE;
-import static de.neuland.pug4j.AttributeFinder.State.LITERAL;
-
 
 public class AttributeFinder {
-
 
     enum State {
         KEY,
@@ -42,6 +40,7 @@ public class AttributeFinder {
     private final AttributeList token;
     private String key = "";
     private String value = "";
+    private boolean interpolated = false;
 
     public AttributeFinder(Scanner scanner, int lineNo) {
         this.scanner = scanner;
@@ -134,6 +133,9 @@ public class AttributeFinder {
                     break;
 
                 case ')':
+                    if (stack.isEmpty()) {
+                        return;
+                    }
                     handleClosingBraces(NORMAL_BRACES, last);
                     break;
                 case '}':
@@ -153,7 +155,7 @@ public class AttributeFinder {
     }
 
     private boolean isLiteral(char character) {
-        return CharUtils.isAsciiAlphanumeric(character) || character == '_';
+        return CharUtils.isAsciiAlphanumeric(character) || character == '_' || character == '.';
     }
 
     private boolean isQuote(char character, State last) {
@@ -178,7 +180,7 @@ public class AttributeFinder {
     }
 
     private void skipWhitespace() {
-        Matcher matcher = scanner.getMatcherForPattern(" *");
+        Matcher matcher = scanner.getMatcherForPattern("[ \n]*");
         if (matcher.find()) {
             scanner.consume(matcher.group(0).length());
         }
@@ -186,41 +188,48 @@ public class AttributeFinder {
 
 
     private void findKey() {
-        Matcher matcher = scanner.getMatcherForPattern("[\\w-_]+");
+        Matcher matcher = scanner.getMatcherForPattern("[\"']?[@:]?[\\w-_]+[\"']?");
         String scannedText = scanner.getInput();
 
         if (matcher.find() && scannedText.startsWith(matcher.group(0))) {       // TODO anderen weg finden?
             key = matcher.group(0);
             scanner.consume(key.length());
             stack.push(EQUALS);
+
+        } else {
+            skipWhitespace();
+            stack.push(KEY);
         }
     }
 
 
     private void handleEquals() {
-        Matcher matcher = scanner.getMatcherForPattern(" *= *");
+        Matcher matcher = scanner.getMatcherForPattern(" *!?= *");
         String scannedText = scanner.getInput();
 
         if (matcher.find(0) && scannedText.startsWith(matcher.group(0))) {       // TODO anderen weg finden?
             scanner.consume(matcher.group(0).length());
             stack.push(VALUE);
+
+            interpolated = matcher.group(0).contains("!");
         }
     }
 
     private void addAttribute() {
         if(value.isEmpty()) {
             token.addBooleanAttribute(key, true);
-        } else if(isDoubleQuotedValue()) {
-            token.addAttribute(key, value, false);
+        } else if(isQuotedValue()) {
+            token.addAttribute(key, value.substring(1, value.length() -1), !interpolated);
         } else {
             token.addExpressionAttribute(key, value, false);
         }
         key = "";
         value = "";
+        interpolated = false;
     }
 
-    private boolean isDoubleQuotedValue() {
-        return value.charAt(0) == '\"' && value.charAt(value.length() -1) == '\"';
+    private boolean isQuotedValue() {
+        return (value.charAt(0) == '\"' && value.charAt(value.length() -1) == '\"') || (value.charAt(0) == '\'' && value.charAt(value.length() -1) == '\'');
     }
 
 }
