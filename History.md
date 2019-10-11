@@ -5,9 +5,10 @@
 * Upgraded to jexl 3
 * Renaming to Pug4J
 
-## 1.2.8 / 2019-09-18
+## 1.3.0 / 2019-10-10
+* removed obsolete basePath handling. Basepath Should be configured in the FileTemplateLoader
+* made file extension configurable. removed last static jade extension check.
 * Fixed issue #172: json als mixin argument (quoted keys)
-* Fixed issue #170: Bug with configuring base path
 * Fixed issue #153: Variable assignments in for/each loops
 * Improvements to issue #150: Caused by: java.lang.RuntimeException this reader only responds to
 
