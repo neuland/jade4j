@@ -5,6 +5,7 @@ import de.neuland.pug4j.lexer.token.AttributeList;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import org.apache.commons.lang3.CharUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import static de.neuland.pug4j.AttributeFinder.State.CURLY_BRACES;
 import static de.neuland.pug4j.AttributeFinder.State.DOUBLE_QUOTED;
@@ -105,7 +106,6 @@ public class AttributeFinder {
         }
 
         if (!isQuote(character, last)) {
-
             if(isLiteral(character)) {
                 if(last != LITERAL) {
                     stack.push(LITERAL);
@@ -145,9 +145,13 @@ public class AttributeFinder {
                     handleClosingBraces(EDGY_BRACES, last);
                     break;
             }
+            if(character != ' ' && character != '\n' && character != '\t') {
+                value += character;
+            }
+        }else{
+            value += character;
         }
 
-        value += character;
         scanner.consume(1);
         if (!stack.isEmpty()) {
             stack.push(VALUE);
@@ -180,7 +184,7 @@ public class AttributeFinder {
     }
 
     private void skipWhitespace() {
-        Matcher matcher = scanner.getMatcherForPattern("[ \n]*");
+        Matcher matcher = scanner.getMatcherForPattern("[ \n\t]*");
         if (matcher.find()) {
             scanner.consume(matcher.group(0).length());
         }
@@ -188,12 +192,12 @@ public class AttributeFinder {
 
 
     private void findKey() {
-        Matcher matcher = scanner.getMatcherForPattern("[\"']?[@:]?[\\w-_]+[\"']?");
+        Matcher matcher = scanner.getMatcherForPattern("[\"']?([@:]?[\\w-_]+)[\"']?");
         String scannedText = scanner.getInput();
 
         if (matcher.find() && scannedText.startsWith(matcher.group(0))) {       // TODO anderen weg finden?
-            key = matcher.group(0);
-            scanner.consume(key.length());
+            key = matcher.group(1);
+            scanner.consume(matcher.group(0).length());
             stack.push(EQUALS);
 
         } else {
@@ -229,7 +233,7 @@ public class AttributeFinder {
     }
 
     private boolean isQuotedValue() {
-        return (value.charAt(0) == '\"' && value.charAt(value.length() -1) == '\"') || (value.charAt(0) == '\'' && value.charAt(value.length() -1) == '\'');
+        return (value.charAt(0) == '\"' && value.charAt(value.length() -1) == '\"') && StringUtils.countMatches(value,"\"")==2 || (value.charAt(0) == '\'' && value.charAt(value.length() -1) == '\'') && StringUtils.countMatches(value,"\'")==2;
     }
 
 }
