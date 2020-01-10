@@ -24,6 +24,7 @@ import java.util.HashMap;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
+@Ignore("Replaced By Pug2 Tests")
 public class OriginalJade20150515Test {
     private static String[] ignoredCases = new String[]{"attrs", "attrs.js", "code.conditionals", "code.iteration",
             "filters.coffeescript", "filters.less", "filters.markdown", "filters.stylus",
