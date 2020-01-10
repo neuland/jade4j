@@ -41,6 +41,7 @@ public class Lexer {
     private String indentType;
     private CharacterParser characterParser;
     private ExpressionHandler expressionHandler;
+    private boolean ternary=false;
 
     public Lexer(String filename, TemplateLoader templateLoader,ExpressionHandler expressionHandler) throws IOException {
         this.expressionHandler = expressionHandler;
@@ -851,10 +852,16 @@ public class Lexer {
                 if (str.charAt(i) == ' ' || str.charAt(i) == '\n') {
                     for (int x = i; x < str.length(); x++) {
                         if (str.charAt(x) != ' ' && str.charAt(x) != '\n') {
-                            if (characterParser.isPunctuator(str.charAt(x)) && str.charAt(x) != '"' && str.charAt(x) != '\'')
+                            if (characterParser.isPunctuator(str.charAt(x)) && str.charAt(x) != '"' && str.charAt(x) != '\''){
+                                if (str.charAt(x) == '?')
+                                    ternary = true;
+                                if (str.charAt(x) == ':' && !ternary)
+                                    return true;
                                 return false;
-                            else
+                            }else{
+                                ternary = false;
                                 return true;
+                            }
                         }
                     }
                 }
