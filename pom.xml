@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.neuland-bfi</groupId>
     <artifactId>jade4j</artifactId>
@@ -30,8 +31,8 @@
         <url>https://github.com/neuland/jade4j</url>
         <connection>scm:git:git://github.com/neuland/jade4j.git</connection>
         <developerConnection>scm:git:git@github.com:neuland/jade4j.git</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <developers>
         <developer>
@@ -54,10 +55,18 @@
             <url>https://github.com/chbloemer</url>
             <id>chbloemer</id>
         </developer>
+        <developer>
+            <name>Guilherme I F L Weizenmann</name>
+            <url>https://github.com/giflw</url>
+            <id>giflw</id>
+        </developer>
     </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.7</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
     </properties>
 
     <prerequisites>
@@ -92,8 +101,36 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>jade4j-proto</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>appassembler-maven-plugin</artifactId>
+                        <version>1.10</version>
+                        <configuration>
+                            <programs>
+                                <program>
+                                    <mainClass>de.neuland.jade4j.proto.Jade4JProto</mainClass>
+                                    <id>jade4j-proto</id>
+                                </program>
+                            </programs>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>assemble</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
-    
+
     <build>
         <pluginManagement>
             <plugins>
@@ -164,7 +201,9 @@
                     <execution>
                         <id>deploy</id>
                         <phase>deploy</phase>
-                        <goals><goal>deploy</goal></goals>
+                        <goals>
+                            <goal>deploy</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -218,11 +257,23 @@
             <version>1.4.2</version>
         </dependency>
         <dependency>
-          <groupId>com.vladsch.flexmark</groupId>
-          <artifactId>flexmark-all</artifactId>
-          <version>0.28.2</version>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-all</artifactId>
+            <version>0.28.2</version>
         </dependency>
-
+        <!-- Optionals for Proto -->
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.22</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.sparkjava</groupId>
+            <artifactId>spark-core</artifactId>
+            <version>1.1.1</version>
+            <optional>true</optional>
+        </dependency>
         <!-- Testing -->
         <dependency>
             <groupId>org.hamcrest</groupId>
