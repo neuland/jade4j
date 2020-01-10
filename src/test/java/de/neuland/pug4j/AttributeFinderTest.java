@@ -208,4 +208,18 @@ public class AttributeFinderTest {
         assertThat(attributes.get(2).getValue(), IsEqual.equalTo("foo"));
     }
 
+    @Test
+    public void testAttributesWithClass() {
+        List<Attribute> attributes = findAttributes("(class=\"ap-input--ok2\")");
+        assertThat(attributes.get(0).getName(), IsEqual.equalTo("class"));
+        assertThat(attributes.get(0).getValue(), IsEqual.equalTo("ap-input--ok2"));
+    }
+
+//    @Test
+//    public void testAttributesTernaryExpression() {
+//        List<Attribute> attributes = findAttributes("(class=error ? \"ap-input--error1\" : \"\")");
+//        assertThat(attributes.get(0).getName(), IsEqual.equalTo("class"));
+//        assertExpressionStringWithValue(attributes.get(0).getValue(), "error ? \"ap-input--error1\" : \"\")");
+//    }
+
 }
