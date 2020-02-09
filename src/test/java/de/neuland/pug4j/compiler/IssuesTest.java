@@ -17,8 +17,10 @@ import de.neuland.pug4j.template.PugTemplate;
 import de.neuland.pug4j.template.ReaderTemplateLoader;
 import de.neuland.pug4j.template.TemplateLoader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,6 +37,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class IssuesTest {
+    private static final Charset FILES_ENCODING = Charset.forName("UTF-8");
     private static String[] ignoredCases = new String[]{"131"};
 
     private String file;
@@ -66,9 +69,10 @@ public class IssuesTest {
             return;
         }
         String issuesResourcePath = TestFileHelper.getIssuesResourcePath("");
-        FileReader fileReader = new FileReader(issuesResourcePath + File.separator + file);
+        String pathToFile = issuesResourcePath + File.separator + file;
+        InputStreamReader reader = new InputStreamReader(new FileInputStream(pathToFile), FILES_ENCODING);
         String templateName = file;
-        ReaderTemplateLoader templateLoader = new ReaderTemplateLoader(fileReader, templateName);
+        ReaderTemplateLoader templateLoader = new ReaderTemplateLoader(reader, templateName);
 
         compareJade(templateLoader, templateName);
     }
