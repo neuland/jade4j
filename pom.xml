@@ -228,8 +228,8 @@
         </dependency>
         <dependency>
           <groupId>com.vladsch.flexmark</groupId>
-          <artifactId>flexmark-all</artifactId>
-          <version>0.50.40</version>
+          <artifactId>flexmark</artifactId>
+          <version>0.60.2</version>
         </dependency>
         <dependency>
             <groupId>org.graalvm.sdk</groupId>

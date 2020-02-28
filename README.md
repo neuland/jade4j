@@ -19,8 +19,8 @@ pug4j's intention is to be able to process jade templates in Java without the ne
 - [Expressions](#expressions)
 - [Reserved Words](#reserved-words)
 - [Framework Integrations](#framework-integrations)
-- [Breaking Changes in 2.0.0](#breaking-changes)
-- [Breaking Changes in 1.0.0](#breaking-changes)
+- [Breaking Changes in 2.0.0](#breaking-changes-2)
+- [Breaking Changes in 1.0.0](#breaking-changes-1)
 - [Authors](#authors)
 - [License](#license)
 
@@ -300,14 +300,25 @@ You can read more about this in the [JEXL documentation](http://commons.apache.o
 - [jooby-jade](https://github.com/jooby-project/jooby/tree/master/jooby-jade) jade4j for [Jooby](http://jooby.org).
 - [vertx-web](http://vertx.io/docs/vertx-web/js/#_jade_template_engine) jade4j for [Vert.X](http://vertx.io/)
 
-<a name="breaking-changes"></a>
+<a name="breaking-changes-2"></a>
 ## Breaking Changes in 2.0.0
 - Classes are renamed to pug4j.
 - Default file extension is now .pug
 - Compiler Level has been raised to Java 8+
 - Syntax has been adapted to the most current pug version. (2.0.4)
 
-## Breaking Changes in 1.0.0
+<a name="breaking-changes-1"></a>
+### Breaking Changes in 1.3.1
+- Fixed a mayor scoping bug in loops. Use this version and not 1.3.0
+
+### Breaking Changes in 1.3.0
+- setBasePath has been removed from JadeConfiguration. Set folderPath on FileTemplateLoader instead.
+- Scoping of variables in loops changed, so its more in line with jade. This could break your template.
+
+### Breaking Changes in 1.2.0
+- Breaking change in filter interface: if you use filters outside of the project, they need to be adapted to new interface
+
+### Breaking Changes in 1.0.0
 In Version 1.0.0 we added a lot of features of JadeJs 1.11. There are also some Breaking Changes:
 - Instead of 'id = 5' you must use '- var id = 5'
 - Instead of 'h1(attributes, class = "test")' you must use 'h1(class= "test")&attributes(attributes)'
@@ -315,8 +326,6 @@ In Version 1.0.0 we added a lot of features of JadeJs 1.11. There are also some 
 - Jade Syntax for Conditional Comments is not supported anymore
 - Thanks to rzara for contributing to issue-108
 
-## Breaking Changes in 1.2.0
-- Breaking change in filter interface: if you use filters outside of the project, they need to be adapted to new interface
 
 <a name="authors"></a>
 ## Authors
