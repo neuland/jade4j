@@ -1,6 +1,5 @@
 package de.neuland.pug4j.lexer;
 
-import de.neuland.pug4j.AttributeFinder;
 import de.neuland.pug4j.exceptions.ExpressionException;
 import de.neuland.pug4j.exceptions.PugLexerException;
 import de.neuland.pug4j.expression.ExpressionHandler;
@@ -311,7 +310,7 @@ public class Lexer {
         }
         return result;
     }
-    private String scan1(String regexp) {
+    private String scanEndOfLine(String regexp) {
         String result = null;
         Matcher matcher = scanner.getMatcherForPattern(regexp);
         if (matcher.find(0) && matcher.groupCount()>0) {
@@ -500,7 +499,7 @@ public class Lexer {
     }
 
     private Token filter() {
-        String val = scan1("^:([\\w\\-]+)");
+        String val = scanEndOfLine("^:([\\w\\-]+)");
         if (StringUtils.isNotBlank(val)) {
             this.pipeless = true;
             return new Filter(val, lineno);
@@ -530,7 +529,7 @@ public class Lexer {
     }
 
     private Token whileToken() {
-        String val = scan1("^while +([^\\n]+)");
+        String val = scanEndOfLine("^while +([^\\n]+)");
         if (StringUtils.isNotBlank(val)) {
             return new While(val, lineno);
         }
@@ -577,7 +576,7 @@ public class Lexer {
 //    },
 
     private Token doctype() {
-        String val = scan1("^!!! *([^\\n]+)?");
+        String val = scanEndOfLine("^!!! *([^\\n]+)?");
         if (StringUtils.isNotBlank(val)) {
             throw new PugLexerException("`!!!` is deprecated, you must now use `doctype`", filename, getLineno(), templateLoader);
         }
@@ -595,7 +594,7 @@ public class Lexer {
     }
 
     private Token id() {
-        String val = scan1("^#([\\w-]+)");
+        String val = scanEndOfLine("^#([\\w-]+)");
         if (StringUtils.isNotBlank(val)) {
             return new CssId(val, lineno);
         }
@@ -603,7 +602,7 @@ public class Lexer {
     }
 
     private Token className() {
-        String val = scan1("^\\.([\\w-]+)");
+        String val = scanEndOfLine("^\\.([\\w-]+)");
         if (StringUtils.isNotBlank(val)) {
             return new CssClass(val, lineno);
         }
@@ -615,11 +614,11 @@ public class Lexer {
 //          this.scan(/^(<[^\n]*)/, 'text');
 //      },
     private Token text() {
-        String val = scan1("^(?:\\| ?| )([^\\n]+)");
+        String val = scanEndOfLine("^(?:\\| ?| )([^\\n]+)");
         if (StringUtils.isEmpty(val)) {
-            val = scan1("^\\|?( )");
+            val = scanEndOfLine("^\\|?( )");
             if (StringUtils.isEmpty(val)) {
-                val = scan1("^(<[^\\n]*)");
+                val = scanEndOfLine("^(<[^\\n]*)");
             }
         }
         if (StringUtils.isNotEmpty(val)) {
@@ -628,7 +627,7 @@ public class Lexer {
         return null;
     }
     private Token textFail() {
-        String val = scan1("^([^\\.\\n][^\\n]+)");
+        String val = scanEndOfLine("^([^\\.\\n][^\\n]+)");
         if (StringUtils.isNotEmpty(val)) {
             return new Text(val, lineno);
         }
@@ -640,7 +639,7 @@ public class Lexer {
     }
 
     private Token extendsToken() {
-        String val = scan1("^extends? +([^\\n]+)");
+        String val = scanEndOfLine("^extends? +([^\\n]+)");
         if (StringUtils.isNotBlank(val)) {
             return new ExtendsToken(val, lineno);
         }
@@ -648,7 +647,7 @@ public class Lexer {
     }
 
     private Token prepend() {
-        String name = scan1("^prepend +([^\\n]+)");
+        String name = scanEndOfLine("^prepend +([^\\n]+)");
         if (StringUtils.isNotBlank(name)) {
             Block tok = new Block(name, lineno);
             tok.setMode("prepend");
@@ -658,7 +657,7 @@ public class Lexer {
     }
 
     private Token append() {
-        String name = scan1("^append +([^\\n]+)");
+        String name = scanEndOfLine("^append +([^\\n]+)");
         if (StringUtils.isNotBlank(name)) {
             Block tok = new Block(name, lineno);
             tok.setMode("append");
@@ -702,7 +701,7 @@ public class Lexer {
     }
 
     private Token include() {
-        String val = scan1("^include +([^\\n]+)");
+        String val = scanEndOfLine("^include +([^\\n]+)");
         if (StringUtils.isNotBlank(val)) {
             return new Include(val, lineno);
         }
@@ -734,7 +733,7 @@ public class Lexer {
     }
 
     private Token caseToken() {
-        String val = scan1("^case +([^\\n]+)");
+        String val = scanEndOfLine("^case +([^\\n]+)");
         if (StringUtils.isNotBlank(val)) {
             return new CaseToken(val, lineno);
         }
@@ -742,15 +741,34 @@ public class Lexer {
     }
 
     private Token when() {
-        String val = scan1("^when +([^:\\n]+)");
+        String val = scanEndOfLine("^when +([^:\\n]+)");
         if (StringUtils.isNotBlank(val)) {
-            return new When(val, lineno);
+            try {
+                CharacterParser.State parse = characterParser.parse(val);
+                while(parse.isNesting() || parse.isString()){
+                    Matcher matcher = scanner.getMatcherForPattern(":([^:\\n]+)");
+                    if(!matcher.find(0))
+                        break;
+
+                    val += matcher.group(0);
+                    consume(matcher.group(0).length());
+                    parse = characterParser.parse(val);
+                }
+                try {
+                    expressionHandler.assertExpression(val);
+                } catch (ExpressionException e) {
+                    throw new PugLexerException(e.getMessage(), filename, getLineno(), templateLoader);
+                }
+                return new When(val, lineno);
+            } catch (CharacterParser.SyntaxError syntaxError) {
+                throw new PugLexerException(syntaxError.getMessage(), filename, getLineno(), templateLoader);
+            }
         }
         return null;
     }
 
     private Token defaultToken() {
-        String val = scan1("^(default *)");
+        String val = scanEndOfLine("^(default *)");
         if (StringUtils.isNotBlank(val)) {
             return new Default(val, lineno);
         }
