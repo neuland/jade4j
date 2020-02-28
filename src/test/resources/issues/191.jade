@@ -1,0 +1,30 @@
+- var value = ""
+if true
+  - value = "Hallo"
+p=value
+
+- var x = "A"
+for a in ["B","C"]
+  - x = x + a
+p=x
+
+mixin test()
+  - var x = "0"
+  for f in ["A","B"]
+    - var g = x + f
+    for u in ["C","D"]
+      - g = g + u;
+      - x = x + g;
+    p=g
+  p=x
+  p=g
+
++test()
+
+- var p1 = "0"
+for x1 in ["A"]
+  for y1 in ["B"]
+    for z1 in ["C"]
+      - p1 = p1+ x1 + y1 + z1;
+p=p1
+

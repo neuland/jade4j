@@ -50,7 +50,7 @@ public class PugModel implements Map<String, Object> {
 			for (Iterator<Map<String, Object>> i = scopesIterator; i.hasNext();) {
 				Map<String, Object> scope = i.next();
 				for(String nonLocalVar : nonLocalVars) {
-					if (scope.containsKey(nonLocalVar)) {
+					if (scope.containsKey(nonLocalVar) && lastScope.containsKey(nonLocalVar)) {
 						scope.put(nonLocalVar, lastScope.get(nonLocalVar));
 						countFoundNonLocalVars++;
 					}
