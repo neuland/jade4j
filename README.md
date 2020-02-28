@@ -92,7 +92,7 @@ Just add following dependency definitions to your `pom.xml`.
 <dependency>
   <groupId>de.neuland-bfi</groupId>
   <artifactId>jade4j</artifactId>
-  <version>1.3.0</version>
+  <version>1.3.1</version>
 </dependency>
 ```
 
@@ -301,6 +301,9 @@ You can read more about this in the [JEXL documentation](http://commons.apache.o
 
 <a name="breaking-changes"></a>
 ## Breaking Changes
+
+### 1.3.1
+- Fixed a mayor scoping bug in loops. Use this version and not 1.3.0
 
 ### 1.3.0
 - setBasePath has been removed from JadeConfiguration. Set folderPath on FileTemplateLoader instead.
