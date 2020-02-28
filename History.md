@@ -5,6 +5,11 @@
 * Upgraded to jexl 3
 * Renaming to Pug4J
 
+## 1.3.1 / 2020-02-28
+* Fixed issue #191: Scoping Issue with nested loops
+* Fixed issue #187: maven pom flexmark-all is too much
+* Fixed issue #188: Unit tests failures on default Windows console
+
 ## 1.3.0 / 2019-10-10
 * removed obsolete basePath handling. Basepath Should be configured in the FileTemplateLoader
 * made file extension configurable. removed last static jade extension check.
