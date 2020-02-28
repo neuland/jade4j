@@ -62,8 +62,8 @@ public class JexlExpressionHandler implements ExpressionHandler {
 				nonLocalVars = (HashSet<String>) model.get(NON_LOCAL_VARS);
 			} else {
 				nonLocalVars = new HashSet<String>();
-				model.put(NON_LOCAL_VARS, nonLocalVars);
 			}
+			model.put(NON_LOCAL_VARS, nonLocalVars);
 			nonLocalVars.add(matcher.group(1));
 		}
 	}
