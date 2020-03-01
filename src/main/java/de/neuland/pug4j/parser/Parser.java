@@ -175,7 +175,7 @@ public class Parser {
         }
         node = new ExpressionNode();
         node.setValue(text);
-        node.setLineNumber(tok.getLineNumber());
+        node.setLineNumber(tok.getStartLineNumber());
         return node;
     }
 
@@ -187,14 +187,14 @@ public class Parser {
             BlockCommentNode node = new BlockCommentNode();
             node.setBlock(block);
             node.setBuffered(token.isBuffer());
-            node.setLineNumber(token.getLineNumber());
+            node.setLineNumber(token.getStartLineNumber());
             node.setFileName(filename);
             node.setValue(token.getValue());
             return node;
         } else {
             CommentNode node = new CommentNode();
             node.setBuffered(token.isBuffer());
-            node.setLineNumber(token.getLineNumber());
+            node.setLineNumber(token.getStartLineNumber());
             node.setFileName(filename);
             node.setValue(token.getValue());
             return node;
@@ -205,7 +205,7 @@ public class Parser {
         Mixin mixinToken = (Mixin) expect(Mixin.class);
         MixinNode node = new MixinNode();
         node.setName(mixinToken.getValue());
-        node.setLineNumber(mixinToken.getLineNumber());
+        node.setLineNumber(mixinToken.getStartLineNumber());
         node.setFileName(filename);
 
         if (StringUtils.isNotBlank(mixinToken.getArguments())) {
@@ -243,7 +243,7 @@ public class Parser {
         MixinNode mixin = new MixinNode();
         mixin.setBlock(new BlockNode());
         mixin.setName(callToken.getValue());
-        mixin.setLineNumber(callToken.getLineNumber());
+        mixin.setLineNumber(callToken.getStartLineNumber());
         mixin.setFileName(filename);
         mixin.setCall(true);
 
@@ -282,7 +282,7 @@ public class Parser {
             blockNode = block();
         } else {
             blockNode = new BlockNode();
-            blockNode.setLineNumber(block.getLineNumber());
+            blockNode.setLineNumber(block.getStartLineNumber());
             blockNode.setFileName(filename);
             LiteralNode node = new LiteralNode();
             node.setValue("");
@@ -474,7 +474,7 @@ public class Parser {
             Token token = expect(Colon.class);
             Colon colon = (Colon) token;
             BlockNode block = new BlockNode();
-            block.setLineNumber(colon.getLineNumber());
+            block.setLineNumber(colon.getStartLineNumber());
             block.setFileName(filename);
             block.getNodes().add(parseExpr());
             return block;
@@ -527,7 +527,7 @@ public class Parser {
             node.push(tokens[i]);
         }
         node.setValue(tok.getValue());
-        node.setLineNumber(tok.getLineNumber());
+        node.setLineNumber(tok.getStartLineNumber());
         node.setFileName(filename);
         return node;
     }
@@ -539,7 +539,7 @@ public class Parser {
         node.setValue(eachToken.getValue());
         node.setKey(eachToken.getKey());
         node.setCode(eachToken.getCode());
-        node.setLineNumber(eachToken.getLineNumber());
+        node.setLineNumber(eachToken.getStartLineNumber());
         node.setFileName(filename);
         node.setBlock(block());
         if (peek() instanceof Else) {
@@ -554,7 +554,7 @@ public class Parser {
         While whileToken = (While) token;
         WhileNode node = new WhileNode();
         node.setValue(whileToken.getValue());
-        node.setLineNumber(whileToken.getLineNumber());
+        node.setLineNumber(whileToken.getStartLineNumber());
         node.setFileName(filename);
         BlockNode block = block();
         if (block != null)
@@ -570,7 +570,7 @@ public class Parser {
         Node node = new AssigmentNode();
         node.setName(assignmentToken.getName());
         node.setValue(assignmentToken.getValue());
-        node.setLineNumber(assignmentToken.getLineNumber());
+        node.setLineNumber(assignmentToken.getStartLineNumber());
         node.setFileName(filename);
         return node;
     }
@@ -602,7 +602,7 @@ public class Parser {
                 continue;
             } else if (incomingToken instanceof AttributeList) {
                 if (seenAttrs) {
-                    throw new PugParserException(filename, line(), templateLoader, this.filename + ", line " + this.peek().getLineNumber() + ":\nYou should not have jade tags with multiple attributes.");
+                    throw new PugParserException(filename, line(), templateLoader, this.filename + ", line " + this.peek().getStartLineNumber() + ":\nYou should not have jade tags with multiple attributes.");
                     //console.warn(this.filename + ', line ' + this.peek().line + ':\nYou should not have jade tags with multiple attributes.');
                 }
                 seenAttrs = true;
@@ -640,7 +640,7 @@ public class Parser {
         } else if (peek() instanceof Colon) {
             Token next = advance();
             BlockNode block = new BlockNode();
-            block.setLineNumber(next.getLineNumber());
+            block.setLineNumber(next.getStartLineNumber());
             block.setFileName(filename);
             block.push(parseExpr());
             tagNode.setBlock(block);
@@ -763,26 +763,26 @@ public class Parser {
     private Node parseConditional() {
         If conditionalToken = (If) expect(If.class);
         ConditionalNode conditional = new ConditionalNode();
-        conditional.setLineNumber(conditionalToken.getLineNumber());
+        conditional.setLineNumber(conditionalToken.getStartLineNumber());
         conditional.setFileName(filename);
 
         List<IfConditionNode> conditions = conditional.getConditions();
 
-        IfConditionNode main = new IfConditionNode(conditionalToken.getValue(), conditionalToken.getLineNumber());
+        IfConditionNode main = new IfConditionNode(conditionalToken.getValue(), conditionalToken.getStartLineNumber());
         main.setInverse(conditionalToken.isInverseCondition());
         main.setBlock(block());
         conditions.add(main);
 
         while (peek() instanceof ElseIf) {
             ElseIf token = (ElseIf) expect(ElseIf.class);
-            IfConditionNode elseIf = new IfConditionNode(token.getValue(), token.getLineNumber());
+            IfConditionNode elseIf = new IfConditionNode(token.getValue(), token.getStartLineNumber());
             elseIf.setBlock(block());
             conditions.add(elseIf);
         }
 
         if (peek() instanceof Else) {
             Else token = (Else) expect(Else.class);
-            IfConditionNode elseNode = new IfConditionNode(null, token.getLineNumber());
+            IfConditionNode elseNode = new IfConditionNode(null, token.getStartLineNumber());
             elseNode.setDefault(true);
             elseNode.setBlock(block());
             conditions.add(elseNode);
@@ -892,7 +892,7 @@ public class Parser {
             token = expect(Default.class);
             node.setDefault(true);
         }
-        node.setLineNumber(token.getLineNumber());
+        node.setLineNumber(token.getStartLineNumber());
         node.setFileName(filename);
         node.setValue(token.getValue());
         node.setBlock(blockExpansion());
@@ -906,7 +906,7 @@ public class Parser {
         codeNode.setValue(expressionToken.getValue());
         codeNode.setBuffer(expressionToken.isBuffer());
         codeNode.setEscape(expressionToken.isEscape());
-        codeNode.setLineNumber(expressionToken.getLineNumber());
+        codeNode.setLineNumber(expressionToken.getStartLineNumber());
         codeNode.setFileName(filename);
         boolean block = false;
 //        int i = 1;

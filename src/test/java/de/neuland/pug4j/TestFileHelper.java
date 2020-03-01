@@ -29,10 +29,14 @@ public class TestFileHelper {
 		return getResourcePath("/");
 	}
 
-	public static String getLexerResourcePath(String fileName) throws FileNotFoundException {
-		return getResourcePath(TESTFILE_LEXER_FOLDER + fileName);
+	public static String getLexerResourcePath(String fileName) {
+		try {
+			return getResourcePath(TESTFILE_LEXER_FOLDER + fileName);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
-
     public static String getLexer_0_0_8_ResourcePath(String fileName) throws FileNotFoundException {
         return getResourcePath(TESTFILE_LEXER_0_0_8_FOLDER + fileName);
     }

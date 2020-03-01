@@ -88,12 +88,7 @@ public class OriginalJade20150515SingleTest {
 		return "";
 	}
 	private String getResourcePath(String filename) {
-		try {
-			return TestFileHelper.getLexerResourcePath(filename);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return null;
-		}
+		return TestFileHelper.getLexerResourcePath(filename);
 	}
 
 }

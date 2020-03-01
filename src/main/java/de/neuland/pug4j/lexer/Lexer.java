@@ -76,12 +76,12 @@ public class Lexer {
         	return token;
         }
 
-        if ((token = blank()) != null) {
-        	return token;
+        if (blank()) {
+        	return stashed();
         }
 
-        if ((token = eos()) != null) {
-           return token;
+        if (eos()) {
+           return stashed();
         }
         
         if ((token = pipelessText()) != null) {
@@ -366,28 +366,32 @@ public class Lexer {
 //        return this.next();
 //      }
 //    },
-    private Token blank(){
+    private boolean blank(){
         Matcher matcher = scanner.getMatcherForPattern("^\\n *\\n");
         if (matcher.find(0)) {
             consume(matcher.end()-1);
             ++this.lineno;
 
-            if(this.pipeless)
-                return new Text("",lineno);
-            return this.next();
+            if(this.pipeless) {
+                stash.push(new Text("", lineno));
+                return true;
+            }
+            stash.push(this.next());
+            return true;
         }
-        return null;
+        return false;
     }
-    private Token eos() {
+    private boolean eos() {
         if (scanner.getInput().length() > 0) {
-            return null;
+            return false;
         }
         if (indentStack.size() > 0) {
             indentStack.poll();
-            return new Outdent(lineno);
+            stash.push(new Outdent(lineno));
         } else {
-            return new Eos("eos", lineno);
+            stash.push(new Eos("eos", lineno));
         }
+        return true;
     }
 
     private Token comment() {
@@ -945,7 +949,7 @@ public class Lexer {
      */
 
     private Token attrs() {
-        if ('(' == scanner.getInput().charAt(0)) {
+        if (scanner.getInput().length()>0 && '(' == scanner.getInput().charAt(0)) {
 //            AttributeList tok = new AttributeFinder(scanner,lineno).find(); //TODO: Attribute Finder führt aktuell zur endlosschleife bei einigen tests.
             int index = this.bracketExpression().getEnd();
             String str = scanner.getInput().substring(1, index);

@@ -6,33 +6,122 @@ public abstract class Token {
 
 	private String value;
     private ArrayList<String> values;
-    private int lineNumber;
+    private int startLineNumber;
+    private int startColumn;
+    private int endLineNumber;
+    private int endColumn;
+    private String fileName;
     private boolean buffer = false;
     private String mode;
     private String name;
     private int indents;
     private boolean selfClosing = false;
-
-    public Token(String value, int lineNumber) {
-        this.value = value;
-        this.lineNumber = lineNumber;
+    private String type = this.getType();
+    public Token(){
     }
 
-    public Token(String value, int lineNumber, boolean buffer) {
+    public Token(String value){
         this.value = value;
-        this.lineNumber = lineNumber;
+    }
+    public Token(String value, boolean buffer){
+        this.value = value;
+        this.buffer = buffer;
+    }
+    public Token(String value, int startLineNumber) {
+        this.value = value;
+        this.startLineNumber = startLineNumber;
+    }
+
+    public Token(String value, int startLineNumber, int startColumn) {
+        this.value = value;
+        this.startLineNumber = startLineNumber;
+        this.startColumn = startColumn;
+    }
+
+    public Token(String value, int startLineNumber, boolean buffer) {
+        this.value = value;
+        this.startLineNumber = startLineNumber;
         this.buffer = buffer;
     }
 
+    public Token(String value, int startLineNumber, int startColumn, boolean buffer) {
+        this.value = value;
+        this.startLineNumber = startLineNumber;
+        this.startColumn = startColumn;
+        this.buffer = buffer;
+    }
+    public Token(String value, int startLineNumber, String filename) {
+        this.value = value;
+        this.startLineNumber = startLineNumber;
+        this.fileName = filename;
+    }
+
+    public Token(String value, int startLineNumber, int startColumn, String filename) {
+        this.value = value;
+        this.startLineNumber = startLineNumber;
+        this.startColumn = startColumn;
+        this.fileName = filename;
+    }
+
+    public Token(String value, int startLineNumber, String filename, boolean buffer) {
+        this.value = value;
+        this.startLineNumber = startLineNumber;
+        this.fileName = filename;
+        this.buffer = buffer;
+    }
+
+    public Token(String value, int startLineNumber, int startColumn, String filename, boolean buffer) {
+        this.value = value;
+        this.startLineNumber = startLineNumber;
+        this.startColumn = startColumn;
+        this.fileName = filename;
+        this.buffer = buffer;
+    }
 	public String getValue() {
 		return this.value;
 	}
 	
-	public int getLineNumber() {
-        return lineNumber;
+	public int getStartLineNumber() {
+        return startLineNumber;
     }
-	
-	public void setBuffer(boolean buffer) {
+
+    public void setStartLineNumber(int startLineNumber) {
+        this.startLineNumber = startLineNumber;
+    }
+
+    public int getStartColumn() {
+        return startColumn;
+    }
+
+    public void setStartColumn(int startColumn) {
+        this.startColumn = startColumn;
+    }
+
+    public int getEndLineNumber() {
+        return endLineNumber;
+    }
+
+    public void setEndLineNumber(int endLineNumber) {
+        this.endLineNumber = endLineNumber;
+    }
+
+    public int getEndColumn() {
+        return endColumn;
+    }
+
+    public void setEndColumn(int endColumn) {
+        this.endColumn = endColumn;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public void setBuffer(boolean buffer) {
         this.buffer = buffer;
     }
 	
@@ -87,5 +176,9 @@ public abstract class Token {
 
     public void setValues(ArrayList<String> values) {
         this.values = values;
+    }
+
+    public String getType(){
+        return this.getClass().getSimpleName();
     }
 }
