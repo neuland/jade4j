@@ -112,12 +112,12 @@ public class Lexer {
             return token;
         }
 
-        if ((token = when()) != null) {
-           return token;
+        if (when()) {
+           return stashed();
         }
         
-        if ((token = defaultToken()) != null) {
-            return token;
+        if (defaultToken()) {
+            return stashed();
         }
         
         if ((token = extendsToken()) != null) {
@@ -148,12 +148,12 @@ public class Lexer {
             return token;
         }
 
-        if ((token = mixin()) != null) {
-           return token;
+        if (mixin()) {
+           return stashed();
         }
         
-        if ((token = call()) != null) {
-           return token;
+        if (call()) {
+           return stashed();
         }
         
         if ((token = conditional()) != null) {
@@ -223,8 +223,8 @@ public class Lexer {
             return token;
         }
 
-        if ((token = dot()) != null) {
-            return token;
+        if (dot()) {
+            return stashed();
         }
 
         if ((token = assignment()) != null) {
@@ -844,7 +844,11 @@ public class Lexer {
         return null;
     }
 
-    private Token when() {
+    /**
+     * When.
+     * TODO: add error check
+     */
+    private boolean when() {
         String val = scan("^when +([^:\\n]+)");
         if (StringUtils.isNotBlank(val)) {
             try {
@@ -855,28 +859,39 @@ public class Lexer {
                         break;
 
                     val += matcher.group(0);
-                    consume(matcher.group(0).length());
+                    int increment = matcher.group(0).length();
+                    consume(increment);
+                    incrementColumn(increment);
                     parse = characterParser.parse(val);
                 }
+
+                incrementColumn(-val.length());
                 try {
                     expressionHandler.assertExpression(val);
                 } catch (ExpressionException e) {
                     throw new PugLexerException(e.getMessage(), filename, getLineno(), templateLoader);
                 }
-                return new When(val, lineno);
+                incrementColumn(val.length());
+                pushToken(new When(val, lineno));
+                return true;
             } catch (CharacterParser.SyntaxError syntaxError) {
                 throw new PugLexerException(syntaxError.getMessage(), filename, getLineno(), templateLoader);
             }
         }
-        return null;
+        return false;
     }
 
-    private Token defaultToken() {
+    /**
+     * Default.
+     * TODO: add error check
+     */
+    private boolean defaultToken() {
         String val = scan("^(default *)");
         if (StringUtils.isNotBlank(val)) {
-            return new Default(val, lineno);
+            pushToken(tok(new Default(val, lineno)));
+            return true;
         }
-        return null;
+        return false;
     }
 
     private Token assignment() {
@@ -892,53 +907,75 @@ public class Lexer {
         return null;
     }
 
-    private Token dot() {
+    /**
+     * Dot.
+     * Todo: add piplesstext
+     */
+
+    private boolean dot() {
         this.pipeless = true;
         Matcher matcher = scanner.getMatcherForPattern("^\\.");
         if (matcher.find(0)) {
-            Dot tok = new Dot(lineno);
+            Token tok = tok(new Dot(lineno));
             consume(matcher.end());
-            return tok;
+            pushToken(tokEnd(tok));
+            return true;
         }
-        return null;
+        return false;
     }
 
-    private Token mixin() {
+    /**
+     * Mixin. ok and done.
+     */
+
+    private boolean mixin() {
         Matcher matcher = scanner.getMatcherForPattern("^mixin +([-\\w]+)(?: *\\((.*)\\))? *");
         if (matcher.find(0) && matcher.groupCount() > 1) {
-            Mixin tok = new Mixin(matcher.group(1), lineno);
-            tok.setArguments(matcher.group(2));
             consume(matcher.end());
-            return tok;
+            Mixin tok = (Mixin) tok(new Mixin(matcher.group(1), lineno));
+            tok.setArguments(matcher.group(2));
+            incrementColumn(matcher.group(0).length());
+            pushToken(tokEnd(tok));
+            return true;
         }
-        return null;
+        return false;
     }
 
-    private Token call() {
+    /**
+     * Call mixin. ok and done.
+     */
+    private boolean call() {
         Call tok;
+        int increment;
         Matcher matcher = scanner.getMatcherForPattern("^\\+(\\s*)(([-\\w]+)|(#\\{))");
         if (matcher.find(0) && matcher.groupCount() > 3) {
             // try to consume simple or interpolated call
             if(matcher.group(3)!=null) {
                 // simple call
-                consume(matcher.end());
-                tok = new Call(matcher.group(3), lineno);
+                increment = matcher.end();
+                consume(increment);
+                tok = (Call) tok(new Call(matcher.group(3), lineno));
             }else{
                 // interpolated call
                 CharacterParser.Match match = this.bracketExpression(2 + matcher.group(1).length());
-                this.consume(match.getEnd() + 1);
+                increment = match.getEnd() + 1;
+                this.consume(increment);
                 try {
                     expressionHandler.assertExpression(match.getSrc());
                 } catch (ExpressionException e) {
-                    e.printStackTrace();
+                    throw new PugLexerException(e.getMessage(),this.filename,this.lineno,templateLoader);
                 }
-                tok = new Call("#{"+match.getSrc()+"}", lineno);
+                tok = (Call) tok(new Call("#{"+match.getSrc()+"}", lineno));
             }
+
+            incrementColumn(increment);
+
             matcher = scanner.getMatcherForPattern("^ *\\(");
             if (matcher.find(0)) {
                 CharacterParser.Match range = this.bracketExpression(matcher.group(0).length() - 1);
                 matcher = Pattern.compile("^\\s*[-\\w]+ *=").matcher(range.getSrc());
                 if (!matcher.find(0)) { // not attributes
+                    incrementColumn(1);
                     this.consume(range.getEnd() + 1);
                     tok.setArguments(range.getSrc());
                 }
@@ -948,11 +985,19 @@ public class Lexer {
                     } catch (ExpressionException e) {
                         e.printStackTrace();
                     }
+                    for (int i = 0; i< tok.getArguments().length();i++) {
+                        if(tok.getArguments().charAt(i) == '\n'){
+                            incrementLine(1);
+                        }else{
+                            incrementColumn(1);
+                        }
+                    }
                 }
             }
-            return tok;
+            pushToken(tokEnd(tok));
+            return true;
         }
-        return null;
+        return false;
     }
 
     public boolean isEndOfAttribute(int i, String str, String key, String val, Loc loc, CharacterParser.State state) {
@@ -1053,7 +1098,8 @@ public class Lexer {
 //            AttributeList tok = new AttributeFinder(scanner,lineno).find(); //TODO: Attribute Finder führt aktuell zur endlosschleife bei einigen tests.
             int index = this.bracketExpression().getEnd();
             String str = scanner.getInput().substring(1, index);
-            AttributeList tok = new AttributeList(getLineno());
+            AttributeList tok = new AttributeList();
+            tok(tok);
 
             assertNestingCorrect(str);
 
@@ -1147,7 +1193,7 @@ public class Lexer {
                 tok.setSelfClosing(true);
             }
 
-            return tok;
+            return tokEnd(tok);
         }
         return null;
     }
@@ -1167,10 +1213,16 @@ public class Lexer {
     private Token attributesBlock() {
         Matcher matcher = scanner.getMatcherForPattern("^&attributes\\b");
         if (matcher.find(0) && matcher.group(0) != null) {
-            this.scanner.consume(11);
+            int consumed = 11;
+            this.scanner.consume(consumed);
+            Token attributesBlock = tok(new AttributesBlock());
+            incrementColumn(consumed);
             CharacterParser.Match match = this.bracketExpression();
-            this.scanner.consume(match.getEnd()+1);
-            return new AttributesBlock(match.getSrc(),lineno);
+            consumed = match.getEnd() + 1;
+            this.scanner.consume(consumed);
+            attributesBlock.setValue(match.getSrc());
+            incrementColumn(consumed);
+            return tokEnd(attributesBlock);
         }
         return null;
     }
@@ -1257,27 +1309,39 @@ public class Lexer {
             // blank line
             if (scanner.isBlankLine()) {
                 this.pipeless = false;
-                return new Newline(lineno);
+                this.interpolationAllowed = true;
+                return tokEnd(tok(new Newline()));
             }
 
             // outdent
             if (indentStack.size() > 0 && indents < indentStack.get(0)) {
                 while (indentStack.size() > 0 && indentStack.get(0) > indents) {
-                    stash.add(new Outdent(lineno));
+                    this.colno = 1;
+                    Token token = tok(new Outdent());
+                    this.colno = indentStack.get(0) + 1;
+                    pushToken(tokEnd(token));
                     indentStack.poll();
                 }
                 tok = this.stash.pollLast();
                 // indent
             } else if (indents > 0 && (indentStack.size() == 0 || indents != indentStack.get(0))) {
+                tok = tok(new Indent(String.valueOf(indents), lineno));
+                this.colno = 1 + indents;
                 indentStack.push(indents);
-                tok = new Indent(String.valueOf(indents), lineno);
                 tok.setIndents(indents);
                 // newline
             } else {
-                tok = new Newline(lineno);
+                tok = tok(new Newline());
+                Integer indentStack0 = 0;
+                if(indentStack.size()>0) {
+                    indentStack0 = indentStack.get(0);
+                }
+                if(indentStack0==null)
+                    indentStack0 = 0;
+                this.colno = 1 + Math.min(indentStack0,indents);
             }
             this.pipeless = false;
-            return tok;
+            return tokEnd(tok);
         }
         return null;
     }
@@ -1371,9 +1435,9 @@ public class Lexer {
                 } while (scanner.getInput().length() > 0 && isMatch);
                 while (scanner.getInput().length() == 0 && tokens.get(tokens.size() - 1).equals(""))
                     tokens.remove(tokens.size() - 1);
-                PipelessText pipelessText = new PipelessText(lineno);
+                PipelessText pipelessText = new PipelessText();
                 pipelessText.setValues(tokens);
-                return pipelessText;
+                return tok(pipelessText);
             }
         }
         return null;
@@ -1405,15 +1469,15 @@ public class Lexer {
     private Token slash() {
         String val = scan("^\\/");
         if (StringUtils.isNotBlank(val)) {
-            return new Slash(lineno,colno);
+            return tokEnd(new Slash());
         }
         return null;
     }
 
     private Token colon() {
-        String val = scanOld("^: *");
+        String val = scanOld("^: +");
         if (StringUtils.isNotBlank(val)) {
-            return new Colon(lineno);
+            return tokEnd(new Colon());
         }
         return null;
     }

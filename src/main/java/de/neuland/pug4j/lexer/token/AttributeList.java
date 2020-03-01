@@ -9,6 +9,9 @@ public class AttributeList extends Token {
 	private LinkedList<Attribute> attributes = new LinkedList<Attribute>();
 //	private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
 
+	public AttributeList() {
+	}
+
 	public AttributeList(int lineNumber) {
 		super(null, lineNumber);
 	}
