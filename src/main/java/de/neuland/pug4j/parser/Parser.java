@@ -466,7 +466,7 @@ public class Parser {
         tagNode.setFileName(filename);
         tagNode.setName(name);
         tagNode.setBuffer(true);
-        return this.tag(tagNode);
+        return this.tag(tagNode,true);
     }
 
     private Node blockExpansion() {
@@ -584,10 +584,13 @@ public class Parser {
         tagNode.setName(name);
         tagNode.setValue(name);
         tagNode.setSelfClosing(token.isSelfClosing());
-        return this.tag(tagNode);
+        return this.tag(tagNode,true);
+    }
+    private Node tag(AttrsNode tagNode) {
+        return tag(tagNode,false);
     }
 
-    private Node tag(AttrsNode tagNode) {
+    private Node tag(AttrsNode tagNode,boolean selfClosingAllowed) {
         // ast-filter look-ahead
         boolean seenAttrs = false;
         while (true) {
@@ -661,6 +664,11 @@ public class Parser {
 //                tagNode.setBlock(new BlockNode());
             for (int i = 0, len = block.getNodes().size(); i < len; ++i) {
                 tagNode.getBlock().push(block.getNodes().get(i));
+            }
+        }else if(peek() instanceof Slash){
+            if(selfClosingAllowed){
+                this.advance();
+                tagNode.setSelfClosing(true);
             }
         }
 //        else{

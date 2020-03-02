@@ -34,6 +34,8 @@ public class Lexer {
     public static final Pattern PATTERN_TEXT_2 = Pattern.compile("^( )");
     public static final Pattern PATTERN_TEXT_3 = Pattern.compile("^\\|( ?)");
     public static final Pattern PATTERN_FILTER = Pattern.compile("^:([\\w\\-]+)");
+    public static final Pattern PATTERN_COLON = Pattern.compile("^: +");
+    public static final Pattern PATTERN_SLASH = Pattern.compile("^\\/");
     @SuppressWarnings("unused")
     private LinkedList<String> options;
     Scanner scanner;
@@ -179,8 +181,8 @@ public class Lexer {
             return token;
         }
         
-        if ((token = tag()) != null) {
-            return token;
+        if (tag()) {
+            return stashed();
         }
 
         if (filter()) {
@@ -230,8 +232,8 @@ public class Lexer {
             return token;
         }
 
-        if ((token = colon()) != null) {
-            return token;
+        if (colon()) {
+            return stashed();
         }
 
         if (dot()) {
@@ -240,6 +242,10 @@ public class Lexer {
 
         if ((token = assignment()) != null) {
             return token;
+        }
+
+        if (slash()) {
+            return stashed();
         }
 
         if ((token = textFail()) != null) {
@@ -326,17 +332,6 @@ public class Lexer {
         return t != null ? t : next();
     }
 
-    // TODO: use multiscan?!
-    private String scanOld(String regexp) {
-        String result = null;
-        Matcher matcher = scanner.getMatcherForPattern(regexp);
-        if (matcher.find(0) && matcher.group(0)!=null) {
-            int end = matcher.end();
-            consume(end);
-            return matcher.group(0);
-        }
-        return result;
-    }
     private String scan(String regexp) {
         String result = null;
         Matcher matcher = scanner.getMatcherForPattern(regexp);
@@ -353,9 +348,11 @@ public class Lexer {
 
     private Token scan(Pattern pattern,Token token) {
         Matcher matcher = scanner.getMatcherForPattern(pattern);
-        if (matcher.find(0) && matcher.groupCount()>0) {
+        if (matcher.find(0)) {
             int end = matcher.end();
-            String val = matcher.group(1);
+            String val = null;
+            if(matcher.groupCount()>0)
+                val = matcher.group(1);
             int diff = end - (val!=null ? val.length() : 0);
             token = tok(token);
             token.setValue(val);
@@ -620,8 +617,20 @@ public class Lexer {
     // return tok;
     // }
     // },
-
-    private Token tag() {
+    private boolean tag() {
+        Matcher matcher = scanner.getMatcherForPattern(Pattern.compile("^(\\w(?:[-:\\w]*\\w)?)"));
+        if(matcher.find(0) && matcher.groupCount() > 0){
+            String name = matcher.group(1);
+            int length = matcher.group(0).length();
+            consume(length);
+            Token token = tok(new Tag(name));
+            incrementColumn(length);
+            pushToken(tokEnd(token));
+            return true;
+        }
+        return false;
+    }
+    private boolean tagOld() {
         Matcher matcher = scanner.getMatcherForPattern(Pattern.compile("^(\\w[-:\\w]*)(\\/?)"));
         if (matcher.find(0) && matcher.groupCount() > 1) {
             consume(matcher.end());
@@ -639,9 +648,10 @@ public class Lexer {
             if (!matcher.group(2).isEmpty()) {
                 tok.setSelfClosing(true);
             }
-            return tok;
+            pushToken(tokEnd(tok));
+            return true;
         }
-        return null;
+        return false;
     }
 
     private boolean yield() {
@@ -1592,28 +1602,23 @@ public class Lexer {
         }
         return indents;
     }
-//    slash: function() {
-//        var tok = this.scan(/^\//, 'slash');
-//        if (tok) {
-//            this.tokens.push(this.tokEnd(tok));
-//            return true;
-//        }
-//    },
 
-    private Token slash() {
-        String val = scan("^\\/");
-        if (StringUtils.isNotBlank(val)) {
-            return tokEnd(new Slash());
+    private boolean slash() {
+        Token token = scan(PATTERN_SLASH,new Slash());
+        if (token != null) {
+            pushToken(tokEnd(token));
+            return true;
         }
-        return null;
+        return false;
     }
 
-    private Token colon() {
-        String val = scanOld("^: +");
-        if (StringUtils.isNotBlank(val)) {
-            return tokEnd(new Colon());
+    private boolean colon() {
+        Token token = scan(PATTERN_COLON,new Colon());
+        if (token != null) {
+            pushToken(tokEnd(token));
+            return true;
         }
-        return null;
+        return false;
     }
 
     private String ensurePugExtension(String templateName) {

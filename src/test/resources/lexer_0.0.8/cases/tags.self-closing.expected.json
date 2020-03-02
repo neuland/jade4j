@@ -6,7 +6,8 @@
 {"type":"tag","line":4,"val":"foo","selfClosing":false}
 {"type":"attrs","line":4,"attrs":[{"name":"bar","val":"'baz'","escaped":true}]}
 {"type":"newline","line":5}
-{"type":"tag","line":5,"val":"foo","selfClosing":true}
+{"type":"tag","line":5,"val":"foo","selfClosing":false}
+{"type":"slash","line":5}
 {"type":"newline","line":6}
 {"type":"tag","line":6,"val":"foo","selfClosing":false}
 {"type":"attrs","line":6,"attrs":[{"name":"bar","val":"'baz'","escaped":true}],"selfClosing":true}
