@@ -367,7 +367,7 @@ public class Lexer {
 
     private Token scanEndOfLine(String regexp, Token token) {
         Matcher matcher = scanner.getMatcherForPattern(regexp);
-        if (matcher.find(0) && matcher.groupCount() > 0) {
+        if (matcher.find(0)) {
             int whitespaceLength = 0;
             Pattern pattern = Pattern.compile("^([ ]+)([^ ]*)");
             Matcher whitespace = pattern.matcher(matcher.group(0));
@@ -380,18 +380,27 @@ public class Lexer {
             if(newInput.charAt(0) == ':'){
                 scanner.consume(matcher.group(0).length());
                 token = tok(token);
-                token.setValue(matcher.group(1));
+                if(matcher.groupCount()>0) {
+                    token.setValue(matcher.group(1));
+                }
                 incrementColumn(matcher.group(0).length() - whitespaceLength);
                 return token;
             }
 
             Pattern pattern2 = Pattern.compile("^[ \\t]*(\\n|$)");
             Matcher matcher1 = pattern2.matcher(newInput);
-            if(matcher1.matches()){
+            if(matcher1.find(0)){
                 Pattern pattern3 = Pattern.compile("^[ \\t]*");
-                scanner.consume(pattern3.matcher(newInput).group(0).length());
+                int length = matcher.group(0).length();
+                Matcher matcher2 = pattern3.matcher(newInput);
+                if(matcher2.groupCount()>0) {
+                    length = matcher2.group(0).length();
+                }
+                scanner.consume(length);
                 token = tok(token);
-                token.setValue(matcher.group(1));
+                if(matcher.groupCount()>0) {
+                    token.setValue(matcher.group(1));
+                }
                 incrementColumn(matcher.group(0).length() - whitespaceLength);
                 return token;
             }
@@ -843,11 +852,9 @@ public class Lexer {
     }
 
     private boolean mixinBlock() {
-        Matcher matcher = scanner.getMatcherForPattern("^block[ \\t]*(\\n|$)");
-        if (matcher.find(0) && matcher.groupCount() > 0) {
-            consume(matcher.end()-matcher.group(1).length());
-            MixinBlock mixinBlock = new MixinBlock(lineno);
-            pushToken(tokEnd(tok(mixinBlock)));
+        Token token = scanEndOfLine("^block", new MixinBlock());
+        if (token!=null) {
+            pushToken(tokEnd(token));
             return true;
         }
         return false;
