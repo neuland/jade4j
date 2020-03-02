@@ -9,6 +9,7 @@ import de.neuland.pug4j.expression.ExpressionHandler;
 import de.neuland.pug4j.lexer.token.Doctypes;
 import de.neuland.pug4j.model.PugModel;
 import de.neuland.pug4j.parser.node.Node;
+import org.apache.commons.lang3.StringUtils;
 
 public class PugTemplate {
 
@@ -61,7 +62,7 @@ public class PugTemplate {
 	}
 
 	public void setDoctype(String name){
-		if (name == null) {
+		if (name == null || StringUtils.isBlank(name)) {
 			name = "default";
 		}
 		doctypeLine = Doctypes.get(name);

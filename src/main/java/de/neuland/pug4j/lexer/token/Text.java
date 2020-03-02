@@ -7,4 +7,7 @@ public class Text extends Token {
 		super(value, lineNumber);
 	}
 
+    public Text() {
+
+    }
 }

@@ -6,4 +6,7 @@ public class Filter extends Token {
         super(value, lineNumber);
     }
 
+    public Filter() {
+
+    }
 }

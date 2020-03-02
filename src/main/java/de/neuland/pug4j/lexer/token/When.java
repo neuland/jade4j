@@ -7,4 +7,7 @@ public class When extends Token {
 		super(value, lineNumber);
 	}
 
+    public When() {
+
+    }
 }

@@ -7,4 +7,7 @@ public class Default extends Token {
 		super(value, lineNumber);
 	}
 
+    public Default() {
+
+    }
 }

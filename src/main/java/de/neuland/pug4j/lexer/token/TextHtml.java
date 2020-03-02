@@ -7,4 +7,7 @@ public class TextHtml extends Token {
         super(value, lineNumber);
     }
 
+    public TextHtml() {
+
+    }
 }

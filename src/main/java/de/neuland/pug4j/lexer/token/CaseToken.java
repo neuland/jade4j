@@ -8,4 +8,7 @@ public class CaseToken extends Token {
 		super(value, lineNumber);
 	}
 
+    public CaseToken() {
+
+    }
 }

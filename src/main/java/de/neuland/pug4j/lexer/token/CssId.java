@@ -6,4 +6,7 @@ public class CssId extends Token {
 		super(value, lineNumber);
 	}
 
+    public CssId() {
+
+    }
 }

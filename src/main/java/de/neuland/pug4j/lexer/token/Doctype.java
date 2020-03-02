@@ -6,4 +6,7 @@ public class Doctype extends Token {
         super(value, lineNumber);
     }
 
+    public Doctype() {
+
+    }
 }

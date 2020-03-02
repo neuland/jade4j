@@ -4,4 +4,8 @@ public class Path extends Token {
     public Path(String value) {
         super(value);
     }
+
+    public Path() {
+
+    }
 }

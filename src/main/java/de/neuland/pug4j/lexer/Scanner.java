@@ -106,6 +106,10 @@ public class Scanner {
         return pattern.matcher(input);
     }
 
+    public Matcher getMatcherForPattern(Pattern pattern) {
+        return pattern.matcher(input);
+    }
+
     public boolean isIntendantionViolated() {
         return input != null && input.length() > 0
                 && (' ' == input.charAt(0) || '\t' == input.charAt(0));
