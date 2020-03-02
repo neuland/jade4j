@@ -108,8 +108,8 @@ public class Lexer {
             return token;
         }
         
-        if ((token = caseToken()) != null) {
-            return token;
+        if (caseToken()) {
+            return stashed();
         }
 
         if (when()) {
@@ -136,8 +136,8 @@ public class Lexer {
             return token;
         }
         
-        if ((token = mixinBlock()) != null) {
-            return token;
+        if (mixinBlock()) {
+            return stashed();
         }
 
         if ((token = include()) != null) {
@@ -339,7 +339,65 @@ public class Lexer {
         }
         return result;
     }
+//    scanEndOfLine: function (regexp, type) {
+//        var captures;
+//        if (captures = regexp.exec(this.input)) {
+//            var whitespaceLength = 0;
+//            var whitespace;
+//            var tok;
+//            if (whitespace = /^([ ]+)([^ ]*)/.exec(captures[0])) {
+//                whitespaceLength = whitespace[1].length;
+//                this.incrementColumn(whitespaceLength);
+//            }
+//            var newInput = this.input.substr(captures[0].length);
+//            if (newInput[0] === ':') {
+//                this.input = newInput;
+//                tok = this.tok(type, captures[1]);
+//                this.incrementColumn(captures[0].length - whitespaceLength);
+//                return tok;
+//            }
+//            if (/^[ \t]*(\n|$)/.test(newInput)) {
+//                this.input = newInput.substr(/^[ \t]*/.exec(newInput)[0].length);
+//                tok = this.tok(type, captures[1]);
+//                this.incrementColumn(captures[0].length - whitespaceLength);
+//                return tok;
+//            }
+//        }
+//    },
 
+    private Token scanEndOfLine(String regexp, Token token) {
+        Matcher matcher = scanner.getMatcherForPattern(regexp);
+        if (matcher.find(0) && matcher.groupCount() > 0) {
+            int whitespaceLength = 0;
+            Pattern pattern = Pattern.compile("^([ ]+)([^ ]*)");
+            Matcher whitespace = pattern.matcher(matcher.group(0));
+            if(whitespace.find(0)){
+                whitespaceLength = whitespace.group(0).length();
+                incrementColumn(whitespaceLength);
+            }
+
+            String newInput = scanner.getInput().substring(matcher.group(0).length());
+            if(newInput.charAt(0) == ':'){
+                scanner.consume(matcher.group(0).length());
+                token = tok(token);
+                token.setValue(matcher.group(1));
+                incrementColumn(matcher.group(0).length() - whitespaceLength);
+                return token;
+            }
+
+            Pattern pattern2 = Pattern.compile("^[ \\t]*(\\n|$)");
+            Matcher matcher1 = pattern2.matcher(newInput);
+            if(matcher1.matches()){
+                Pattern pattern3 = Pattern.compile("^[ \\t]*");
+                scanner.consume(pattern3.matcher(newInput).group(0).length());
+                token = tok(token);
+                token.setValue(matcher.group(1));
+                incrementColumn(matcher.group(0).length() - whitespaceLength);
+                return token;
+            }
+        }
+        return null;
+    }
     // private int indexOfDelimiters(char start, char end) {
     // String str = scanner.getInput();
     // int nstart = 0;
@@ -784,13 +842,15 @@ public class Lexer {
         return null;
     }
 
-    private Token mixinBlock() {
+    private boolean mixinBlock() {
         Matcher matcher = scanner.getMatcherForPattern("^block[ \\t]*(\\n|$)");
         if (matcher.find(0) && matcher.groupCount() > 0) {
             consume(matcher.end()-matcher.group(1).length());
-            return new MixinBlock(lineno);
+            MixinBlock mixinBlock = new MixinBlock(lineno);
+            pushToken(tokEnd(tok(mixinBlock)));
+            return true;
         }
-        return null;
+        return false;
     }
 
     private Token blockCode() {
@@ -835,13 +895,46 @@ public class Lexer {
         }
         return null;
     }
-
-    private Token caseToken() {
+    /**
+     * Path
+     * TODO: check if val.trim is correct.
+     */
+//
+//    path: function() {
+//        var tok = this.scanEndOfLine(/^ ([^\n]+)/, 'path');
+//        if (tok && (tok.val = tok.val.trim())) {
+//            this.tokens.push(this.tokEnd(tok));
+//            return true;
+//        }
+//    },
+    private boolean path(){
+        String val = scan("^ ([^\\n]+)");
+        if (StringUtils.isNotBlank(val)) {
+            Token token = tok(new Path(val.trim()));
+            pushToken(tokEnd(token));
+            return true;
+        }
+        return false;
+    }
+    /**
+     * Case.
+     * TODO: add error check
+     */
+    private boolean caseToken() {
         String val = scan("^case +([^\\n]+)");
         if (StringUtils.isNotBlank(val)) {
-            return new CaseToken(val, lineno);
+            Token tok = tok(new CaseToken(val, lineno));
+            incrementColumn(-val.length());
+            try {
+                expressionHandler.assertExpression(val);
+            } catch (ExpressionException e) {
+                throw new PugLexerException(e.getMessage(), filename, getLineno(), templateLoader);
+            }
+            pushToken(tokEnd(tok));
+            incrementColumn(val.length());
+            return true;
         }
-        return null;
+        return false;
     }
 
     /**
