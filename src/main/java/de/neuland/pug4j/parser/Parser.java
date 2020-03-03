@@ -413,8 +413,8 @@ public class Parser {
 
     private Node parseExtends() {
         Token token = expect(ExtendsToken.class);
-        ExtendsToken extendsToken = (ExtendsToken) token;
-        String templateName = extendsToken.getValue().trim();
+        Path path = (Path) expect(Path.class);
+        String templateName = path.getValue().trim();
 
         Parser parser = createParser(templateName);
 

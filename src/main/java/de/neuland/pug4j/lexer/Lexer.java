@@ -36,13 +36,16 @@ public class Lexer {
     public static final Pattern PATTERN_FILTER = Pattern.compile("^:([\\w\\-]+)");
     public static final Pattern PATTERN_COLON = Pattern.compile("^: +");
     public static final Pattern PATTERN_SLASH = Pattern.compile("^\\/");
+    public static final Pattern PATTERN_TAG = Pattern.compile("^(\\w(?:[-:\\w]*\\w)?)");
+    public static final Pattern PATTERN_INTERPOLATION = Pattern.compile("^#\\{");
+    public static final Pattern PATTERN_BLANK = Pattern.compile("^\\n[ \\t]*\\n");
     @SuppressWarnings("unused")
     private LinkedList<String> options;
     Scanner scanner;
     private LinkedList<Token> deferredTokens;
     private int lastIndents = -1;
-    private int lineno;
-    private int colno;
+    private int lineno = 1;
+    private int colno = 1;
     private LinkedList<Token> stash;
     private LinkedList<Integer> indentStack;
     private String indentRe = null;
@@ -117,8 +120,8 @@ public class Lexer {
             return stashed();
         }
         
-        if ((token = interpolation()) != null) {
-            return token;
+        if (interpolation()) {
+            return stashed();
         }
         
         if (caseToken()) {
@@ -133,20 +136,20 @@ public class Lexer {
             return stashed();
         }
         
-        if ((token = extendsToken()) != null) {
-           return token;
+        if (extendsToken()) {
+           return stashed();
         }
         
-        if ((token = append()) != null) {
-           return token;
+        if (append()) {
+           return stashed();
         }
         
-        if ((token = prepend()) != null) {
-           return token;
+        if (prepend()) {
+           return stashed();
         }
         
-        if ((token = block()) != null) {
-            return token;
+        if (block()) {
+            return stashed();
         }
         
         if (mixinBlock()) {
@@ -228,8 +231,8 @@ public class Lexer {
             return stashed();
         }
 
-        if ((token = comment()) != null) {
-            return token;
+        if (comment()) {
+            return stashed();
         }
 
         if (colon()) {
@@ -248,12 +251,12 @@ public class Lexer {
             return stashed();
         }
 
-        if ((token = textFail()) != null) {
-            return token;
+        if (textFail()) {
+            return stashed();
         }
 
-        if ((token = fail()) != null) {
-            return token;
+        if (fail()) {
+            return stashed();
         }
         return null;
     }
@@ -362,31 +365,6 @@ public class Lexer {
         }
         return null;
     }
-//    scanEndOfLine: function (regexp, type) {
-//        var captures;
-//        if (captures = regexp.exec(this.input)) {
-//            var whitespaceLength = 0;
-//            var whitespace;
-//            var tok;
-//            if (whitespace = /^([ ]+)([^ ]*)/.exec(captures[0])) {
-//                whitespaceLength = whitespace[1].length;
-//                this.incrementColumn(whitespaceLength);
-//            }
-//            var newInput = this.input.substr(captures[0].length);
-//            if (newInput[0] === ':') {
-//                this.input = newInput;
-//                tok = this.tok(type, captures[1]);
-//                this.incrementColumn(captures[0].length - whitespaceLength);
-//                return tok;
-//            }
-//            if (/^[ \t]*(\n|$)/.test(newInput)) {
-//                this.input = newInput.substr(/^[ \t]*/.exec(newInput)[0].length);
-//                tok = this.tok(type, captures[1]);
-//                this.incrementColumn(captures[0].length - whitespaceLength);
-//                return tok;
-//            }
-//        }
-//    },
 
     private Token scanEndOfLine(Pattern pattern, Token token) {
         Matcher matcher = scanner.getMatcherForPattern(pattern);
@@ -395,7 +373,7 @@ public class Lexer {
             Pattern pattern1 = Pattern.compile("^([ ]+)([^ ]*)");
             Matcher whitespace = pattern1.matcher(matcher.group(0));
             if(whitespace.find(0)){
-                whitespaceLength = whitespace.group(0).length();
+                whitespaceLength = whitespace.group(1).length();
                 incrementColumn(whitespaceLength);
             }
 
@@ -416,8 +394,8 @@ public class Lexer {
                 Pattern pattern3 = Pattern.compile("^[ \\t]*");
                 int length = matcher.group(0).length();
                 Matcher matcher2 = pattern3.matcher(newInput);
-                if(matcher2.groupCount()>0) {
-                    length = matcher2.group(0).length();
+                if(matcher2.find(0)) {
+                    length = length + matcher2.end();
                 }
                 scanner.consume(length);
                 token = tok(token);
@@ -430,24 +408,6 @@ public class Lexer {
         }
         return null;
     }
-    // private int indexOfDelimiters(char start, char end) {
-    // String str = scanner.getInput();
-    // int nstart = 0;
-    // int nend = 0;
-    // int pos = 0;
-    // for (int i = 0, len = str.length(); i < len; ++i) {
-    // if (start == str.charAt(i)) {
-    // nstart++;
-    // } else if (end == str.charAt(i)) {
-    // nend = nend + 1;
-    // if (nend == nstart) {
-    // pos = i;
-    // break;
-    // }
-    // }
-    // }
-    // return pos;
-    // }
 
     private Token stashed() {
         if (stash.size() > 0) {
@@ -475,11 +435,11 @@ public class Lexer {
 //        }
 //    },
     private boolean blank(){
-        Matcher matcher = scanner.getMatcherForPattern("^\\n *\\n");
+        Matcher matcher = scanner.getMatcherForPattern(PATTERN_BLANK);
         if (matcher.find(0)) {
             consume(matcher.end()-1);
             incrementLine(1);
-
+            //TODO: remove pipeless
             if(this.pipeless) {
                 pushToken(new Text("", lineno));
                 return true;
@@ -494,34 +454,19 @@ public class Lexer {
      * end-of-source. ok
      */
 
-//    eos: function() {
-//        if (this.input.length) return;
-//        if (this.interpolated) {
-//            this.error('NO_END_BRACKET', 'End of line was reached with no closing bracket for interpolation.');
-//        }
-//        for (var i = 0; this.indentStack[i]; i++) {
-//            this.tokens.push(this.tokEnd(this.tok('outdent')));
-//        }
-//        this.tokens.push(this.tokEnd(this.tok('eos')));
-//        this.ended = true;
-//        return true;
-//    },
-
-
     private boolean eos() {
         if (scanner.getInput().length() > 0) {
             return false;
         }
-//        if(this.interpolated){
-//            throw new PugLexerException("End of line was reached with no closing bracket for interpolation.",this.filename,this.lineno,templateLoader);
-//        }
-        if (indentStack.size() > 0) {
-            indentStack.poll();
-            pushToken(tok(new Outdent()));
-        } else {
-            pushToken(tok(new Eos("eos", lineno)));
-            this.ended = true;
+        if(this.interpolated){
+            throw new PugLexerException("End of line was reached with no closing bracket for interpolation.",this.filename,this.lineno,templateLoader);
         }
+        while (indentStack.size() > 0) {
+            indentStack.poll();
+            pushToken(tokEnd(tok(new Outdent())));
+        }
+        pushToken(tokEnd(tok(new Eos("eos", lineno))));
+        this.ended = true;
         return true;
     }
 
@@ -529,31 +474,20 @@ public class Lexer {
      * Comment.
      */
 
-//    comment: function() {
-//        var captures;
-//        if (captures = /^\/\/(-)?([^\n]*)/.exec(this.input)) {
-//            this.consume(captures[0].length);
-//            var tok = this.tok('comment', captures[2]);
-//            tok.buffer = '-' != captures[1];
-//            this.interpolationAllowed = tok.buffer;
-//            this.tokens.push(tok);
-//            this.incrementColumn(captures[0].length);
-//            this.tokEnd(tok);
-//            this.callLexerFunction('pipelessText');
-//            return true;
-//        }
-//    },
-
-    private Token comment() {
+    private boolean comment() {
         Matcher matcher = scanner.getMatcherForPattern("^\\/\\/(-)?([^\\n]*)");
         if (matcher.find(0) && matcher.groupCount() > 1) {
-            boolean buffer = !"-".equals(matcher.group(1));
-            Comment comment = new Comment(matcher.group(2), lineno, buffer);
             consume(matcher.end());
-            this.pipeless = true;
-            return comment;
+            boolean buffer = !"-".equals(matcher.group(1));
+            this.interpolationAllowed = buffer;
+            Comment comment = new Comment(matcher.group(2), lineno, buffer);
+            incrementColumn(matcher.end());
+            pushToken(tokEnd(comment));
+            this.pipeless = true; //TODO: remove
+// TODO:            pipelessText();
+            return true;
         }
-        return null;
+        return false;
     }
 
     private Token code() {
@@ -575,50 +509,34 @@ public class Lexer {
         return null;
     }
 
-//    /**
-//     * Interpolated tag.
-//     */
-//
-//    interpolation: function() {
-//      if (/^#\{/.test(this.input)) {
-//        var match;
-//        try {
-//          match = this.bracketExpression(1);
-//        } catch (ex) {
-//          return;//not an interpolation expression, just an unmatched open interpolation
-//        }
-//
-//        this.consume(match.end + 1);
-//        return this.tok('interpolation', match.src);
-//      }
-//    }
-    private Token interpolation(){
-        Matcher matcher = scanner.getMatcherForPattern("^#\\{");
+    private boolean interpolation(){
+        Matcher matcher = scanner.getMatcherForPattern(PATTERN_INTERPOLATION);
         if (matcher.find(0)) {
             try {
                 CharacterParser.Match match = this.bracketExpression(1);
                 this.scanner.consume(match.getEnd()+1);
-                return new Interpolation(match.getSrc(),lineno);
+                Token tok = tok(new Interpolation(match.getSrc(), lineno));
+                incrementColumn(2); // '#{'
+                try {
+                    expressionHandler.assertExpression(match.getSrc());
+                } catch (ExpressionException e) {
+                    throw new PugLexerException(e.getMessage(), filename, lineno, templateLoader);
+                }
+                String[] splitted = StringUtils.split(match.getSrc(), '\n');
+                int lines = splitted.length-1;
+                incrementLine(lines);
+                incrementColumn(splitted[lines].length()+1); // + 1 → '}'
+                pushToken(tokEnd(tok));
+                return true;
             } catch(Exception ex){
-                return null; //not an interpolation expression, just an unmatched open interpolation
+                return false; //not an interpolation expression, just an unmatched open interpolation
             }
         }
-        return null;
+        return false;
     }
-    // code: function() {
-    // var captures;
-    // if (captures = /^(!?=|-)([^\n]+)/.exec(this.input)) {
-    // this.consume(captures[0].length);
-    // var flags = captures[1];
-    // captures[1] = captures[2];
-    // var tok = this.tok('code', captures[1]);
-    // tok.escape = flags[0] === '=';
-    // tok.buffer = flags[0] === '=' || flags[1] === '=';
-    // return tok;
-    // }
-    // },
+
     private boolean tag() {
-        Matcher matcher = scanner.getMatcherForPattern(Pattern.compile("^(\\w(?:[-:\\w]*\\w)?)"));
+        Matcher matcher = scanner.getMatcherForPattern(PATTERN_TAG);
         if(matcher.find(0) && matcher.groupCount() > 0){
             String name = matcher.group(1);
             int length = matcher.group(0).length();
@@ -626,29 +544,6 @@ public class Lexer {
             Token token = tok(new Tag(name));
             incrementColumn(length);
             pushToken(tokEnd(token));
-            return true;
-        }
-        return false;
-    }
-    private boolean tagOld() {
-        Matcher matcher = scanner.getMatcherForPattern(Pattern.compile("^(\\w[-:\\w]*)(\\/?)"));
-        if (matcher.find(0) && matcher.groupCount() > 1) {
-            consume(matcher.end());
-            Tag tok;
-            String name = matcher.group(1);
-            if (':' == name.charAt(name.length() - 1)) {
-                name = name.substring(0, name.length() - 1);
-                tok = new Tag(name, lineno);
-                this.defer(new Colon(lineno));
-                while (' ' == scanner.getInput().charAt(0))
-                    scanner.consume(1);
-            } else {
-                tok = new Tag(name, lineno);
-            }
-            if (!matcher.group(2).isEmpty()) {
-                tok.setSelfClosing(true);
-            }
-            pushToken(tokEnd(tok));
             return true;
         }
         return false;
@@ -842,58 +737,134 @@ public class Lexer {
         return false;
     }
 
-    private Token textFail() {
+    private boolean textFail() {
         String val = scan("^([^\\.\\n][^\\n]+)");
         if (StringUtils.isNotEmpty(val)) {
-            return new Text(val, lineno);
+            pushToken(tokEnd(tok(new Text(val, lineno))));
+            return true;
         }
-        return null;
+        return false;
     }
 
-    private Token fail() {
+    private boolean fail() {
         throw new PugLexerException("unexpected text " + StringUtils.substring(scanner.getInput(),0,5), filename, getLineno(), templateLoader);
     }
-
-    private Token extendsToken() {
+//  "extends": function() {
+//        var tok = this.scan(/^extends?(?= |$|\n)/, 'extends');
+//        if (tok) {
+//            this.tokens.push(this.tokEnd(tok));
+//            if (!this.callLexerFunction('path')) {
+//                this.error('NO_EXTENDS_PATH', 'missing path for extends');
+//            }
+//            return true;
+//        }
+//        if (this.scan(/^extends?\b/)) {
+//            this.error('MALFORMED_EXTENDS', 'malformed extends');
+//        }
+//    },
+    private boolean extendsTokenOld() {
         String val = scan("^extends? +([^\\n]+)");
         if (StringUtils.isNotBlank(val)) {
-            return new ExtendsToken(val, lineno);
+            pushToken(tokEnd(tok(new ExtendsToken(val, lineno))));
+            return true;
         }
-        return null;
+        return false;
+    }
+    private boolean extendsToken() {
+        Token token = scan(Pattern.compile("^extends?(?= |$|\\n)"), new ExtendsToken());
+        if (token != null) {
+            pushToken(tokEnd(token));
+            if(!path()){
+                throw new PugLexerException("missing path for extends",this.filename,this.lineno,templateLoader);
+            }
+            return true;
+        }
+        //TODO: add error check
+        return false;
     }
 
-    private Token prepend() {
-        String name = scan("^prepend +([^\\n]+)");
-        if (StringUtils.isNotBlank(name)) {
-            Block tok = new Block(name, lineno);
-            tok.setMode("prepend");
-            return tok;
+    private boolean prepend() {
+        Matcher matcher = scanner.getMatcherForPattern(Pattern.compile("^(?:block +)?prepend +([^\\n]+)"));
+        if (matcher.find(0)) {
+            String name = matcher.group(1).trim();
+            String comment = "";
+            if(name.indexOf("//") != -1){
+                String[] split = StringUtils.split(name, "//");
+                comment = "//" + StringUtils.join(Arrays.copyOfRange(split,1,split.length),"//");
+                name = StringUtils.split(name,"//")[0].trim();
+            }
+            if(StringUtils.isNotBlank(name)) {
+                Token token = tok(new Block(name));
+                int len = matcher.group(0).length() - comment.length();
+                Pattern whitespaceRe = Pattern.compile("[ \\n\\t]");
+                while(whitespaceRe.matcher(String.valueOf(scanner.getInput().charAt(len-1))).find(0)) {
+                    len--;
+                }
+                incrementColumn(len);
+                token.setMode("prepend");
+                pushToken(tokEnd(token));
+                consume(matcher.end() - comment.length());
+                incrementColumn(matcher.end() - comment.length() - len);
+                return true;
+            }
         }
-        return null;
+        return false;
     }
 
-    private Token append() {
-        String name = scan("^append +([^\\n]+)");
-        if (StringUtils.isNotBlank(name)) {
-            Block tok = new Block(name, lineno);
-            tok.setMode("append");
-            return tok;
+    private boolean append() {
+        Matcher matcher = scanner.getMatcherForPattern(Pattern.compile("^(?:block +)?append +([^\\n]+)"));
+        if (matcher.find(0)) {
+            String name = matcher.group(1).trim();
+            String comment = "";
+            if(name.indexOf("//") != -1){
+                String[] split = StringUtils.split(name, "//");
+                comment = "//" + StringUtils.join(Arrays.copyOfRange(split,1,split.length),"//");
+                name = StringUtils.split(name,"//")[0].trim();
+            }
+            if(StringUtils.isNotBlank(name)) {
+                Token token = tok(new Block(name));
+                int len = matcher.group(0).length() - comment.length();
+                Pattern whitespaceRe = Pattern.compile("[ \\n\\t]");
+                while(whitespaceRe.matcher(String.valueOf(scanner.getInput().charAt(len-1))).find(0)) {
+                    len--;
+                }
+                incrementColumn(len);
+                token.setMode("append");
+                pushToken(tokEnd(token));
+                consume(matcher.end() - comment.length());
+                incrementColumn(matcher.end() - comment.length() - len);
+                return true;
+            }
         }
-        return null;
+        return false;
     }
 
-    private Token block() {
-        Matcher matcher = scanner.getMatcherForPattern("^block\\b *(?:(prepend|append) +)?([^\\n]+)");
-        if (matcher.find(0) && matcher.groupCount() > 1) {
-            String val = matcher.group(1);
-            String mode = StringUtils.isNotBlank(val) ? val : "replace";
-            String name = matcher.group(2);
-            Block tok = new Block(name, lineno);
-            tok.setMode(mode);
-            consume(matcher.end());
-            return tok;
+    private boolean block() {
+        Matcher matcher = scanner.getMatcherForPattern(Pattern.compile("^block +([^\\n]+)"));
+        if (matcher.find(0)) {
+            String name = matcher.group(1).trim();
+            String comment = "";
+            if(name.indexOf("//") != -1){
+                String[] split = StringUtils.split(name, "//");
+                comment = "//" + StringUtils.join(Arrays.copyOfRange(split,1,split.length),"//");
+                name = StringUtils.split(name,"//")[0].trim();
+            }
+            if(StringUtils.isNotBlank(name)) {
+                Token token = tok(new Block(name));
+                int len = matcher.group(0).length() - comment.length();
+                Pattern whitespaceRe = Pattern.compile("[ \\n\\t]");
+                while(whitespaceRe.matcher(String.valueOf(scanner.getInput().charAt(len-1))).find(0)) {
+                    len--;
+                }
+                incrementColumn(len);
+                token.setMode("replace");
+                pushToken(tokEnd(token));
+                consume(matcher.end() - comment.length());
+                incrementColumn(matcher.end() - comment.length() - len);
+                return true;
+            }
         }
-        return null;
+        return false;
     }
 
     private boolean mixinBlock() {

@@ -7,4 +7,7 @@ public class ExtendsToken extends Token {
 		super(value, lineNumber);
 	}
 
+    public ExtendsToken() {
+
+    }
 }

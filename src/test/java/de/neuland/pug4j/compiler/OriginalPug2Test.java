@@ -54,7 +54,7 @@ public class OriginalPug2Test {
             "mixin-via-include",
             "layout.append.without-block",
             "layout.prepend.without-block",
-            "layout.multi.append.prepend.block",
+//            "layout.multi.append.prepend.block",
             "include-extends-relative",
             "layout.prepend",
 

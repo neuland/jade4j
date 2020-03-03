@@ -1,5 +1,6 @@
 {"type":"newline","line":2}
-{"type":"extends","line":2,"val":"../fixtures/prepend/app-layout"}
+{"type":"extends","line":2}
+{"type":"path","line":2,"val":"../fixtures/prepend/app-layout"}
 {"type":"newline","line":4}
 {"type":"block","line":4,"val":"head","mode":"prepend"}
 {"type":"indent","line":5,"val":2}
