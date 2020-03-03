@@ -63,10 +63,16 @@ public class Parser {
         while (!(peek() instanceof Eos)) {
             if (peek() instanceof Newline) {
                 advance();
+            } else if(peek() instanceof TextHtml){
+//TODO:                block.setNodes();
             } else {
                 Node expr = parseExpr();
                 if (expr != null) {
-                    block.push(expr);
+                    if(expr instanceof BlockNode){
+                        block.getNodes().addAll(expr.getNodes());
+                    }else {
+                        block.push(expr);
+                    }
                 }
             }
         }
@@ -263,10 +269,8 @@ public class Parser {
     }
 
     private Node parseCssClassOrId() {
-        Token tok = advance();
         Tag div = new Tag("div", line());
         lexer.defer(div);
-        lexer.defer(tok);
         return parseExpr();
     }
 
@@ -1001,7 +1005,7 @@ public class Parser {
     }
 
     private Token peek() {
-        return lookahead(1);
+        return lookahead(0);
     }
 
     private void skip(int n) {

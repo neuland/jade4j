@@ -13,7 +13,7 @@ public class PugParserException extends PugException {
 	}
 
 	public PugParserException(String filename, int lineNumber, TemplateLoader templateLoader, Token token) {
-		super("unknown token " + token, filename, lineNumber, templateLoader, null);
+		super("unknown token " + token.getType() + " with value "+ token.getValue(), filename, lineNumber, templateLoader, null);
 	}
 
 	public PugParserException(String filename, int lineNumber, TemplateLoader templateLoader, String message) {

@@ -4,4 +4,8 @@ public class BlockCode extends Token {
     public BlockCode(int lineNumber) {
         super(null, lineNumber);
     }
+
+    public BlockCode() {
+
+    }
 }

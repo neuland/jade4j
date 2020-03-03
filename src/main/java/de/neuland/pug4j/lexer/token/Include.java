@@ -9,7 +9,11 @@ public class Include extends Token {
 		super(value, lineNumber);
 	}
 
-	public String getFilter() {
+    public Include() {
+
+    }
+
+    public String getFilter() {
 		return filter;
 	}
 
