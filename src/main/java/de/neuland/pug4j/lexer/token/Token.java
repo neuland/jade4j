@@ -2,7 +2,7 @@ package de.neuland.pug4j.lexer.token;
 
 import java.util.ArrayList;
 
-public abstract class Token {
+public abstract class Token implements Cloneable{
 
 	private String value;
     private ArrayList<String> values;
@@ -180,5 +180,8 @@ public abstract class Token {
 
     public String getType(){
         return this.getClass().getSimpleName();
+    }
+    public Token clone() throws CloneNotSupportedException {
+        return (Token) super.clone();
     }
 }

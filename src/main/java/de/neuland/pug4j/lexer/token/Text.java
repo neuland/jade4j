@@ -10,4 +10,8 @@ public class Text extends Token {
     public Text() {
 
     }
+
+    public Text(String value) {
+        super(value);
+    }
 }

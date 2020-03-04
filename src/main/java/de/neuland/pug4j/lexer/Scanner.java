@@ -123,4 +123,7 @@ public class Scanner {
         return input.length() > 2 && input.charAt(0) == '\n' && input.charAt(1) == '\n';
     }
 
+    public void setInput(String input) {
+        this.input = input;
+    }
 }

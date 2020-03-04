@@ -50,8 +50,8 @@ public class Lexer {
     Scanner scanner;
     private LinkedList<Token> deferredTokens;
     private int lastIndents = -1;
-    private int lineno = 1;
-    private int colno = 1;
+    private int lineno;
+    private int colno;
     private LinkedList<Token> tokens;
     private LinkedList<Integer> indentStack;
     private Pattern indentRe = null;
@@ -80,8 +80,15 @@ public class Lexer {
         indentStack = new LinkedList<Integer>();
         lastIndents = 0;
         lineno = 1;
+        colno = 1;
         characterParser = new CharacterParser();
         int x = 0;
+    }
+    public Lexer(String input,String filename, TemplateLoader templateLoader,ExpressionHandler expressionHandler,int lineno,int colno, boolean interpolated) throws IOException {
+        this(input, filename,templateLoader,expressionHandler);
+        this.lineno = lineno;
+        this.colno = colno;
+        this.interpolated = interpolated;
     }
     public Lexer(String input,String filename, TemplateLoader templateLoader,ExpressionHandler expressionHandler) throws IOException {
         this.expressionHandler = expressionHandler;
@@ -94,6 +101,7 @@ public class Lexer {
         indentStack = new LinkedList<Integer>();
         lastIndents = 0;
         lineno = 1;
+        colno = 1;
         characterParser = new CharacterParser();
         int x = 0;
     }
@@ -534,7 +542,6 @@ public class Lexer {
         Token token = scan(PATTERN_FILTER,new Filter());
         if (token!=null) {
             incrementColumn(token.getValue().length());
-            this.pipeless = true; //TODO: remove
             pushToken(tokEnd(token));
             attrs();
             if(!inInclude){
@@ -693,15 +700,6 @@ public class Lexer {
         return false;
     }
 
-
-//    endInterpolation: function () {
-//        if (this.interpolated && this.input[0] === ']') {
-//            this.input = this.input.substr(1);
-//            this.ended = true;
-//            return true;
-//        }
-//    },
-
     private boolean endInterpolation(){
         if(interpolated && this.scanner.getInput().charAt(0) == ']'){
             this.consume(1);
@@ -711,124 +709,14 @@ public class Lexer {
         return false;
     }
 
-
-//    addText: function (type, value, prefix, escaped) {
-//        var tok;
-//        if (value + prefix === '') return;
-//        prefix = prefix || '';
-//        escaped = escaped || 0;
-//        var indexOfEnd = this.interpolated ? value.indexOf(']') : -1;
-//        var indexOfStart = this.interpolationAllowed ? value.indexOf('#[') : -1;
-//        var indexOfEscaped = this.interpolationAllowed ? value.indexOf('\\#[') : -1;
-//        var matchOfStringInterp = /(\\)?([#!]){((?:.|\n)*)$/.exec(value);
-//            var indexOfStringInterp = this.interpolationAllowed && matchOfStringInterp ? matchOfStringInterp.index : Infinity;
-//
-//            if (indexOfEnd === -1) indexOfEnd = Infinity;
-//            if (indexOfStart === -1) indexOfStart = Infinity;
-//            if (indexOfEscaped === -1) indexOfEscaped = Infinity;
-//
-//            if (indexOfEscaped !== Infinity && indexOfEscaped < indexOfEnd && indexOfEscaped < indexOfStart && indexOfEscaped < indexOfStringInterp) {
-//                prefix = prefix + value.substring(0, indexOfEscaped) + '#[';
-//                return this.addText(type, value.substring(indexOfEscaped + 3), prefix, escaped + 1);
-//            }
-//            if (indexOfStart !== Infinity && indexOfStart < indexOfEnd && indexOfStart < indexOfEscaped && indexOfStart < indexOfStringInterp) {
-//                tok = this.tok(type, prefix + value.substring(0, indexOfStart));
-//                this.incrementColumn(prefix.length + indexOfStart + escaped);
-//                this.tokens.push(this.tokEnd(tok));
-//                tok = this.tok('start-pug-interpolation');
-//                this.incrementColumn(2);
-//                this.tokens.push(this.tokEnd(tok));
-//                var child = new this.constructor(value.substr(indexOfStart + 2), {
-//                        filename: this.filename,
-//                        interpolated: true,
-//                        startingLine: this.lineno,
-//                        startingColumn: this.colno
-//      });
-//                var interpolated;
-//                try {
-//                    interpolated = child.getTokens();
-//                } catch (ex) {
-//                    if (ex.code && /^PUG:/.test(ex.code)) {
-//                        this.colno = ex.column;
-//                        this.error(ex.code.substr(4), ex.msg);
-//                    }
-//                    throw ex;
-//                }
-//                this.colno = child.colno;
-//                this.tokens = this.tokens.concat(interpolated);
-//                tok = this.tok('end-pug-interpolation');
-//                this.incrementColumn(1);
-//                this.tokens.push(this.tokEnd(tok));
-//                this.addText(type, child.input);
-//                return;
-//            }
-//            if (indexOfEnd !== Infinity && indexOfEnd < indexOfStart && indexOfEnd < indexOfEscaped && indexOfEnd < indexOfStringInterp) {
-//                if (prefix + value.substring(0, indexOfEnd)) {
-//                    this.addText(type, value.substring(0, indexOfEnd), prefix);
-//                }
-//                this.ended = true;
-//                this.input = value.substr(value.indexOf(']') + 1) + this.input;
-//                return;
-//            }
-//            if (indexOfStringInterp !== Infinity) {
-//                if (matchOfStringInterp[1]) {
-//                    prefix = prefix + value.substring(0, indexOfStringInterp) + '#{';
-//                    return this.addText(type, value.substring(indexOfStringInterp + 3), prefix, escaped + 1);
-//                }
-//                var before = value.substr(0, indexOfStringInterp);
-//                if (prefix || before) {
-//                    before = prefix + before;
-//                    tok = this.tok(type, before);
-//                    this.incrementColumn(before.length + escaped);
-//                    this.tokens.push(this.tokEnd(tok));
-//                }
-//
-//                var rest = matchOfStringInterp[3];
-//                var range;
-//                tok = this.tok('interpolated-code');
-//                this.incrementColumn(2);
-//                try {
-//                    range = characterParser.parseUntil(rest, '}');
-//                } catch (ex) {
-//                    if (ex.index !== undefined) {
-//                        this.incrementColumn(ex.index);
-//                    }
-//                    if (ex.code === 'CHARACTER_PARSER:END_OF_STRING_REACHED') {
-//                        this.error('NO_END_BRACKET', 'End of line was reached with no closing bracket for interpolation.');
-//                    } else if (ex.code === 'CHARACTER_PARSER:MISMATCHED_BRACKET') {
-//                        this.error('BRACKET_MISMATCH', ex.message);
-//                    } else {
-//                        throw ex;
-//                    }
-//                }
-//                tok.mustEscape = matchOfStringInterp[2] === '#';
-//                tok.buffer = true;
-//                tok.val = range.src;
-//                this.assertExpression(range.src);
-//
-//                if (range.end + 1 < rest.length) {
-//                    rest = rest.substr(range.end + 1);
-//                    this.incrementColumn(range.end + 1);
-//                    this.tokens.push(this.tokEnd(tok));
-//                    this.addText(type, rest);
-//                } else {
-//                    this.incrementColumn(rest.length);
-//                    this.tokens.push(this.tokEnd(tok));
-//                }
-//                return;
-//            }
-//
-//            value = prefix + value;
-//            tok = this.tok(type, value);
-//            this.incrementColumn(value.length + escaped);
-//            this.tokens.push(this.tokEnd(tok));
-//        },
-
     private void addText(Token token, String value){
-        addText(token,value,"",0);
+        addText(token,value,"");
+    }
+    private void addText(Token token, String value, String prefix) {
+        addText(token,value,prefix,0);
     }
     private void addText(Token token, String value, String prefix,int escaped) {
-        Token newToken;
+
         if ("".equals(value + prefix))
             return;
         int indexOfEnd = this.interpolated ? value.indexOf(']') : -1;
@@ -836,9 +724,6 @@ public class Lexer {
         int indexOfEscaped = this.interpolationAllowed ? value.indexOf("\\#[") : -1;
         Matcher matchOfStringInterp = Pattern.compile("(\\\\)?([#!])\\{((?:.|\\n)*)$").matcher(value);
         int indexOfStringInterp = this.interpolationAllowed && matchOfStringInterp.find(0) ? matchOfStringInterp.start() : -1;
-//        if (indexOfEnd == -1) indexOfEnd = Infinity;
-//        if (indexOfStart == -1) indexOfStart = Infinity;
-//        if (indexOfEscaped == -1) indexOfEscaped = Infinity;
 
         if (indexOfEscaped != -1 && indexOfEscaped < indexOfEnd && indexOfEscaped < indexOfStart && indexOfEscaped < indexOfStringInterp) {
             prefix = prefix + value.substring(0, indexOfEscaped) + "#[";
@@ -846,102 +731,87 @@ public class Lexer {
             return;
         }
         if (indexOfStart != -1 && indexOfStart < indexOfEnd && indexOfStart < indexOfEscaped && indexOfStart < indexOfStringInterp) {
-            token.setValue(prefix + StringUtils.substring(value, 0, indexOfStart));
-            newToken = tok(token);
+            Token newToken = tok(token);
+            newToken.setValue(prefix + StringUtils.substring(value, 0, indexOfStart));
             incrementColumn(prefix.length() + indexOfStart + escaped);
             pushToken(tokEnd(newToken));
             newToken = this.tok(new StartPugInterpolation());
             this.incrementColumn(2);
             pushToken(this.tokEnd(newToken));
-//            Lexer lexer = new Lexer(value.substring(indexOfStart + 2), templateLoader, expressionHandler);
-//            var child = new Lexer(value.substr(indexOfStart + 2), {
-//                    filename: this.filename,
-//                    interpolated: true,
-//                    startingLine: this.lineno,
-//                    startingColumn: this.colno
-//      });
-//            var interpolated;
-//            try {
-//                interpolated = child.getTokens();
-//            } catch (ex) {
-//                if (ex.code && /^PUG:/.test(ex.code)) {
-//                    this.colno = ex.column;
-//                    this.error(ex.code.substr(4), ex.msg);
-//                }
-//                throw ex;
-//            }
-//            this.colno = child.colno;
-//            this.tokens = this.tokens.concat(interpolated);
-//            newToken = this.tok('end-pug-interpolation');
-//            this.incrementColumn(1);
-//            this.tokens.push(this.tokEnd(newToken));
-//            this.addText(type, child.input);
-//            return;
+            Lexer child = null;
+            try {
+                child = new Lexer(value.substring(indexOfStart + 2),this.filename, templateLoader, expressionHandler,this.lineno,this.colno,this.interpolated);
+            } catch (IOException e) {
+                new PugLexerException(e.getMessage(),this.filename,this.lineno,templateLoader);
+            }
+            LinkedList<Token> childTokens = child.getTokens();
+            this.colno = child.getLineno();
+            this.tokens.addAll(childTokens);
+            Token endInterpolationToken = tok(new EndPugInterpolation());
+            this.incrementColumn(1);
+            pushToken(this.tokEnd(endInterpolationToken));
+            this.addText(token, child.getInput());
+            return;
         }
-//        if (indexOfEnd !== Infinity && indexOfEnd < indexOfStart && indexOfEnd < indexOfEscaped && indexOfEnd < indexOfStringInterp) {
-//            if (prefix + value.substring(0, indexOfEnd)) {
-//                this.addText(type, value.substring(0, indexOfEnd), prefix);
-//            }
-//            this.ended = true;
-//            this.input = value.substr(value.indexOf(']') + 1) + this.input;
-//            return;
-//        }
-//        if (indexOfStringInterp !== Infinity) {
-//            if (matchOfStringInterp[1]) {
-//                prefix = prefix + value.substring(0, indexOfStringInterp) + '#{';
-//                return this.addText(type, value.substring(indexOfStringInterp + 3), prefix, escaped + 1);
-//            }
-//
-
-
-        String before = StringUtils.substring(value, 0, 0 + indexOfStringInterp);
-        if (prefix != null || before != null) {
-            before = prefix + before;
-            token.setValue(before);
-            Token tok = this.tok(token);
-            this.incrementColumn(before.length() + escaped);
-            pushToken(this.tokEnd(tok));
+        if (indexOfEnd != -1 && indexOfEnd < indexOfStart && indexOfEnd < indexOfEscaped && indexOfEnd < indexOfStringInterp) {
+            if ((prefix + StringUtils.substring(value,0, indexOfEnd)).length()>0) {
+                this.addText(token, value.substring(0, indexOfEnd), prefix);
+            }
+            this.ended = true;
+            scanner.setInput(value.substring(value.indexOf(']') + 1) + scanner.getInput());
+            return;
         }
+        if (indexOfStringInterp != -1) {
+            if (matchOfStringInterp.group(1)!=null) {
+                prefix = prefix + StringUtils.substring(value,0, indexOfStringInterp) + "#{";
+                this.addText(token, value.substring(indexOfStringInterp + 3), prefix, escaped + 1);
+                return;
+            }
 
-        String rest = matchOfStringInterp.group(3);
-        int range;
-        newToken = this.tok(new InterpolatedCode());
-        this.incrementColumn(2);
-//        try {
-//            range = characterParser.parseUntil(rest, '}');
-//        } catch (ex) {
-//            if (ex.index !== undefined) {
-//                this.incrementColumn(ex.index);
-//            }
-//            if (ex.code === 'CHARACTER_PARSER:END_OF_STRING_REACHED') {
-//                this.error('NO_END_BRACKET', 'End of line was reached with no closing bracket for interpolation.');
-//            } else if (ex.code === 'CHARACTER_PARSER:MISMATCHED_BRACKET') {
-//                this.error('BRACKET_MISMATCH', ex.message);
-//            } else {
-//                throw ex;
-//            }
-//        }
-//        tok.mustEscape = matchOfStringInterp[2] === '#';
-//        tok.buffer = true;
-//        tok.val = range.src;
-//        this.assertExpression(range.src);
-//
-//        if (range.end + 1 < rest.length) {
-//            rest = rest.substr(range.end + 1);
-//            this.incrementColumn(range.end + 1);
-//            this.tokens.push(this.tokEnd(tok));
-//            this.addText(type, rest);
-//        } else {
-//            this.incrementColumn(rest.length);
-//            this.tokens.push(this.tokEnd(tok));
-//        }
-//        return;
 
-//    }
-//        value = prefix + value;
-//        tok = this.tok(type, value);
-//        this.incrementColumn(value.length + escaped);
-//        this.tokens.push(this.tokEnd(tok));
+
+            String before = StringUtils.substring(value, 0, 0 + indexOfStringInterp);
+            if (prefix != null || before != null) {
+                before = prefix + before;
+                Token tok = this.tok(token);
+                tok.setValue(before);
+                this.incrementColumn(before.length() + escaped);
+                pushToken(this.tokEnd(tok));
+            }
+
+            String rest = matchOfStringInterp.group(3);
+            InterpolatedCode interpolatedCodeToken = (InterpolatedCode) this.tok(new InterpolatedCode());
+            this.incrementColumn(2);
+            CharacterParser.Match range;
+            range = characterParser.parseUntil(rest, "}");
+
+            interpolatedCodeToken.setMustEscape("#".equals(matchOfStringInterp.group(2)));
+            interpolatedCodeToken.setBuffer(true);
+            interpolatedCodeToken.setValue(range.getSrc());
+            try {
+                expressionHandler.assertExpression(range.getSrc());
+            } catch (ExpressionException e) {
+                throw new PugLexerException(e.getMessage(),this.filename,this.lineno,templateLoader);
+            }
+
+
+            if (range.getEnd() + 1 < rest.length()) {
+                rest = rest.substring(range.getEnd() + 1);
+                this.incrementColumn(range.getEnd() + 1);
+                pushToken(this.tokEnd(interpolatedCodeToken));
+                this.addText(token, rest);
+            } else {
+                this.incrementColumn(rest.length());
+                pushToken(this.tokEnd(interpolatedCodeToken));
+            }
+            return;
+
+    }
+        value = prefix + value;
+        Token tok = this.tok(token);
+        token.setValue(value);
+        this.incrementColumn(value.length() + escaped);
+        pushToken(this.tokEnd(tok));
 
     }
 
@@ -955,24 +825,17 @@ public class Lexer {
             token = scan(PATTERN_TEXT_3,textToken);
         }
         if (token!=null) {
-            //TODO:implement addText
+            addText(new Text(),token.getValue());
             pushToken(tokEnd(token));
             return true;
         }
         return false;
     }
 
-//    textHtml: function () {
-//        var tok = this.scan(/^(<[^\n]*)/, 'text-html');
-//        if (tok) {
-//            this.addText('text-html', tok.val);
-//            return true;
-//        }
-//    },
     private boolean textHtml() {
         Token token = scan(Pattern.compile("^(<[^\\n]*)"), new TextHtml());
         if (token!=null) {
-            //TODO:implement addText
+            addText(new TextHtml(),token.getValue());
             pushToken(tokEnd(token));
             return true;
         }
@@ -1246,15 +1109,13 @@ public class Lexer {
 
     /**
      * Dot.
-     * Todo: add piplesstext
      */
 
     private boolean dot() {
-        this.pipeless = true;
         Token token = scanEndOfLine(PATTERN_DOT, new Dot());
         if (token!=null) {
             pushToken(tokEnd(token));
-//            pipelessText();
+            pipelessText();
             return true;
         }
         return false;
@@ -1648,7 +1509,6 @@ public class Lexer {
 
             // blank line
             if (scanner.isBlankLine()) {
-                this.pipeless = false; //TODO: remove
                 this.interpolationAllowed = true;
                 pushToken(tokEnd(tok(new Newline())));
                 return true;
@@ -1695,7 +1555,6 @@ public class Lexer {
                 pushToken(tokEnd(tok));
             }
             this.interpolationAllowed = true;
-            this.pipeless = false; //TODO: remove
             return true;
         }
         return false;
@@ -1706,10 +1565,16 @@ public class Lexer {
         return token;
     }
     private Token tok(Token token){
-        token.setStartLineNumber(this.lineno);
-        token.setStartColumn(this.colno);
-        token.setFileName(this.filename);
-        return token;
+        try {
+            Token newToken = token.clone();
+            newToken.setStartLineNumber(this.lineno);
+            newToken.setStartColumn(this.colno);
+            newToken.setFileName(this.filename);
+            return newToken;
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     //    tokEnd: function(tok){
@@ -1767,7 +1632,7 @@ public class Lexer {
                     String line = scanner.getInput().substring(stringPtr + 1,nextLineBreak+1);
                     Matcher lineCaptures = indentRe.matcher("\n"+line);
                     int lineIndents = 0;
-                    if(lineCaptures.groupCount()>0) {
+                    if(lineCaptures.groupCount()>1) {
                         lineIndents = lineCaptures.group(1).length();
                     }
 
@@ -1778,7 +1643,7 @@ public class Lexer {
                         // consume test along with `\n` prefix if match
                         stringPtr += line.length() + 1;
                         tokens.add(line.substring(indents));
-                    }else if(lineIndents > this.indentStack.get(0)){
+                    }else if(this.indentStack.size() > 0 && lineIndents > this.indentStack.get(0)){
                         // line is indented less than the first line but is still indented
                         // need to retry lexing the text block
                         this.tokens.pollLast();
@@ -1789,7 +1654,7 @@ public class Lexer {
 
                 while (scanner.getInput().length() == 0 && tokens.get(tokens.size() - 1).equals(""))
                     tokens.remove(tokens.size() - 1);
-                for (int i = 0; i<=tokens.size(); i++) {
+                for (int i = 0; i<tokens.size(); i++) {
                     Token token = null;
                     String tokenString = tokens.get(i);
                     incrementLine(1);
@@ -1802,7 +1667,7 @@ public class Lexer {
                     if(token!=null){
                         pushToken(tokEnd(token));
                     }
-//                    this.addText();
+                    this.addText(new Text(),tokenString);
 
                 }
                 pushToken(tokEnd(tok(new EndPipelessText())));
@@ -1866,5 +1731,8 @@ public class Lexer {
                 break;
         }
         return list;
+    }
+    public String getInput(){
+        return scanner.getInput();
     }
 }
