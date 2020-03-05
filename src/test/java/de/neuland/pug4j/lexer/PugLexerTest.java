@@ -45,12 +45,13 @@ public class PugLexerTest {
         }
     }
     private static String[] ignoredCases = new String[]{
-            "attr-es2015",
-            "attrs-data",
-            "attrs.js",
-            "attrs",
-            "tags.self-closing",
-            "text"
+            "regression.784"
+            //"attr-es2015",
+            //"attrs-data",
+            //"attrs.js",
+            //"attrs",
+            //"tags.self-closing",
+            //"text"
     };
     // Ensure you instantiate these rules
     @ClassRule

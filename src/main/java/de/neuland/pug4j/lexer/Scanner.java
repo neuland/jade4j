@@ -1,7 +1,10 @@
 package de.neuland.pug4j.lexer;
 
+import java.io.BufferedReader;
 import java.io.LineNumberReader;
 import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,31 +37,19 @@ public class Scanner {
 
     private void initFromReader(Reader reader) {
         try {
+            BufferedReader in = new BufferedReader(reader);
             StringBuilder sb = new StringBuilder();
-            LineNumberReader in = new LineNumberReader(reader);
             String s = "";
-            boolean first = true;
-//            int c = 0;
-//            while ((c = in.read()) != -1) {
-//                if(c != '\uFEFF' && !first) {
-//                    sb.append((char) c);
-//                }
-//                first = false;
-//            }
-            while ((s = in.readLine()) != null) {
-                if(!first) {
-                    sb.append("\n");
-                }else{
-                    s = s.replaceAll("^\\uFEFF", "");
-                }
-                first=false;
-                if (StringUtils.isNotEmpty(s)) {
-                    sb.append(s);
-                }
+            int data = in.read();
+            while(data != -1){
+                char theChar = (char) data;
+                sb.append(theChar);
+                data = in.read();
             }
             input = sb.toString();
             if (StringUtils.isNotBlank(input)) {
-                input = sb.toString().replaceAll("\\r\\n|\\r", "\\n");
+                input = input.replace("^\\uFEFF", "");
+                input = input.replaceAll("\\r\\n|\\r", "\\n");
             }
             in.close();
             reader.close();

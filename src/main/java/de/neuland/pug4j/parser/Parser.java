@@ -2,8 +2,8 @@ package de.neuland.pug4j.parser;
 
 import de.neuland.pug4j.exceptions.PugParserException;
 import de.neuland.pug4j.expression.ExpressionHandler;
-import de.neuland.pug4j.lexer.Assignment;
-import de.neuland.pug4j.lexer.Each;
+import de.neuland.pug4j.lexer.token.Assignment;
+import de.neuland.pug4j.lexer.token.Each;
 import de.neuland.pug4j.lexer.Lexer;
 import de.neuland.pug4j.lexer.token.*;
 import de.neuland.pug4j.parser.node.*;

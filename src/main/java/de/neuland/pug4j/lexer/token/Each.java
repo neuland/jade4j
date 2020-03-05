@@ -1,4 +1,4 @@
-package de.neuland.pug4j.lexer;
+package de.neuland.pug4j.lexer.token;
 
 import de.neuland.pug4j.lexer.token.Token;
 
