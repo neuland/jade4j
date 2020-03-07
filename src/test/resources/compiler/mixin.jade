@@ -1,4 +1,4 @@
-include includes/mixins
+include includes/mixins.jade
 
 mixin say(a, b)
   h1= a
@@ -12,8 +12,8 @@ mixin tell(a)
 mixin hello
   h3 world
   
-mixin say("hello", "world")
-mixin hello
++say("hello", "world")
++hello
 
 +tell("again")
   +say("hello", "world")

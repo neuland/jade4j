@@ -4,12 +4,14 @@ import de.neuland.pug4j.exceptions.ExpressionException;
 import de.neuland.pug4j.exceptions.PugLexerException;
 import de.neuland.pug4j.expression.ExpressionHandler;
 import de.neuland.pug4j.lexer.token.*;
+import de.neuland.pug4j.parser.node.ExpressionString;
 import de.neuland.pug4j.template.TemplateLoader;
 import de.neuland.pug4j.util.CharacterParser;
 import de.neuland.pug4j.util.Options;
 import de.neuland.pug4j.util.StringReplacer;
 import de.neuland.pug4j.util.StringReplacerCallback;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -46,6 +48,7 @@ public class Lexer {
     public static final Pattern PATTERN_ATTRIBUTES_BLOCK = Pattern.compile("^&attributes\\b");
     public static final Pattern PATTERN_WHITESPACE = Pattern.compile("[ \\n\\t]");
     public static final Pattern PATTERN_QUOTE = Pattern.compile("['\"]");
+    public static final int INFINITY = Integer.MAX_VALUE;
     @SuppressWarnings("unused")
     private LinkedList<String> options;
     Scanner scanner;
@@ -683,7 +686,7 @@ public class Lexer {
     }
 
     private void addText(Token token, String value){
-        addText(token,value,null);
+        addText(token,value,"");
     }
     private void addText(Token token, String value, String prefix) {
         addText(token,value,prefix,0);
@@ -696,15 +699,22 @@ public class Lexer {
         int indexOfStart = this.interpolationAllowed ? value.indexOf("#[") : -1;
         int indexOfEscaped = this.interpolationAllowed ? value.indexOf("\\#[") : -1;
         Matcher matchOfStringInterp = Pattern.compile("(\\\\)?([#!])\\{((?:.|\\n)*)$").matcher(value);
-        int indexOfStringInterp = this.interpolationAllowed && matchOfStringInterp.find(0) ? matchOfStringInterp.start() : -1;
+        int indexOfStringInterp = this.interpolationAllowed && matchOfStringInterp.find(0) ? matchOfStringInterp.start() : INFINITY;
 
-        if (indexOfEscaped != -1 && indexOfEscaped < indexOfEnd && indexOfEscaped < indexOfStart && indexOfEscaped < indexOfStringInterp) {
+        if (indexOfEnd == -1) indexOfEnd = INFINITY;
+        if (indexOfStart == -1) indexOfStart = INFINITY;
+        if (indexOfEscaped == -1) indexOfEscaped = INFINITY;
+
+
+        if (indexOfEscaped != INFINITY && indexOfEscaped < indexOfEnd && indexOfEscaped < indexOfStart && indexOfEscaped < indexOfStringInterp) {
             prefix = prefix + value.substring(0, indexOfEscaped) + "#[";
             this.addText(token, StringUtils.substring(value, indexOfEscaped + 3), prefix, escaped + 1);
             return;
         }
-        if (indexOfStart != -1 && indexOfStart < indexOfEnd && indexOfStart < indexOfEscaped && indexOfStart < indexOfStringInterp) {
+        if (indexOfStart != INFINITY && indexOfStart < indexOfEnd && indexOfStart < indexOfEscaped && indexOfStart < indexOfStringInterp) {
             Token newToken = tok(token);
+            if(prefix==null)
+                prefix="";
             newToken.setValue(prefix + StringUtils.substring(value, 0, indexOfStart));
             incrementColumn(prefix.length() + indexOfStart + escaped);
             pushToken(tokEnd(newToken));
@@ -713,7 +723,7 @@ public class Lexer {
             pushToken(this.tokEnd(startPugInterpolation));
             Lexer child = null;
             try {
-                child = new Lexer(value.substring(indexOfStart + 2),this.filename, templateLoader, expressionHandler,this.lineno,this.colno,this.interpolated);
+                child = new Lexer(value.substring(indexOfStart + 2),this.filename, templateLoader, expressionHandler,this.lineno,this.colno,true);
             } catch (IOException e) {
                 new PugLexerException(e.getMessage(),this.filename,this.lineno,templateLoader);
             }
@@ -726,7 +736,7 @@ public class Lexer {
             this.addText(token, child.getInput());
             return;
         }
-        if (indexOfEnd != -1 && indexOfEnd < indexOfStart && indexOfEnd < indexOfEscaped && indexOfEnd < indexOfStringInterp) {
+        if (indexOfEnd != INFINITY && indexOfEnd < indexOfStart && indexOfEnd < indexOfEscaped && indexOfEnd < indexOfStringInterp) {
             if ((prefix + StringUtils.substring(value,0, indexOfEnd)).length()>0) {
                 this.addText(token, value.substring(0, indexOfEnd), prefix);
             }
@@ -734,7 +744,7 @@ public class Lexer {
             scanner.setInput(value.substring(value.indexOf(']') + 1) + scanner.getInput());
             return;
         }
-        if (indexOfStringInterp != -1) {
+        if (indexOfStringInterp != INFINITY) {
             if (matchOfStringInterp.group(1)!=null) {
                 prefix = prefix + StringUtils.substring(value,0, indexOfStringInterp) + "#{";
                 this.addText(token, value.substring(indexOfStringInterp + 3), prefix, escaped + 1);
@@ -745,7 +755,8 @@ public class Lexer {
 
             String before = StringUtils.substring(value, 0, 0 + indexOfStringInterp);
             if (prefix != null || before != null) {
-                before = prefix + before;
+                if(prefix!=null)
+                    before = prefix + before;
                 Token tok = this.tok(token);
                 tok.setValue(before);
                 this.incrementColumn(before.length() + escaped);
@@ -1320,7 +1331,7 @@ public class Lexer {
 
         AttributeValueResponse valueResponse = this.attributeValue(str.substring(i));
 
-        if (valueResponse.getValue()!=null && valueResponse.getValue().length()>0) {
+        if (valueResponse.getValue()!=null) {
             tok.setAttributeValue(valueResponse.getValue());
             tok.setEscaped(valueResponse.isMustEscape());
         } else {
@@ -1462,16 +1473,26 @@ public class Lexer {
             }
         }
 
-        try {
-            expressionHandler.assertExpression(val);
-        } catch (ExpressionException e) {
-            throw new PugLexerException(e.getMessage(),this.filename,this.lineno,templateLoader);
-        }
-
-
         this.lineno = line;
         this.colno = col;
-        return new AttributeValueResponse(val,escapeAttr,str.substring(i));
+
+        if ("".equals(val)) {
+            return new AttributeValueResponse(Boolean.TRUE,false,str.substring(i));
+        } else if (doubleQuotedRe.matcher(val).matches()
+                || quotedRe.matcher(val).matches()) {
+            //toConstant
+            val = val.trim();
+            val = val.replaceAll("\\n","");
+            val = StringEscapeUtils.unescapeJson(val);
+            String value = cleanRe.matcher(val).replaceAll("");
+
+            return new AttributeValueResponse(value,escapeAttr,str.substring(i));
+        } else {
+            ExpressionString value = new ExpressionString(val);
+            value.setEscape(escapeAttr);
+            assertExpression(val);
+            return new AttributeValueResponse(value,escapeAttr,str.substring(i));
+        }
     }
 //        AttributeList tok = new AttributeList();
 //        tok(tok);
@@ -1901,10 +1922,8 @@ public class Lexer {
     public LinkedList<Token> getTokens(){
         Token t = null;
         LinkedList<Token> list = new LinkedList<Token>();
-        while((t = this.advance()) != null){
-            list.add(t);
-            if(t instanceof Eos)
-                break;
+        while(!ended){
+            list.add(advance());
         }
         return list;
     }

@@ -13,7 +13,7 @@ public class TestFileHelper {
 	public static final String TESTFILE_20190911_ORIGINAL_FOLDER = "/originalTests20190911/";
 	public static final String TESTFILE_20150927_ORIGINAL_FOLDER = "/originalTests20150927/";
     public static final String TESTFILE_20150515_ORIGINAL_FOLDER = "/originalTests20150515/";
-    public static final String TESTFILE_PUG2_ORIGINAL_FOLDER = "/pug@2.0.4/";
+    public static final String TESTFILE_PUG2_ORIGINAL_FOLDER = "/pug@2.0.4/cases/";
     public static final String TESTFILE_ISSUES_FOLDER = "/issues/";
     public static final String TESTFILE_COMPILER_ERROR_FOLDER = "/compiler/errors/";
     

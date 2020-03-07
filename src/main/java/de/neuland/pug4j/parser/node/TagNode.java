@@ -36,9 +36,16 @@ public class TagNode extends AttrsNode {
     private boolean isInline(Node node) {
         // Recurse if the node is a block
         if (node instanceof BlockNode) {
-            return everyIsInline(node.getNodes());
+            return ((BlockNode) node).isYield() || everyIsInline(node.getNodes());
         }
-        return node instanceof TextNode || (ArrayUtils.indexOf(inlineTags, node.getName()) > -1);
+        boolean inline = false;
+        if(node instanceof ExpressionNode){
+            inline = ((ExpressionNode) node).isInline();
+        }
+        if(node instanceof TagNode){
+            inline = ((TagNode) node).isInline();
+        }
+        return (node instanceof TextNode && !"\n".equals(node.getValue())) || inline;
     }
 
     private boolean everyIsInline(LinkedList<Node> nodes) {
@@ -87,6 +94,11 @@ public class TagNode extends AttrsNode {
     public void execute(IndentWriter writer, PugModel model, PugTemplate template) throws PugCompilerException {
         writer.increment();
 
+
+        if ("pre".equals(this.name)) {
+            writer.setEscape(true);
+        }
+
         if (!writer.isCompiledTag()) {
             if (!writer.isCompiledDoctype() && "html".equals(name)) {
 //              template.setDoctype(null);
@@ -94,43 +106,31 @@ public class TagNode extends AttrsNode {
             writer.setCompiledTag(true);
         }
 
-        if ("pre".equals(this.name)) {
-            writer.setEscape(true);
-        }
+        // pretty print
         if (writer.isPp() && !isInline()) {
             writer.prettyIndent(0, true);
         }
 
-        if (isSelfClosing()) {
-            openTag(writer, model, template, true);
+        if (isSelfClosing() || (!template.isXml() && isBodyless())) {
+            openTag(writer, model, template, !(template.isTerse() && !isSelfClosing()));
             if (hasBlock()) {
                 handleIgnoredBlock();
             }
-
-        } else if (template.isXml() || !isBodyless()) {
+        } else {
             openTag(writer, model, template, false);
+
             if (hasCodeNode()) {
                 codeNode.execute(writer, model, template);
             }
             if (hasBlock()) {
                 block.execute(writer, model, template);
             }
-            // pretty print
             if (writer.isPp() && !isInline() && !"pre".equals(name) && !canInline()) {
                 writer.prettyIndent(0, true);
             }
             writer.append("</");
             writer.append(bufferName(template, model));
             writer.append(">");
-
-        } else {
-            if (template.isTerse()) {
-                openTag(writer, model, template, false);
-
-            } else {
-                openTag(writer, model, template, true);
-            }
-
             if (hasBlock()) {
                 handleIgnoredBlock();
             }

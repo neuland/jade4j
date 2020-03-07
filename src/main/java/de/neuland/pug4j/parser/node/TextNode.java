@@ -14,7 +14,7 @@ public class TextNode extends Node {
 
 	private String value = "";
 	private List<Object> preparedValue = new LinkedList<Object>();
-
+	boolean isHtml = false;
 	public void appendText(String txt) {
 		value += txt;
 		prepare();
@@ -37,7 +37,7 @@ public class TextNode extends Node {
 	public void execute(IndentWriter writer, PugModel model, PugTemplate template) throws PugCompilerException {
 		try {
 			String string = Utils.interpolate(preparedValue, model,template.getExpressionHandler());
-			writer.append(string);
+			writer.append(value);
 		} catch (ExpressionException e) {
 			throw new PugCompilerException(this, template.getTemplateLoader(), e);
 		}
@@ -49,5 +49,13 @@ public class TextNode extends Node {
 
 	public LinkedList<Node> getNodes() {
 		return nodes;
+	}
+
+	public boolean isHtml() {
+		return isHtml;
+	}
+
+	public void setHtml(boolean html) {
+		isHtml = html;
 	}
 }

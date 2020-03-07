@@ -75,14 +75,14 @@ public class OriginalPug2Test {
         jade.setFilter("plain", new PlainFilter());
         jade.setFilter("cdata", new CDATAFilter());
         jade.setPrettyPrint(true);
-        PugTemplate template = jade.getTemplate("/cases/" + file);
+        PugTemplate template = jade.getTemplate("" + file);
         Writer writer = new StringWriter();
         HashMap<String, Object> model = new HashMap<String, Object>();
         model.put("title","Jade");
         jade.renderTemplate(template,model, writer);
         String html = writer.toString();
 
-        String pathToExpectedHtml = basePath + "/cases/" + file.replace(".pug", ".html");
+        String pathToExpectedHtml = basePath + "" + file.replace(".pug", ".html");
         String expected = readFile(pathToExpectedHtml).trim().replaceAll("\r", "");
 
         assertEquals(file, expected, html.trim());
@@ -94,7 +94,7 @@ public class OriginalPug2Test {
 
     @Parameterized.Parameters(name="{0}")
     public static Collection<String[]> data() {
-        File folder = new File(TestFileHelper.getOriginalPug2ResourcePath("/cases/"));
+        File folder = new File(TestFileHelper.getOriginalPug2ResourcePath(""));
         Collection<File> files = FileUtils.listFiles(folder, new String[]{"pug"}, false);
 
         Collection<String[]> data = new ArrayList<String[]>();

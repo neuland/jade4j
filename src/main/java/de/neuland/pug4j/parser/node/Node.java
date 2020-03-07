@@ -11,6 +11,7 @@ public abstract class Node implements Cloneable {
 
 	protected LinkedList<Node> nodes = new LinkedList<Node>();
     protected int lineNumber;
+    protected int column;
     protected String name;
     protected String value;
     protected Node block;
@@ -100,4 +101,12 @@ public abstract class Node implements Cloneable {
 
 		return clone;
 	}
+
+    public void setColumn(int startColumn){
+        this.column = startColumn;
+    }
+
+    public int getColumn() {
+        return column;
+    }
 }

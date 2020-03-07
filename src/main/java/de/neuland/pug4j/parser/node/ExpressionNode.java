@@ -12,6 +12,7 @@ public class ExpressionNode extends Node {
 
 	private boolean escape;
 	private boolean buffer;
+	private boolean inline;
 
 	public void setEscape(boolean escape) {
 		this.escape = escape;
@@ -19,6 +20,14 @@ public class ExpressionNode extends Node {
 
 	public void setBuffer(boolean buffer) {
 		this.buffer = buffer;
+	}
+
+	public boolean isInline() {
+		return inline;
+	}
+
+	public void setInline(boolean inline) {
+		this.inline = inline;
 	}
 
 	@Override

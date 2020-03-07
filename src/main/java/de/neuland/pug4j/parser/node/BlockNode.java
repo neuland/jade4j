@@ -18,6 +18,7 @@ public class BlockNode extends Node {
 	private Collection<? extends Node> appended = new ArrayList<Node>();;
 	private Parser parser;
 	private boolean subBlock;
+	private boolean namedBlock;
 
 	public void execute(IndentWriter writer, PugModel model, PugTemplate template) throws PugCompilerException {
 
@@ -27,16 +28,10 @@ public class BlockNode extends Node {
 
 		for (int i = 0; i < getNodes().size(); ++i) {
 			// Pretty print text
-			if (writer.isPp() && i > 0 && !writer.isEscape() && getNodes().get(i) instanceof TextNode && getNodes().get(i - 1) instanceof TextNode)
+			if (writer.isPp() && i > 0 && !writer.isEscape() && getNodes().get(i) instanceof TextNode && getNodes().get(i - 1) instanceof TextNode && "\n".equals(getNodes().get(i - 1).getValue()))
 				writer.prettyIndent(1, false);
 
 			getNodes().get(i).execute(writer, model, template);
-			// Multiple text nodes are separated by newlines
-			Node nextNode = null;
-			if(i+1 < getNodes().size())
-				nextNode = getNodes().get(i + 1);
-			if (nextNode !=null && getNodes().get(i) instanceof TextNode && nextNode instanceof TextNode)
-				writer.append("\n");
 		}
 
 	}
@@ -117,5 +112,13 @@ public class BlockNode extends Node {
 
 	public boolean isSubBlock() {
 		return subBlock;
+	}
+
+	public boolean isNamedBlock() {
+		return namedBlock;
+	}
+
+	public void setNamedBlock(boolean namedBlock) {
+		this.namedBlock = namedBlock;
 	}
 }

@@ -30,6 +30,7 @@ public class LargeBodyTextParserTest extends ParserTest {
         assertThat(block.getNodes(), notNullValue());
         
         assertThat(block.pollNode().getValue(), equalTo("Hello World!"));
+        assertThat(block.pollNode().getValue(), equalTo("\n"));
         assertThat(block.pollNode().getValue(), equalTo(" Here comes the Message!"));
         
         assertThat(block.hasNodes(), equalTo(false));

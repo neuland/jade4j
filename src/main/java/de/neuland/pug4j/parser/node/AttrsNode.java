@@ -185,36 +185,6 @@ public abstract class AttrsNode extends Node {
     private void addAttributesToMap(HashMap<String, String> newAttributes, ArrayList<String> classes, ArrayList<Boolean> classEscaping, Attr attribute, PugModel model, PugTemplate template) throws ExpressionException {
         String name = attribute.getName();
         boolean escaped = attribute.isEscaped();
-//        if ("class".equals(key)) {
-//          classes.push(attr.val);
-//          classEscaping.push(attr.escaped);
-//        } else if (isConstant(attr.val)) {
-//          if (buffer) {
-//            this.buffer(runtime.attr(key, toConstant(attr.val), escaped, this.terse));
-//          } else {
-//            var val = toConstant(attr.val);
-//            if (key === 'style') val = runtime.style(val);
-//            if (escaped && !(key.indexOf('data') === 0 && typeof val !== 'string')) {
-//              val = runtime.escape(val);
-//            }
-//            buf.push(utils.stringify(key) + ': ' + utils.stringify(val));
-//          }
-//        } else {
-//          if (buffer) {
-//            this.bufferExpression('jade.attr("' + key + '", ' + attr.val + ', ' + utils.stringify(escaped) + ', ' + utils.stringify(this.terse) + ')');
-//          } else {
-//            var val = attr.val;
-//            if (key === 'style') {
-//              val = 'jade.style(' + val + ')';
-//            }
-//            if (escaped && !(key.indexOf('data') === 0)) {
-//              val = 'jade.escape(' + val + ')';
-//            } else if (escaped) {
-//              val = '(typeof (jade_interp = ' + val + ') == "string" ? jade.escape(jade_interp) : jade_interp)';
-//            }
-//            buf.push(utils.stringify(key) + ': ' + val);
-//          }
-//        }
 
         String value = null;
         Object attributeValue = attribute.getValue();

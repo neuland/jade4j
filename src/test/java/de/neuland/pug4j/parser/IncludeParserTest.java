@@ -31,26 +31,25 @@ public class IncludeParserTest extends ParserTest {
         pNode = (BlockNode) tagNode.getBlock();
         textNode = (TextNode) pNode.getNodes().get(0);
         assertThat(textNode.getValue(), equalTo("Before Include"));
-        
-        includeNode = (BlockNode) root.pollNode();
-        tagNode = (TagNode) includeNode.pollNode();
+
+        //includeNode = (BlockNode) root.pollNode();
+        tagNode = (TagNode) root.pollNode();
         assertThat(tagNode.getName(), equalTo("span"));
         pNode = (BlockNode) tagNode.getBlock();
         textNode = (TextNode) pNode.getNodes().get(0);
         assertThat(textNode.getValue(), equalTo("Hello Include"));
-        
-        yieldNode = (BlockNode) includeNode.pollNode();
+
+        yieldNode = (BlockNode) root.pollNode();
         assertThat(yieldNode, notNullValue());
 
-        pNode = (BlockNode) yieldNode.pollNode();
-        tagNode = (TagNode) pNode.getNodes().get(0);
+        tagNode = (TagNode) yieldNode.pollNode();
         assertThat(tagNode.getName(), equalTo("p"));
         pNode = (BlockNode) tagNode.getBlock();
         textNode = (TextNode) pNode.getNodes().get(0);
         assertThat(textNode.getValue(), equalTo("After Include"));
 
         assertThat(yieldNode.hasNodes(), equalTo(false));
-        assertThat(includeNode.hasNodes(), equalTo(false));
+        assertThat(tagNode.hasNodes(), equalTo(false));
         assertThat(root.hasNodes(), equalTo(false));
 
     }
@@ -63,25 +62,24 @@ public class IncludeParserTest extends ParserTest {
         textNode = (TextNode) pNode.getNodes().get(0);
         assertThat(textNode.getValue(), equalTo("Before Include"));
 
-        includeNode = (BlockNode) root.pollNode();
-        tagNode = (TagNode) includeNode.pollNode();
+        //includeNode = (BlockNode) root.pollNode();
+        tagNode = (TagNode) root.pollNode();
         assertThat(tagNode.getName(), equalTo("span"));
         pNode = (BlockNode) tagNode.getBlock();
         textNode = (TextNode) pNode.getNodes().get(0);
         assertThat(textNode.getValue(), equalTo("Hello Include"));
 
-        yieldNode = (BlockNode) includeNode.pollNode();
+        yieldNode = (BlockNode) root.pollNode();
         assertThat(yieldNode, notNullValue());
 
-        pNode = (BlockNode) yieldNode.pollNode();
-        tagNode = (TagNode) pNode.getNodes().get(0);
+        tagNode = (TagNode) yieldNode.pollNode();
         assertThat(tagNode.getName(), equalTo("p"));
         pNode = (BlockNode) tagNode.getBlock();
         textNode = (TextNode) pNode.getNodes().get(0);
         assertThat(textNode.getValue(), equalTo("After Include"));
 
         assertThat(yieldNode.hasNodes(), equalTo(false));
-        assertThat(includeNode.hasNodes(), equalTo(false));
+        assertThat(tagNode.hasNodes(), equalTo(false));
         assertThat(root.hasNodes(), equalTo(false));
     }
 }
