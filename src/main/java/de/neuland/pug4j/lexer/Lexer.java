@@ -298,7 +298,7 @@ public class Lexer {
 
     public Token advance() {
         boolean found = true;
-        while (tokens.size() <= 0 && found) {
+        while (tokens.size() <= 0 && found && !ended) {
             found = next();
         }
 
@@ -476,7 +476,7 @@ public class Lexer {
             expression.setBuffer(flags.charAt(0) == '=' || flags.length()>1 && flags.charAt(1) == '=');
             incrementColumn(matcher.end()-matcher.group(2).length());
             if(expression.isBuffer()) {
-                assertExpression(matcher.group(2));
+                assertExpression(code);
             }
             incrementColumn(code.length());
             pushToken(tokEnd(expression));
@@ -815,7 +815,6 @@ public class Lexer {
         Token token = scan(Pattern.compile("^(<[^\\n]*)"), new TextHtml());
         if (token!=null) {
             addText(new TextHtml(),token.getValue());
-            pushToken(tokEnd(token));
             return true;
         }
         return false;
@@ -1923,7 +1922,9 @@ public class Lexer {
         Token t = null;
         LinkedList<Token> list = new LinkedList<Token>();
         while(!ended){
-            list.add(advance());
+            Token advance = advance();
+            if(advance!=null)
+                list.add(advance);
         }
         return list;
     }

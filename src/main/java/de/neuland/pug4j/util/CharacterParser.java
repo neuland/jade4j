@@ -310,7 +310,15 @@ public class CharacterParser {
                 } else {
                     state.setEscaped(false);
                 }
-            } else if (state.isRegexp()) {
+            } else if (state.isTemplateQuote()) {
+                if ('`'==character && !state.isEscaped()) {
+                    state.setTemplateQuote(false);
+                } else if ('\\'==character && !state.isEscaped()) {
+                    state.setEscaped(true);
+                } else {
+                    state.setEscaped(false);
+                }
+            }else if (state.isRegexp()) {
                 if ('/'==character && !state.isEscaped()) {
                     state.setRegexp(false);
                 } else if ('\\'==character && !state.isEscaped()) {
@@ -331,6 +339,8 @@ public class CharacterParser {
                 state.setSingleQuote(true);
             } else if (character == '"') {
                 state.setDoubleQuote(true);
+            } else if (character == '`') {
+                state.setTemplateQuote(true);
             } else if (character == '(') {
                 state.setRoundDepth(state.getRoundDepth()+1);
             } else if (character == ')') {
@@ -360,6 +370,7 @@ public class CharacterParser {
 
         private boolean singleQuote = false;
         private boolean doubleQuote = false;
+        private boolean templateQuote = false;
         private boolean regexp = false;
         private boolean regexpStart = false;
 
@@ -373,7 +384,7 @@ public class CharacterParser {
         private Character lastChar = null;
         private String src = "";
         public boolean isString(){
-            return this.singleQuote || this.doubleQuote;
+            return this.singleQuote || this.doubleQuote || this.templateQuote;
         }
         public boolean isComment(){
             return this.lineComment || this.blockComment;
@@ -416,6 +427,14 @@ public class CharacterParser {
 
         public void setDoubleQuote(boolean doubleQuote) {
             this.doubleQuote = doubleQuote;
+        }
+
+        public boolean isTemplateQuote() {
+            return templateQuote;
+        }
+
+        public void setTemplateQuote(boolean templateQuote) {
+            this.templateQuote = templateQuote;
         }
 
         public boolean isRegexp() {

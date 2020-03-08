@@ -82,7 +82,7 @@ public class OriginalPug2Test {
         jade.renderTemplate(template,model, writer);
         String html = writer.toString();
 
-        String pathToExpectedHtml = basePath + "" + file.replace(".pug", ".html");
+        String pathToExpectedHtml = basePath + file.replace(".pug", ".html");
         String expected = readFile(pathToExpectedHtml).trim().replaceAll("\r", "");
 
         assertEquals(file, expected, html.trim());

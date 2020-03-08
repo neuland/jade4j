@@ -531,7 +531,7 @@ public class Parser {
 
         //TODO: check where logik will be
         String templateName = pathToken.getValue().trim();
-        String path = pathHelper.resolvePath(filename, templateName, templateLoader.getExtension());
+        String path = templateLoader.resolvePath(filename, templateName, templateLoader.getExtension());
 
         try {
             if (filters.size()>0) {
@@ -620,7 +620,7 @@ public class Parser {
     private Parser createParser(String templateName) {
         templateName = ensurePugExtension(templateName);
         try {
-            String resolvedPath = pathHelper.resolvePath(this.filename, templateName, templateLoader.getExtension());
+            String resolvedPath = templateLoader.resolvePath(this.filename, templateName, templateLoader.getExtension());
             return new Parser(resolvedPath, templateLoader, expressionHandler);
         } catch (IOException e) {
             throw new PugParserException(
@@ -688,7 +688,7 @@ public class Parser {
             } else {
                 Node expr = parseExpr();
                 if (expr != null) {
-                    if(expr instanceof BlockNode){
+                    if(expr instanceof BlockNode && !((BlockNode) expr).isYield()){
                         block.getNodes().addAll(expr.getNodes());
                     }else {
                         block.push(expr);
@@ -780,7 +780,7 @@ public class Parser {
         while(true){
             if(peek() instanceof TextHtml){
                 Token text = advance();
-                if(currentNode!=null){
+                if(currentNode==null){
                     TextNode textNode = new TextNode();
                     textNode.setValue(text.getValue());
                     textNode.setFileName(this.filename);
@@ -797,7 +797,7 @@ public class Parser {
                 LinkedList<Node> blockNodes = block.getNodes();
                 for (Node node : blockNodes) {
                     if(node instanceof TextNode && ((TextNode) node).isHtml()){
-                        if(currentNode!=null){
+                        if(currentNode==null){
                             currentNode=node;
                             nodes.add(currentNode);
                         }else{

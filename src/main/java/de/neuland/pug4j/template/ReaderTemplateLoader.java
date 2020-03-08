@@ -52,4 +52,9 @@ public class ReaderTemplateLoader implements TemplateLoader {
 	public String getExtension() {
 		return extension;
 	}
+
+	@Override
+	public String resolvePath(String parentName, String templateName, String extension) {
+		return null;
+	}
 }

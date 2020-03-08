@@ -13,7 +13,7 @@ mixin comment (title, str)
 #user
   h1 Tobi
   .comments
-    mixin comment('This', (('is regular javascript')))
+    +comment('This', (('is regular javascript')))
 
 mixin list()
   ul
@@ -22,4 +22,4 @@ mixin list()
     li baz
 
 body
-  mixin list()
+  +list()
