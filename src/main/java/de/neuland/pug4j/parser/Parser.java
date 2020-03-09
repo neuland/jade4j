@@ -582,7 +582,9 @@ public class Parser {
         contexts.pop();
         ast.setFileName(path);
         if (peek() instanceof Indent && ast != null) {
-            ((BlockNode) ast).getIncludeBlock().push(block());
+            BlockNode includeBlock = ((BlockNode) ast).getIncludeBlock();
+            includeBlock.push(block());
+            includeBlock.setYield(false);
         }
 
         return ast;

@@ -13,34 +13,22 @@ import de.neuland.pug4j.template.PugTemplate;
 public class TextNode extends Node {
 
 	private String value = "";
-	private List<Object> preparedValue = new LinkedList<Object>();
 	boolean isHtml = false;
 	public void appendText(String txt) {
 		value += txt;
-		prepare();
 	}
 
 	public void setValue(String value) {
 		this.value = value;
-		prepare();
 	}
 
 	public String getValue() {
 		return value;
 	}
 
-	private void prepare() {
-		preparedValue = Utils.prepareInterpolate(value, false);
-	}
-
 	@Override
 	public void execute(IndentWriter writer, PugModel model, PugTemplate template) throws PugCompilerException {
-		try {
-			String string = Utils.interpolate(preparedValue, model,template.getExpressionHandler());
-			writer.append(value);
-		} catch (ExpressionException e) {
-			throw new PugCompilerException(this, template.getTemplateLoader(), e);
-		}
+		writer.append(value);
 	}
 
 	public void addNode(Node node) {

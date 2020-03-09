@@ -35,8 +35,11 @@ public class TagNode extends AttrsNode {
 
     private boolean isInline(Node node) {
         // Recurse if the node is a block
-        if (node instanceof BlockNode) {
-            return ((BlockNode) node).isYield() || everyIsInline(node.getNodes());
+        if (node instanceof BlockNode && !((BlockNode) node).isYield()) {
+            return everyIsInline(node.getNodes());
+        }
+        if (node instanceof BlockNode && ((BlockNode) node).isYield()) {
+            return true;
         }
         boolean inline = false;
         if(node instanceof ExpressionNode){
