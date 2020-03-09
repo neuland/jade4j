@@ -78,7 +78,7 @@ public class Parser {
             } else {
                 Node expr = parseExpr();
                 if (expr != null) {
-                    if(expr instanceof BlockNode){
+                    if(expr instanceof BlockNode && !((BlockNode) expr).isYield()){
                         block.getNodes().addAll(expr.getNodes());
                     }else {
                         block.push(expr);

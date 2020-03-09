@@ -686,7 +686,7 @@ public class Lexer {
     }
 
     private void addText(Token token, String value){
-        addText(token,value,"");
+        addText(token,value,null);
     }
     private void addText(Token token, String value, String prefix) {
         addText(token,value,prefix,0);
@@ -713,10 +713,13 @@ public class Lexer {
         }
         if (indexOfStart != INFINITY && indexOfStart < indexOfEnd && indexOfStart < indexOfEscaped && indexOfStart < indexOfStringInterp) {
             Token newToken = tok(token);
-            if(prefix==null)
-                prefix="";
-            newToken.setValue(prefix + StringUtils.substring(value, 0, indexOfStart));
-            incrementColumn(prefix.length() + indexOfStart + escaped);
+            if(prefix == null) {
+                newToken.setValue(StringUtils.substring(value, 0, indexOfStart));
+                incrementColumn(indexOfStart + escaped);
+            }else {
+                newToken.setValue(prefix + StringUtils.substring(value, 0, indexOfStart));
+                incrementColumn(prefix.length() + indexOfStart + escaped);
+            }
             pushToken(tokEnd(newToken));
             StartPugInterpolation startPugInterpolation = (StartPugInterpolation) this.tok(new StartPugInterpolation());
             this.incrementColumn(2);
@@ -737,8 +740,14 @@ public class Lexer {
             return;
         }
         if (indexOfEnd != INFINITY && indexOfEnd < indexOfStart && indexOfEnd < indexOfEscaped && indexOfEnd < indexOfStringInterp) {
-            if ((prefix + StringUtils.substring(value,0, indexOfEnd)).length()>0) {
-                this.addText(token, value.substring(0, indexOfEnd), prefix);
+            if(prefix == null){
+                if ((StringUtils.substring(value, 0, indexOfEnd)).length() > 0) {
+                    this.addText(token, value.substring(0, indexOfEnd), prefix);
+                }
+            }else {
+                if ((prefix + StringUtils.substring(value, 0, indexOfEnd)).length() > 0) {
+                    this.addText(token, value.substring(0, indexOfEnd), prefix);
+                }
             }
             this.ended = true;
             scanner.setInput(value.substring(value.indexOf(']') + 1) + scanner.getInput());
@@ -746,7 +755,11 @@ public class Lexer {
         }
         if (indexOfStringInterp != INFINITY) {
             if (matchOfStringInterp.group(1)!=null) {
-                prefix = prefix + StringUtils.substring(value,0, indexOfStringInterp) + "#{";
+                if(prefix==null) {
+                    prefix = StringUtils.substring(value, 0, indexOfStringInterp) + "#{";
+                }else{
+                    prefix = prefix + StringUtils.substring(value, 0, indexOfStringInterp) + "#{";
+                }
                 this.addText(token, value.substring(indexOfStringInterp + 3), prefix, escaped + 1);
                 return;
             }
