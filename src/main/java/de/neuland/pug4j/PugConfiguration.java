@@ -39,6 +39,8 @@ public class PugConfiguration {
     private Map<String, Object> sharedVariables = new HashMap<String, Object>();
     private TemplateLoader templateLoader = new FileTemplateLoader("", "UTF-8");
     private ExpressionHandler expressionHandler = new JexlExpressionHandler();
+//    private ExpressionHandler expressionHandler = new NashornExpressionHandler();
+//    private ExpressionHandler expressionHandler = new GraalJsExpressionHandler();
     protected static final int MAX_ENTRIES = 1000;
 
     public PugConfiguration() {

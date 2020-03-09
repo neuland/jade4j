@@ -12,7 +12,6 @@ import java.util.Collection;
 public class BlockNode extends Node {
 
 	private boolean yield = false;
-	private BlockNode yieldBlock;
 	private String mode;
 	private Collection<? extends Node> prepended = new ArrayList<Node>();
 	private Collection<? extends Node> appended = new ArrayList<Node>();;
@@ -44,15 +43,7 @@ public class BlockNode extends Node {
 		return yield;
 	}
 
-	public void setYieldBlock(BlockNode yieldBlock) {
-		this.yieldBlock = yieldBlock;
-	}
-
 	public BlockNode getYieldBlock() {
-		return yieldBlock;
-	}
-
-	public BlockNode getIncludeBlock() {
 		BlockNode ret = this;
 		for (Node node : getNodes()) {
 			if (node instanceof BlockNode && ((BlockNode) node).isYield()) {
@@ -61,11 +52,11 @@ public class BlockNode extends Node {
 			else if (node instanceof TagNode && ((TagNode) node).isTextOnly()) {
 				continue;
 			}
-			else if (node instanceof BlockNode && ((BlockNode) node).getIncludeBlock() != null) {
-				ret =  ((BlockNode) node).getIncludeBlock();
+			else if (node instanceof BlockNode && ((BlockNode) node).getYieldBlock() != null) {
+				ret =  ((BlockNode) node).getYieldBlock();
 			}
 			else if (node.hasBlock()) {
-				ret =  ((BlockNode) node.getBlock()).getIncludeBlock();
+				ret =  ((BlockNode) node.getBlock()).getYieldBlock();
 			}
 			if(ret instanceof BlockNode && ((BlockNode) ret).isYield()){
 				return ret;
