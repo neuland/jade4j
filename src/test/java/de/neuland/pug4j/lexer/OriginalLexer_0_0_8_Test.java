@@ -3,6 +3,7 @@ package de.neuland.pug4j.lexer;
 import com.google.gson.Gson;
 import de.neuland.pug4j.TestFileHelper;
 import de.neuland.pug4j.expression.JexlExpressionHandler;
+import de.neuland.pug4j.lexer.token.Attribute;
 import de.neuland.pug4j.lexer.token.Eos;
 import de.neuland.pug4j.lexer.token.Token;
 import de.neuland.pug4j.template.FileTemplateLoader;
@@ -27,9 +28,13 @@ public class OriginalLexer_0_0_8_Test {
 
         int line;
 
-        String val;
+        String name;
+
+        Object val;
 
         boolean selfClosing;
+
+        boolean escape;
     }
 
     private static String[] ignoredCases = new String[]{"html", "yield-before-conditional-head", "each.else", "inheritance.extend.mixins", "while", "mixin-block-with-space"};
@@ -47,6 +52,10 @@ public class OriginalLexer_0_0_8_Test {
         mappedTypes.put("pipelesstext", "start-pipeless-text");
         mappedTypes.put("attributesblock", "&attributes");
         mappedTypes.put("casetoken", "case");
+        mappedTypes.put("startpuginterpolation", "start-jade-interpolation");
+        mappedTypes.put("endpuginterpolation", "end-jade-interpolation");
+        mappedTypes.put("startpipelesstext", "start-pipeless-text");
+        mappedTypes.put("endpipelesstext", "end-pipeless-text");
     }
 
 
@@ -72,6 +81,10 @@ public class OriginalLexer_0_0_8_Test {
         return new Gson().fromJson(expected, ExpectedToken.class);
     }
 
+    private String tokenToJsonLine(ExpectedToken expected) {
+        return new Gson().toJson(expected);
+    }
+
     private String readFile(String fileName) throws IOException {
         return FileUtils.readFileToString(new File(TestFileHelper.getLexer_0_0_8_ResourcePath("cases/" + fileName)));
     }
@@ -88,7 +101,23 @@ public class OriginalLexer_0_0_8_Test {
         Lexer lexer1 = new Lexer(file, loader1, new JexlExpressionHandler());
         LinkedList<Token> tokens = lexer1.getTokens();
         String[] expected = readFile(file.replace(".jade", ".expected.json")).split("\\n");
+        ArrayList<String> actual = new ArrayList<String>();
 
+        for (Token token : tokens) {
+            ExpectedToken expectedToken = new ExpectedToken();
+            expectedToken.type=typeOf(token);
+            expectedToken.selfClosing=token.isSelfClosing();
+            if(token instanceof Attribute) {
+                expectedToken.val = ((Attribute) token).getAttributeValue();
+                expectedToken.name = token.getName();
+            }else{
+                expectedToken.val=token.getValue();
+            }
+            expectedToken.line=token.getStartLineNumber();
+            String s = tokenToJsonLine(expectedToken);
+            actual.add(s);
+        }
+        assertToken(expected,actual);
         for (int i = 0; i < expected.length; i++) {
             Token token = tokens.get(i);
             if (breakOnEndOfStreamTokens(token)) {
@@ -101,7 +130,18 @@ public class OriginalLexer_0_0_8_Test {
             assertToken(token, expectedToken);
         }
     }
+    private void assertToken(String[] expected,List<String>actual){
+        StringBuffer expectedString = new StringBuffer();
+        for (String s : expected) {
+            expectedString.append(s).append("\n");
 
+        }
+        StringBuffer actualString = new StringBuffer();
+        for (String s : actual) {
+            actualString.append(s).append("\n");
+        }
+        assertThat(actualString).isEqualTo(expectedString);
+    }
     private void assertToken(Token token, ExpectedToken expectedToken) {
         assertThat(typeOf(token)).isEqualTo(expectedToken.type);
         assertThat(token.isSelfClosing()).isEqualTo(expectedToken.selfClosing);

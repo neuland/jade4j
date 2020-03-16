@@ -20,7 +20,8 @@ select
 a(foo="class:")
 input(pattern='\\S+')
 foo(terse="true")
-foo(date=new Date(0))
+//- Not supported in PUG4J
+//-foo(date=new Date(0))
 
 foo(abc
    ,def)
@@ -35,7 +36,8 @@ foo(abc
 foo(abc
     def)
 
-- var attrs = {foo: 'bar', bar: '<baz>'}
+//- Keys need Quotes in PUG4J
+- var attrs = {"foo": 'bar', "bar": '<baz>'}
 
 div&attributes(attrs)
 

@@ -2,6 +2,7 @@ package de.neuland.pug4j.lexer;
 
 import de.neuland.pug4j.exceptions.ExpressionException;
 import de.neuland.pug4j.exceptions.PugLexerException;
+import de.neuland.pug4j.exceptions.PugParserException;
 import de.neuland.pug4j.expression.ExpressionHandler;
 import de.neuland.pug4j.lexer.token.*;
 import de.neuland.pug4j.parser.node.ExpressionString;
@@ -110,6 +111,13 @@ public class Lexer {
         colno = 1;
         characterParser = new CharacterParser();
         int x = 0;
+    }
+
+    private PugLexerException error(String code, String message, Token token){
+        int startLineNumber = 0;
+        if(token!=null)
+            token.getStartLineNumber();
+        return new PugLexerException(code,message,this.filename, startLineNumber,templateLoader);
     }
 
     public boolean next() {
@@ -843,7 +851,7 @@ public class Lexer {
     }
 
     private boolean fail() {
-        throw new PugLexerException("unexpected text " + StringUtils.substring(scanner.getInput(),0,5), filename, getLineno(), templateLoader);
+        throw error("UNEXPECTED_TEXT","unexpected text \"" + StringUtils.substring(scanner.getInput(),0,5) + "\"",null);
     }
 //  "extends": function() {
 //        var tok = this.scan(/^extends?(?= |$|\n)/, 'extends');
@@ -1343,9 +1351,29 @@ public class Lexer {
 
         AttributeValueResponse valueResponse = this.attributeValue(str.substring(i));
 
+
         if (valueResponse.getValue()!=null) {
-            tok.setAttributeValue(valueResponse.getValue());
-            tok.setEscaped(valueResponse.isMustEscape());
+            if ("".equals(valueResponse.getValue())) {
+                tok.setAttributeValue(true);
+                tok.setEscaped(false);
+            } else if (doubleQuotedRe.matcher(valueResponse.getValue()).matches()
+                    || quotedRe.matcher(valueResponse.getValue()).matches()) {
+                //toConstant
+                String val = valueResponse.getValue();
+                val = val.trim();
+                val = val.replaceAll("\\n","");
+                val = StringEscapeUtils.unescapeJson(val);
+                String cleanValue = cleanRe.matcher(val).replaceAll("");
+
+                tok.setAttributeValue(cleanValue);
+                tok.setEscaped(valueResponse.isMustEscape());
+            } else {
+                ExpressionString expressionString = new ExpressionString(valueResponse.getValue());
+                expressionString.setEscape(valueResponse.isMustEscape());
+                assertExpression(valueResponse.getValue());
+                tok.setAttributeValue(expressionString);
+                tok.setEscaped(valueResponse.isMustEscape());
+            }
         } else {
             // was a boolean attribute (ex: `input(disabled)`)
             tok.setAttributeValue(true);
@@ -1489,21 +1517,9 @@ public class Lexer {
         this.colno = col;
 
         if ("".equals(val)) {
-            return new AttributeValueResponse(Boolean.TRUE,false,str.substring(i));
-        } else if (doubleQuotedRe.matcher(val).matches()
-                || quotedRe.matcher(val).matches()) {
-            //toConstant
-            val = val.trim();
-            val = val.replaceAll("\\n","");
-            val = StringEscapeUtils.unescapeJson(val);
-            String value = cleanRe.matcher(val).replaceAll("");
-
-            return new AttributeValueResponse(value,escapeAttr,str.substring(i));
+            return new AttributeValueResponse("",false,str.substring(i));
         } else {
-            ExpressionString value = new ExpressionString(val);
-            value.setEscape(escapeAttr);
-            assertExpression(val);
-            return new AttributeValueResponse(value,escapeAttr,str.substring(i));
+            return new AttributeValueResponse(val, escapeAttr, str.substring(i));
         }
     }
 //        AttributeList tok = new AttributeList();

@@ -9,4 +9,7 @@ public class PugLexerException extends PugException {
 	public PugLexerException(String message, String filename, int lineNumber, TemplateLoader templateLoader) {
 		super(message, filename, lineNumber, templateLoader, null);
 	}
+	public PugLexerException(String code, String message, String filename, int lineNumber, TemplateLoader templateLoader) {
+		this(message, filename, lineNumber, templateLoader);
+	}
 }

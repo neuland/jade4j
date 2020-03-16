@@ -1,9 +1,13 @@
 mixin centered(title)
   div.centered(id=attributes.id)
-    - if (title)
+    //- Not supported in PUG4J
+    //- - if (title)
+    if (title)
       h1(class=attributes.class)= title
     block
-    - if (attributes.href)
+    //- Not supported in PUG4J
+    //- - if (attributes.href)
+    if (attributes.href)
       .footer
         a(href=attributes.href) Back
 

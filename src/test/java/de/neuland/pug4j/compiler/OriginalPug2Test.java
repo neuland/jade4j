@@ -28,35 +28,35 @@ import static org.junit.Assert.assertEquals;
 public class OriginalPug2Test {
 //    private static String[] ignoredCases = new String[]{};
     private static String[] ignoredCases = new String[] {
-            "filter-in-include",
-            "filters.markdown",     // additional empty line
-            "filters-empty",
-            "filters.custom",
-            "filters.include",
-            "filters.include.custom",
+            "regression.784",       // javascript replace not supported
+//            "filter-in-include",
+//            "filters.markdown",     // additional empty line
+//            "filters-empty",
+//            "filters.custom",
+//            "filters.include",
+//            "filters.include.custom",
             "filters.stylus",
-            "filters.inline",       // wrong line break, probably same as "inline-tag"
+//            "filters.inline",       // wrong line break, probably same as "inline-tag"
             "filters.less",
-            "filters.coffeescript",
+//            "filters.coffeescript",
 
 
-            "escape-test",          // html tag <textarea> closed on next line
-            "mixin-hoist",          // global variable `title = "Pug"` not present
-            "mixin-block-with-space",  //piped text does not appear
-            "inline-tag",              // fails to treat pipes as new lines
-            "includes",                 // different line breaks
+//            "escape-test",          // html tag <textarea> closed on next line
+//            "mixin-block-with-space",  //piped text does not appear
+//            "inline-tag",              // fails to treat pipes as new lines
+//            "includes",                 // different line breaks
 
 
-            "styles",               // JSON representation compiles to Objects, not CSS !
+//            "styles",               // JSON representation compiles to Objects, not CSS !
 
 
             // try to read files in ../
-            "mixin-via-include",
-            "layout.append.without-block",
-            "layout.prepend.without-block",
+//            "mixin-via-include",
+//            "layout.append.without-block",
+//            "layout.prepend.without-block",
 //            "layout.multi.append.prepend.block",
-            "include-extends-relative",
-            "layout.prepend",
+//            "include-extends-relative",
+//            "layout.prepend",
 
     };
 
@@ -78,7 +78,7 @@ public class OriginalPug2Test {
         PugTemplate template = jade.getTemplate("" + file);
         Writer writer = new StringWriter();
         HashMap<String, Object> model = new HashMap<String, Object>();
-        model.put("title","Jade");
+        model.put("title","Pug");
         jade.renderTemplate(template,model, writer);
         String html = writer.toString();
 

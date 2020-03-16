@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 public class Scanner {
 
     private String input;
+    public static final String UTF8_BOM = "\uFEFF";
 
     public Scanner(Reader reader) {
     	initFromReader(reader);
@@ -48,7 +49,7 @@ public class Scanner {
             }
             input = sb.toString();
             if (StringUtils.isNotBlank(input)) {
-                input = input.replace("^\\uFEFF", "");
+                input = removeUTF8BOM(input);
                 input = input.replaceAll("\\r\\n|\\r", "\\n");
             }
             in.close();
@@ -116,5 +117,14 @@ public class Scanner {
 
     public void setInput(String input) {
         this.input = input;
+    }
+
+
+
+    private String removeUTF8BOM(String s) {
+        if (s.startsWith(UTF8_BOM)) {
+            s = s.substring(1);
+        }
+        return s;
     }
 }
