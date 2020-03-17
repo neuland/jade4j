@@ -1,5 +1,5 @@
 # History
-## 1.3.2 / 2020-03-17
+## 1.3.2 / 2020-03-17  
 * Fixed issue #193: Mixin's block argument can't execute multiple times in a loop
 
 ## 1.3.1 / 2020-02-28
