@@ -13,7 +13,7 @@ public class MarkdownFilter extends CachingFilter {
 
 	@Override
 	protected String convert(String source, List<Attr> attributes) {
-		return renderer.render(parser.parse(source));
+		return renderer.render(parser.parse(source)).trim();
 	}
 
 }

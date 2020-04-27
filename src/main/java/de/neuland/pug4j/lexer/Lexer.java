@@ -442,7 +442,7 @@ public class Lexer {
         for (int i = 0;!indentStack.get(i).equals(0);i++) {
             pushToken(tokEnd(tok(new Outdent())));
         }
-        pushToken(tokEnd(tok(new Eos("eos", lineno))));
+        pushToken(tokEnd(tok(new Eos(null, lineno))));
         this.ended = true;
         return true;
     }
@@ -715,7 +715,11 @@ public class Lexer {
 
 
         if (indexOfEscaped != INFINITY && indexOfEscaped < indexOfEnd && indexOfEscaped < indexOfStart && indexOfEscaped < indexOfStringInterp) {
-            prefix = prefix + value.substring(0, indexOfEscaped) + "#[";
+            if(prefix!=null) {
+                prefix = prefix + value.substring(0, indexOfEscaped) + "#[";
+            }else {
+                prefix = value.substring(0, indexOfEscaped) + "#[";
+            }
             this.addText(token, StringUtils.substring(value, indexOfEscaped + 3), prefix, escaped + 1);
             return;
         }
@@ -1950,7 +1954,7 @@ public class Lexer {
     public LinkedList<Token> getTokens(){
         Token t = null;
         LinkedList<Token> list = new LinkedList<Token>();
-        while(!ended){
+        while(!ended || tokens.size()>0){
             Token advance = advance();
             if(advance!=null)
                 list.add(advance);

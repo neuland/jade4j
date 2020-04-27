@@ -1,27 +1,29 @@
-{"type":"tag","line":1,"val":"html","selfClosing":false}
-{"type":"indent","line":2,"val":2}
-{"type":"tag","line":2,"val":"body","selfClosing":false}
-{"type":"indent","line":3,"val":4}
-{"type":"code","line":3,"val":"var friends = 1","escape":false,"buffer":false}
-{"type":"newline","line":4}
-{"type":"case","line":4,"val":"friends"}
-{"type":"indent","line":5,"val":6}
-{"type":"when","line":5,"val":"0"}
-{"type":"indent","line":6,"val":8}
-{"type":"tag","line":6,"val":"p","selfClosing":false}
-{"type":"text","line":6,"val":"you have no friends"}
-{"type":"outdent","line":7}
-{"type":"when","line":7,"val":"1"}
-{"type":"indent","line":8,"val":8}
-{"type":"tag","line":8,"val":"p","selfClosing":false}
-{"type":"text","line":8,"val":"you have a friend"}
-{"type":"outdent","line":9}
-{"type":"default","line":9}
-{"type":"indent","line":10,"val":8}
-{"type":"tag","line":10,"val":"p","selfClosing":false}
-{"type":"text","line":10,"val":"you have #{friends} friends"}
-{"type":"outdent","line":10}
-{"type":"outdent","line":10}
-{"type":"outdent","line":10}
-{"type":"outdent","line":10}
-{"type":"eos","line":10}
+{"type":"tag","line":1,"col":1,"val":"html","selfClosing":false}
+{"type":"indent","line":2,"col":1,"val":"2"}
+{"type":"tag","line":2,"col":3,"val":"body","selfClosing":false}
+{"type":"indent","line":3,"col":1,"val":"4"}
+{"type":"code","line":3,"col":5,"val":"var friends = 1","escape":false,"buffer":false}
+{"type":"newline","line":4,"col":1}
+{"type":"case","line":4,"col":5,"val":"friends"}
+{"type":"indent","line":5,"col":1,"val":"6"}
+{"type":"when","line":5,"col":7,"val":"0"}
+{"type":"indent","line":6,"col":1,"val":"8"}
+{"type":"tag","line":6,"col":9,"val":"p","selfClosing":false}
+{"type":"text","line":6,"col":11,"val":"you have no friends"}
+{"type":"outdent","line":7,"col":1}
+{"type":"when","line":7,"col":7,"val":"1"}
+{"type":"indent","line":8,"col":1,"val":"8"}
+{"type":"tag","line":8,"col":9,"val":"p","selfClosing":false}
+{"type":"text","line":8,"col":11,"val":"you have a friend"}
+{"type":"outdent","line":9,"col":1}
+{"type":"default","line":9,"col":7}
+{"type":"indent","line":10,"col":1,"val":"8"}
+{"type":"tag","line":10,"col":9,"val":"p","selfClosing":false}
+{"type":"text","line":10,"col":11,"val":"you have "}
+{"type":"interpolatedcode","line":10,"col":20,"val":"friends"}
+{"type":"text","line":10,"col":30,"val":" friends"}
+{"type":"outdent","line":10,"col":38}
+{"type":"outdent","line":10,"col":38}
+{"type":"outdent","line":10,"col":38}
+{"type":"outdent","line":10,"col":38}
+{"type":"eos","line":10,"col":38}

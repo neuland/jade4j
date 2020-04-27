@@ -44,7 +44,7 @@ public class CompilerIndentationErrorTest {
         Parser parser = null;
         try {
             FileTemplateLoader loader = new FileTemplateLoader(TestFileHelper.getCompilerErrorsResourcePath(""),
-                    "UTF-8","jade");
+                    "jade");
             parser = new Parser(testName, loader, new JexlExpressionHandler());
         } catch (IOException e) {
             e.printStackTrace();

@@ -41,7 +41,7 @@ public class OriginalJade20150927Test {
     public void shouldCompileJadeToHtml() throws Exception {
         PugConfiguration jade = new PugConfiguration();
         String basePath = TestFileHelper.getOriginal20150515ResourcePath("");
-        jade.setTemplateLoader(new FileTemplateLoader(basePath,"UTF-8","jade"));
+        jade.setTemplateLoader(new FileTemplateLoader(basePath,"jade"));
         jade.setMode(Pug4J.Mode.XHTML); // original jade uses xhtml by default
         jade.setFilter("plain", new PlainFilter());
         jade.setFilter("cdata", new CDATAFilter());

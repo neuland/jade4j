@@ -6,6 +6,7 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -439,7 +440,7 @@ public class CompilerTest {
         JexlExpressionHandler expressionHandler = new JexlExpressionHandler();
         try {
             FileTemplateLoader loader = new FileTemplateLoader(
-                    TestFileHelper.getCompilerResourcePath(""), "UTF-8","jade");
+                    TestFileHelper.getCompilerResourcePath(""), "jade");
             parser = new Parser(testName, loader, expressionHandler);
         } catch (IOException e) {
             e.printStackTrace();

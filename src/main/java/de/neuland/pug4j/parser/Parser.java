@@ -531,7 +531,7 @@ public class Parser {
 
         //TODO: check where logik will be
         String templateName = pathToken.getValue().trim();
-        String path = templateLoader.resolvePath(filename, templateName, templateLoader.getExtension());
+        String path = pathHelper.resolvePath(filename, templateName,templateLoader.getBasePath());
 
         try {
             if (filters.size()>0) {
@@ -561,7 +561,7 @@ public class Parser {
 
         // non-jade
         String extension = FilenameUtils.getExtension(path);
-        if (!templateLoader.getExtension().equals(extension)) {
+        if (!templateLoader.getExtension().equals(extension) && !"".equals(extension)) {
             try {
                 Reader reader = templateLoader.getReader(path);
                 LiteralNode node = new LiteralNode();
@@ -596,7 +596,7 @@ public class Parser {
         Path path = (Path) expect(Path.class);
 
         String templateName = path.getValue().trim();
-
+//        templateName = templateLoader.resolvePath(filename, templateName,templateLoader.getExtension());
         Parser parser = createParser(templateName);
 
         parser.setBlocks(blocks);
@@ -623,7 +623,7 @@ public class Parser {
     private Parser createParser(String templateName) {
         templateName = ensurePugExtension(templateName);
         try {
-            String resolvedPath = templateLoader.resolvePath(this.filename, templateName, templateLoader.getExtension());
+            String resolvedPath = pathHelper.resolvePath(filename, templateName,templateLoader.getBasePath());
             return new Parser(resolvedPath, templateLoader, expressionHandler);
         } catch (IOException e) {
             throw new PugParserException(

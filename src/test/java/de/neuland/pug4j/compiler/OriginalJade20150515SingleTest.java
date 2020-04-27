@@ -66,7 +66,7 @@ public class OriginalJade20150515SingleTest {
 
 	private PugConfiguration getJadeConfiguration() {
 		PugConfiguration jade = new PugConfiguration();
-		jade.setTemplateLoader(new FileTemplateLoader(getResourcePath(""), "UTF-8"));
+		jade.setTemplateLoader(new FileTemplateLoader(getResourcePath("")));
 		//		jade.setExpressionHandler(new JsExpressionHandler());
 		jade.setMode(Pug4J.Mode.XHTML); // original jade uses xhtml by default
 		jade.setFilter("plain", new PlainFilter());

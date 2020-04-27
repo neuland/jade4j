@@ -37,7 +37,7 @@ public class PugConfiguration {
 
     private Map<String, Filter> filters = new HashMap<String, Filter>();
     private Map<String, Object> sharedVariables = new HashMap<String, Object>();
-    private TemplateLoader templateLoader = new FileTemplateLoader("", "UTF-8");
+    private TemplateLoader templateLoader = new FileTemplateLoader();
     private ExpressionHandler expressionHandler = new JexlExpressionHandler();
 //    private ExpressionHandler expressionHandler = new NashornExpressionHandler();
 //    private ExpressionHandler expressionHandler = new GraalJsExpressionHandler();

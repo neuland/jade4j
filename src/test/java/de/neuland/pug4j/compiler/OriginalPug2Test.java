@@ -4,6 +4,7 @@ import de.neuland.pug4j.Pug4J;
 import de.neuland.pug4j.PugConfiguration;
 import de.neuland.pug4j.TestFileHelper;
 import de.neuland.pug4j.filter.CDATAFilter;
+import de.neuland.pug4j.filter.MarkdownFilter;
 import de.neuland.pug4j.filter.PlainFilter;
 import de.neuland.pug4j.template.FileTemplateLoader;
 import de.neuland.pug4j.template.PugTemplate;
@@ -70,10 +71,11 @@ public class OriginalPug2Test {
     public void shouldCompileJadeToHtml() throws Exception {
         PugConfiguration jade = new PugConfiguration();
         String basePath = TestFileHelper.getOriginalPug2ResourcePath("");
-        jade.setTemplateLoader(new FileTemplateLoader(basePath,"UTF-8","pug"));
+        jade.setTemplateLoader(new FileTemplateLoader(basePath,"pug"));
         jade.setMode(Pug4J.Mode.XHTML); // original jade uses xhtml by default
         jade.setFilter("plain", new PlainFilter());
         jade.setFilter("cdata", new CDATAFilter());
+        jade.setFilter("markdown", new MarkdownFilter());
         jade.setPrettyPrint(true);
         PugTemplate template = jade.getTemplate("" + file);
         Writer writer = new StringWriter();

@@ -66,9 +66,9 @@ public class PugLexerTest {
 
     @Test
     public void shouldCompileJadeToHtml() throws Exception {
-        String filename = "/cases/" + file;
-        String basePath = TestFileHelper.getLexerResourcePath("");
-        FileTemplateLoader templateLoader = new FileTemplateLoader(basePath, "UTF-8", "pug");
+        String filename = file;
+        String basePath = TestFileHelper.getLexerResourcePath("/cases/");
+        FileTemplateLoader templateLoader = new FileTemplateLoader(basePath,  "pug");
         Lexer lexer = new Lexer(filename, templateLoader, new JexlExpressionHandler());
         LinkedList<Token> tokens = lexer.getTokens();
 

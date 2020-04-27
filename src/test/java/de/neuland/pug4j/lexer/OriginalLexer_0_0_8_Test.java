@@ -3,9 +3,7 @@ package de.neuland.pug4j.lexer;
 import com.google.gson.Gson;
 import de.neuland.pug4j.TestFileHelper;
 import de.neuland.pug4j.expression.JexlExpressionHandler;
-import de.neuland.pug4j.lexer.token.Attribute;
-import de.neuland.pug4j.lexer.token.Eos;
-import de.neuland.pug4j.lexer.token.Token;
+import de.neuland.pug4j.lexer.token.*;
 import de.neuland.pug4j.template.FileTemplateLoader;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -16,28 +14,37 @@ import org.junit.runners.Parameterized;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class OriginalLexer_0_0_8_Test {
     private static class ExpectedToken {
 
+
         String type;
 
         int line;
+        public int col;
 
         String name;
 
         Object val;
 
-        boolean selfClosing;
+        Boolean selfClosing;
 
-        boolean escape;
+        Boolean escape;
+        Boolean escaped;
+
+        Boolean buffer;
+        String args;
+        String mode;
     }
 
-    private static String[] ignoredCases = new String[]{"html", "yield-before-conditional-head", "each.else", "inheritance.extend.mixins", "while", "mixin-block-with-space"};
+    private static String[] ignoredCases = new String[]{"regression.784"};
 
     private static Map<String, String> mappedTypes = new HashMap<String, String>();
 
@@ -78,15 +85,15 @@ public class OriginalLexer_0_0_8_Test {
     }
 
     private ExpectedToken tokenFromJsonLine(String expected) {
-        return new Gson().fromJson(expected, ExpectedToken.class);
+        return new Gson().newBuilder().disableHtmlEscaping().create().fromJson(expected, ExpectedToken.class);
     }
 
     private String tokenToJsonLine(ExpectedToken expected) {
-        return new Gson().toJson(expected);
+        return new Gson().newBuilder().disableHtmlEscaping().create().toJson(expected);
     }
 
     private String readFile(String fileName) throws IOException {
-        return FileUtils.readFileToString(new File(TestFileHelper.getLexer_0_0_8_ResourcePath("cases/" + fileName)));
+        return FileUtils.readFileToString(new File(TestFileHelper.getLexer_0_0_8_ResourcePath("cases/" + fileName)), Charset.forName("UTF-8"));
     }
 
     private String file;
@@ -97,7 +104,7 @@ public class OriginalLexer_0_0_8_Test {
 
     @Test
     public void shouldLexJadeToTokens() throws Exception {
-        FileTemplateLoader loader1 = new FileTemplateLoader(TestFileHelper.getLexer_0_0_8_ResourcePath("cases/"), "UTF-8");
+        FileTemplateLoader loader1 = new FileTemplateLoader(TestFileHelper.getLexer_0_0_8_ResourcePath("cases/"));
         Lexer lexer1 = new Lexer(file, loader1, new JexlExpressionHandler());
         LinkedList<Token> tokens = lexer1.getTokens();
         String[] expected = readFile(file.replace(".jade", ".expected.json")).split("\\n");
@@ -106,29 +113,46 @@ public class OriginalLexer_0_0_8_Test {
         for (Token token : tokens) {
             ExpectedToken expectedToken = new ExpectedToken();
             expectedToken.type=typeOf(token);
-            expectedToken.selfClosing=token.isSelfClosing();
+            if(token instanceof Tag) {
+                expectedToken.selfClosing = token.isSelfClosing();
+            }
             if(token instanceof Attribute) {
                 expectedToken.val = ((Attribute) token).getAttributeValue();
                 expectedToken.name = token.getName();
+//                expectedToken.escaped = ((Attribute) token).isEscaped();
             }else{
                 expectedToken.val=token.getValue();
             }
+            if(token instanceof Mixin){
+                expectedToken.args=((Mixin) token).getArguments();
+            }
+            if(token instanceof Call){
+                expectedToken.args=((Call) token).getArguments();
+            }
+            if(token instanceof Expression) {
+                expectedToken.buffer = token.isBuffer();
+                expectedToken.escape = ((Expression) token).isEscape();
+            }
+            if(token instanceof Block) {
+                expectedToken.mode = token.getMode();
+            }
             expectedToken.line=token.getStartLineNumber();
+            expectedToken.col=token.getStartColumn();
             String s = tokenToJsonLine(expectedToken);
             actual.add(s);
         }
         assertToken(expected,actual);
-        for (int i = 0; i < expected.length; i++) {
-            Token token = tokens.get(i);
-            if (breakOnEndOfStreamTokens(token)) {
-                break;
-            }
-            ExpectedToken expectedToken = tokenFromJsonLine(expected[i]);
-            if (breakOnTextTokens(expectedToken)) {
-                break;
-            }
-            assertToken(token, expectedToken);
-        }
+//        for (int i = 0; i < expected.length; i++) {
+//            Token token = tokens.get(i);
+//            if (breakOnEndOfStreamTokens(token)) {
+//                break;
+//            }
+//            ExpectedToken expectedToken = tokenFromJsonLine(expected[i]);
+//            if (breakOnTextTokens(expectedToken)) {
+//                break;
+//            }
+//            assertToken(token, expectedToken);
+//        }
     }
     private void assertToken(String[] expected,List<String>actual){
         StringBuffer expectedString = new StringBuffer();
@@ -140,7 +164,10 @@ public class OriginalLexer_0_0_8_Test {
         for (String s : actual) {
             actualString.append(s).append("\n");
         }
-        assertThat(actualString).isEqualTo(expectedString);
+        String expected1 = expectedString.toString();
+        String actual1 = actualString.toString();
+        assertEquals(expected1, actual1);
+//        assertThat(actualString).isEqualTo(expectedString);
     }
     private void assertToken(Token token, ExpectedToken expectedToken) {
         assertThat(typeOf(token)).isEqualTo(expectedToken.type);

@@ -9,6 +9,7 @@ public class TestFileHelper {
     public static final String TESTFILE_LEXER_0_0_8_FOLDER = "/lexer_0.0.8/";
     public static final String TESTFILE_PARSER_FOLDER = "/parser/";
     public static final String TESTFILE_COMPILER_FOLDER = "/compiler/";
+    public static final String TESTFILE_LOADER_FOLDER = "/loader/";
     public static final String TESTFILE_ORIGINAL_FOLDER = "/originalTests/";
 	public static final String TESTFILE_20190911_ORIGINAL_FOLDER = "/originalTests20190911/";
 	public static final String TESTFILE_20150927_ORIGINAL_FOLDER = "/originalTests20150927/";
@@ -62,6 +63,14 @@ public class TestFileHelper {
 	public static String getOriginalResourcePath(String fileName) {
 		try {
 			return getResourcePath(TESTFILE_ORIGINAL_FOLDER + fileName);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	public static String getLoaderResourcePath(String fileName) {
+		try {
+			return getResourcePath(TESTFILE_LOADER_FOLDER + fileName);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

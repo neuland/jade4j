@@ -30,7 +30,7 @@ public class PugConfigurationTest {
     @Test
     public void testGetTemplateWithBasepath() throws IOException {
         PugConfiguration config = new PugConfiguration();
-        config.setTemplateLoader(new FileTemplateLoader(TestFileHelper.getRootResourcePath() + "/parser/", "UTF-8","jade"));
+        config.setTemplateLoader(new FileTemplateLoader(TestFileHelper.getRootResourcePath() + "/parser/", "jade"));
         PugTemplate template = config.getTemplate("assignment");
         assertNotNull(template);
     }

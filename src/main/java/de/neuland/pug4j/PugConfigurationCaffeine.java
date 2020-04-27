@@ -32,13 +32,12 @@ public class PugConfigurationCaffeine {
     private static final String FILTER_SCRIPT = "js";
 
     private boolean prettyPrint = false;
-    private String basePath = "";
     private boolean caching = true;
     private Mode mode = Pug4J.Mode.HTML;
 
     private Map<String, Filter> filters = new HashMap<String, Filter>();
     private Map<String, Object> sharedVariables = new HashMap<String, Object>();
-    private TemplateLoader templateLoader = new FileTemplateLoader("", "UTF-8");
+    private TemplateLoader templateLoader = new FileTemplateLoader();
     private ExpressionHandler expressionHandler = new JexlExpressionHandler();
     protected static final long MAX_ENTRIES = 1000l;
 
@@ -180,13 +179,5 @@ public class PugConfigurationCaffeine {
     public void clearCache() {
         expressionHandler.clearCache();
         cache.invalidateAll();
-    }
-
-    public String getBasePath() {
-        return basePath;
-    }
-
-    public void setBasePath(String basePath) {
-        this.basePath = basePath;
     }
 }

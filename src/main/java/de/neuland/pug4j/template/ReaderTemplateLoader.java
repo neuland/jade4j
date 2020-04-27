@@ -54,7 +54,8 @@ public class ReaderTemplateLoader implements TemplateLoader {
 	}
 
 	@Override
-	public String resolvePath(String parentName, String templateName, String extension) {
+	public String getBasePath() {
 		return null;
 	}
+
 }

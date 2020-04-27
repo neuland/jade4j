@@ -1,19 +1,31 @@
-{"type":"tag","line":1,"val":"foo","selfClosing":false}
-{"type":"attrs","line":1,"attrs":[{"name":"attr","val":"\"<%= bar %>\"","escaped":true}]}
-{"type":"newline","line":2}
-{"type":"tag","line":2,"val":"foo","selfClosing":false}
-{"type":"attrs","line":2,"attrs":[{"name":"class","val":"\"<%= bar %>\"","escaped":true}]}
-{"type":"newline","line":3}
-{"type":"tag","line":3,"val":"foo","selfClosing":false}
-{"type":"attrs","line":3,"attrs":[{"name":"attr","val":"\"<%= bar %>\"","escaped":false}]}
-{"type":"newline","line":4}
-{"type":"tag","line":4,"val":"foo","selfClosing":false}
-{"type":"attrs","line":4,"attrs":[{"name":"class","val":"\"<%= bar %>\"","escaped":false}]}
-{"type":"newline","line":5}
-{"type":"tag","line":5,"val":"foo","selfClosing":false}
-{"type":"attrs","line":5,"attrs":[{"name":"class","val":"\"<%= bar %> lol rofl\"","escaped":false}]}
-{"type":"newline","line":6}
-{"type":"tag","line":6,"val":"foo","selfClosing":false}
-{"type":"attrs","line":6,"attrs":[{"name":"class","val":"\"<%= bar %> lol rofl <%= lmao %>\"","escaped":false}]}
-{"type":"newline","line":7}
-{"type":"eos","line":7}
+{"type":"tag","line":1,"col":1,"val":"foo","selfClosing":false}
+{"type":"startattributes","line":1,"col":4}
+{"type":"attribute","line":1,"col":5,"name":"attr","val":"<%= bar %>"}
+{"type":"endattributes","line":1,"col":22}
+{"type":"newline","line":2,"col":1}
+{"type":"tag","line":2,"col":1,"val":"foo","selfClosing":false}
+{"type":"startattributes","line":2,"col":4}
+{"type":"attribute","line":2,"col":5,"name":"class","val":"<%= bar %>"}
+{"type":"endattributes","line":2,"col":23}
+{"type":"newline","line":3,"col":1}
+{"type":"tag","line":3,"col":1,"val":"foo","selfClosing":false}
+{"type":"startattributes","line":3,"col":4}
+{"type":"attribute","line":3,"col":5,"name":"attr","val":"<%= bar %>"}
+{"type":"endattributes","line":3,"col":23}
+{"type":"newline","line":4,"col":1}
+{"type":"tag","line":4,"col":1,"val":"foo","selfClosing":false}
+{"type":"startattributes","line":4,"col":4}
+{"type":"attribute","line":4,"col":5,"name":"class","val":"<%= bar %>"}
+{"type":"endattributes","line":4,"col":24}
+{"type":"newline","line":5,"col":1}
+{"type":"tag","line":5,"col":1,"val":"foo","selfClosing":false}
+{"type":"startattributes","line":5,"col":4}
+{"type":"attribute","line":5,"col":5,"name":"class","val":"<%= bar %> lol rofl"}
+{"type":"endattributes","line":5,"col":33}
+{"type":"newline","line":6,"col":1}
+{"type":"tag","line":6,"col":1,"val":"foo","selfClosing":false}
+{"type":"startattributes","line":6,"col":4}
+{"type":"attribute","line":6,"col":5,"name":"class","val":"<%= bar %> lol rofl <%= lmao %>"}
+{"type":"endattributes","line":6,"col":45}
+{"type":"newline","line":7,"col":1}
+{"type":"eos","line":7,"col":1}

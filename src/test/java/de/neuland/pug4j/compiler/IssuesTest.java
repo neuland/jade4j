@@ -48,7 +48,7 @@ public class IssuesTest {
 
     @Test
     public void shouldCompileJadeToHtml() throws Exception {
-        FileTemplateLoader templateLoader = new FileTemplateLoader(TestFileHelper.getIssuesResourcePath(""), "UTF-8","jade");
+        FileTemplateLoader templateLoader = new FileTemplateLoader(TestFileHelper.getIssuesResourcePath(""), "jade");
         String templateName = file;
 
         compareJade(templateLoader, templateName);
@@ -56,7 +56,7 @@ public class IssuesTest {
 
     @Test
     public void shouldCompileJadeToHtmlWithClasspathTemplateLoader() throws Exception {
-        ClasspathTemplateLoader templateLoader = new ClasspathTemplateLoader("UTF-8","jade");
+        ClasspathTemplateLoader templateLoader = new ClasspathTemplateLoader(Charset.forName("UTF-8"),"jade");
         String templateName = "issues/" + file;
 
         compareJade(templateLoader, templateName);

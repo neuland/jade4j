@@ -79,7 +79,7 @@ public class OriginalJade20190911Test {
     public void shouldCompileJadeToHtml() throws Exception {
         PugConfiguration jade = new PugConfiguration();
         jade.setMode(Pug4J.Mode.XHTML); // original jade uses xhtml by default
-        jade.setTemplateLoader(new FileTemplateLoader(RESOURCE_PATH, "UTF-8", "pug"));
+        jade.setTemplateLoader(new FileTemplateLoader(RESOURCE_PATH,  "pug"));
 
         jade.setFilter("plain", new PlainFilter());
         jade.setFilter("cdata", new CDATAFilter());

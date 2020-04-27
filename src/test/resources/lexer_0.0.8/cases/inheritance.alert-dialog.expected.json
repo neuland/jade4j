@@ -1,12 +1,13 @@
-{"type":"newline","line":2}
-{"type":"extends","line":2,"val":"auxiliary/dialog"}
-{"type":"newline","line":4}
-{"type":"block","line":4,"val":"content","mode":"replace"}
-{"type":"indent","line":5,"val":2}
-{"type":"tag","line":5,"val":"h1","selfClosing":false}
-{"type":"text","line":5,"val":"Alert!"}
-{"type":"newline","line":6}
-{"type":"tag","line":6,"val":"p","selfClosing":false}
-{"type":"text","line":6,"val":"I'm an alert!"}
-{"type":"outdent","line":6}
-{"type":"eos","line":6}
+{"type":"newline","line":2,"col":1}
+{"type":"extends","line":2,"col":1}
+{"type":"path","line":2,"col":9,"val":"auxiliary/dialog"}
+{"type":"newline","line":4,"col":1}
+{"type":"block","line":4,"col":1,"val":"content","mode":"replace"}
+{"type":"indent","line":5,"col":1,"val":"2"}
+{"type":"tag","line":5,"col":3,"val":"h1","selfClosing":false}
+{"type":"text","line":5,"col":6,"val":"Alert!"}
+{"type":"newline","line":6,"col":1}
+{"type":"tag","line":6,"col":3,"val":"p","selfClosing":false}
+{"type":"text","line":6,"col":5,"val":"I'm an alert!"}
+{"type":"outdent","line":6,"col":18}
+{"type":"eos","line":6,"col":18}

@@ -1,6 +1,10 @@
-{"type":"tag","line":1,"val":"style","selfClosing":false}
-{"type":"attrs","line":1,"attrs":[{"name":"type","val":"\"text/css\"","escaped":true}]}
-{"type":"indent","line":2,"val":2}
-{"type":"include","line":2,"val":"some.styl","filter":"styl","attrs":null}
-{"type":"outdent","line":3}
-{"type":"eos","line":3}
+{"type":"tag","line":1,"col":1,"val":"style","selfClosing":false}
+{"type":"startattributes","line":1,"col":6}
+{"type":"attribute","line":1,"col":7,"name":"type","val":"text/css"}
+{"type":"endattributes","line":1,"col":22}
+{"type":"indent","line":2,"col":1,"val":"2"}
+{"type":"include","line":2,"col":3}
+{"type":"filter","line":2,"col":10,"val":"styl"}
+{"type":"path","line":2,"col":16,"val":"some.styl"}
+{"type":"outdent","line":3,"col":1}
+{"type":"eos","line":3,"col":1}

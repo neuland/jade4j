@@ -1,7 +1,10 @@
-{"type":"code","line":1,"val":"var foo = 'bar'","escape":false,"buffer":false}
-{"type":"newline","line":2}
-{"type":"code","line":2,"val":"var list = [1,2,3]","escape":false,"buffer":false}
-{"type":"newline","line":3}
-{"type":"tag","line":3,"val":"a","selfClosing":false}
-{"type":"attrs","line":3,"attrs":[{"name":"class","val":"list","escaped":true},{"name":"id","val":"foo","escaped":true}]}
-{"type":"eos","line":3}
+{"type":"code","line":1,"col":1,"val":"var foo = 'bar'","escape":false,"buffer":false}
+{"type":"newline","line":2,"col":1}
+{"type":"code","line":2,"col":1,"val":"var list = [1,2,3]","escape":false,"buffer":false}
+{"type":"newline","line":3,"col":1}
+{"type":"tag","line":3,"col":1,"val":"a","selfClosing":false}
+{"type":"startattributes","line":3,"col":2}
+{"type":"attribute","line":3,"col":3,"name":"class","val":{"value":"list","escape":true}}
+{"type":"attribute","line":3,"col":15,"name":"id","val":{"value":"foo","escape":true}}
+{"type":"endattributes","line":3,"col":21}
+{"type":"eos","line":3,"col":22}

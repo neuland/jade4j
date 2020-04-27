@@ -42,7 +42,7 @@ public class IncludeParserTest extends ParserTest {
         yieldNode = (BlockNode) root.pollNode();
         assertThat(yieldNode, notNullValue());
 
-        tagNode = (TagNode) yieldNode.pollNode();
+        tagNode = (TagNode) yieldNode.pollNode().pollNode();
         assertThat(tagNode.getName(), equalTo("p"));
         pNode = (BlockNode) tagNode.getBlock();
         textNode = (TextNode) pNode.getNodes().get(0);
@@ -72,7 +72,7 @@ public class IncludeParserTest extends ParserTest {
         yieldNode = (BlockNode) root.pollNode();
         assertThat(yieldNode, notNullValue());
 
-        tagNode = (TagNode) yieldNode.pollNode();
+        tagNode = (TagNode) yieldNode.pollNode().pollNode();
         assertThat(tagNode.getName(), equalTo("p"));
         pNode = (BlockNode) tagNode.getBlock();
         textNode = (TextNode) pNode.getNodes().get(0);

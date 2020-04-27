@@ -25,7 +25,7 @@ public class JadeRunFullTemplateTest {
 
     @Before
     public void setUp() throws Exception {
-        cfg.setTemplateLoader(new FileTemplateLoader("", "UTF-8","jade"));
+        cfg.setTemplateLoader(new FileTemplateLoader(getResourcePath(""), "jade"));
     }
 
     @Test

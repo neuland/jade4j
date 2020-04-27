@@ -1,11 +1,15 @@
 package de.neuland.pug4j.template;
 
+import de.neuland.pug4j.exceptions.PugTemplateLoaderException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Loads a Pug template from Classpath
@@ -16,19 +20,40 @@ import java.io.Reader;
  */
 public class ClasspathTemplateLoader implements TemplateLoader {
 
-    private String encoding = "UTF-8";
-    private String extension = "pug";
+    private FileTemplateLoader fileTemplateLoader;
 
     public ClasspathTemplateLoader() {
+        String path = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+        fileTemplateLoader = new FileTemplateLoader(path);
     }
 
-    public ClasspathTemplateLoader(String encoding) {
-        this.encoding = encoding;
+    public ClasspathTemplateLoader(Charset encoding) {
+        String path = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+        fileTemplateLoader = new FileTemplateLoader(path,encoding);
     }
 
-    public ClasspathTemplateLoader(String encoding, String extension) {
-        this.encoding = encoding;
-        this.extension = extension;
+    public ClasspathTemplateLoader(Charset encoding, String extension) {
+        String path = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+        fileTemplateLoader = new FileTemplateLoader(path,encoding,extension);
+    }
+    public ClasspathTemplateLoader(String basePath) {
+        String path = Thread.currentThread().getContextClassLoader().getResource(basePath).getPath();
+        fileTemplateLoader = new FileTemplateLoader(path);
+    }
+
+    public ClasspathTemplateLoader(String basePath, Charset encoding) {
+        String path = Thread.currentThread().getContextClassLoader().getResource(basePath).getPath();
+        fileTemplateLoader = new FileTemplateLoader(path,encoding);
+    }
+
+    public ClasspathTemplateLoader(String basePath, String extension) {
+        String path = Thread.currentThread().getContextClassLoader().getResource(basePath).getPath();
+        fileTemplateLoader = new FileTemplateLoader(path,extension);
+    }
+
+    public ClasspathTemplateLoader(String basePath, Charset encoding, String extension) {
+        String path = Thread.currentThread().getContextClassLoader().getResource(basePath).getPath();
+        fileTemplateLoader = new FileTemplateLoader(path,encoding,extension);
     }
 
     public long getLastModified(String name) {
@@ -37,47 +62,17 @@ public class ClasspathTemplateLoader implements TemplateLoader {
 
     @Override
     public Reader getReader(String name) throws IOException {
-        return new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(name), getEncoding());
-    }
-
-    public String getEncoding() {
-        return encoding;
-    }
-
-    public void setEncoding(String encoding) {
-        this.encoding = encoding;
+        return fileTemplateLoader.getReader(name);
     }
 
     @Override
     public String getExtension() {
-        return extension;
+        return fileTemplateLoader.getExtension();
     }
 
     @Override
-    public String resolvePath(String parentName, String templateName, String extension) {
-//		Path basePath = Paths.get(folderPath);
-//		Path parentPath = basePath.resolve(Paths.get(parentName)).getParent();
-//		Path templatePath = parentPath.resolve(Paths.get(templateName));
-//		templatePath = basePath.relativize(templatePath);
-//		String filePath = templatePath.toString();
-//
-//		filePath = FilenameUtils.normalize(filePath);
-        String filePath;
-        if (templateName.startsWith("/")) {
-            //ignore parentName
-            filePath = templateName.substring(1);
-        } else {
-            if (FilenameUtils.indexOfLastSeparator(parentName) == -1)
-                filePath = templateName;
-            else {
-                //            String currentDir = FilenameUtils.getFullPath(parentName);
-                String currentDir = parentName.substring(0, FilenameUtils.indexOfLastSeparator(parentName) + 1);
-                filePath = currentDir + templateName;
-            }
-        }
-        if (StringUtils.lastIndexOf(filePath, "/") >= StringUtils.lastIndexOf(filePath, "."))
-            filePath += "." + extension;
-        filePath = FilenameUtils.normalize(filePath);
-        return filePath;
+    public String getBasePath() {
+        return fileTemplateLoader.getBasePath();
     }
+
 }
