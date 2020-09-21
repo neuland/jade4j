@@ -1,5 +1,10 @@
 [![Build Status](https://secure.travis-ci.org/neuland/jade4j.png?branch=master)](http://travis-ci.org/neuland/jade4j)
+# Attention: jade4j is now pug4j
+In alignment with the javascript template engine we renamed jade4j to pug4j. You will find it under https://github.com/neuland/pug4j
+This is also a new release which supports almost the entire pug 2 syntax.
 
+Please report pug4j issues in the new repository.
+ 
 # jade4j - a jade implementation written in Java
 jade4j's intention is to be able to process jade templates in Java without the need of a JavaScript environment, while being **fully compatible** with the original jade syntax.
 
